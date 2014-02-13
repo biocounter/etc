@@ -1,0 +1,77 @@
+MODE	SHORTCUT	COMMAND
+====	========	=======
+
+================================================================================
+== SEARCHING
+================================================================================
+cmd		/value		Search Forwards
+cmd		?value		Search Backwards
+normal	#			Search for previous occurence of word under cursor
+normal	*			Search for next occurence of word under cursor
+normal	g#  		previous matching search pattern under cursor
+normal	g*  		next matching search pattern under cursor
+
+================================================================================
+== MOVEMENT
+================================================================================
+normal	$   		move to end of line
+normal	%   		jump to matching bracket { } [ ] ( )
+normal	*   		next word under cursor
+normal	0			move to beginning of line
+normal	Ctrl-B  	page up
+normal	Ctrl-D		move half-page down
+normal	Ctrl-F  	page down
+normal	Ctrl-U  	move half-page up
+normal	Ctrl-i  	jump to next cursor position
+normal	Ctrl-o  	jump to last cursor position
+normal	G   		move to last line
+normal	H   		move to top of screen
+normal	L   		move to bottom of screen
+normal	M   		move to middle of screen
+normal	N   		previous matching search pattern
+normal	^   		move to first non-blank char of the line
+normal	_   		same as above, but can take a count to go to a different line
+normal	$   		move to end of line
+normal	n			next matching search pattern
+
+================================================================================
+== EDITING
+================================================================================
+normal	gU			set lowercase
+normal	gU			set uppercase
+normal	gUU			uppercase current line
+normal	gu			set lowercase
+normal	g~			toggle case
+
+
+================================================================================
+== PLUGINS
+================================================================================
+normal	gcc         Toggle comment for the current line
+normal	gcc         Toggle comment for the current line
+normal	gc{motion}	Toggle comments (for small comments within one line the &filetype_inline style will be used, if defined)
+normal	gc{motion}  Toggle comments (for small comments within one line the &filetype_inline style will be used, if defined)
+normal	gCc         Comment the current line
+normal	gCc         Comment the current line
+normal	gC{motion}  Comment region
+normal	gC{motion}  Comment region
+
+normal	g_  		move to last non-blank char of the line (can also take a count as above)
+normal	gg  		move to first line
+normal	nG  		move to n'th line of file (where n is a number)
+normal	z.  		put the line with the cursor at the center
+normal	zb  		put the line with the cursor at the bottom of the screen
+normal	zt  		put the line with the cursor at the top
+normal	{#}B   		move to beginning of previous word before a whitespace
+normal	{#}E   		move to end of word before a whitespace}
+normal	{#}W   		move to beginning of next word after a whitespace
+normal	{#}b   		move to beginning of previous word
+normal	{#}e   		move to end of word
+normal	{#}h		move one character left
+normal	{#}j   		move one row down
+normal	{#}k   		move one row up
+normal	{#}l   		move one character right
+normal	{#}w   		move to beginning of next word
+visual	U			set uppercase
+visual	u			set lowercase
+visual	~			toggle case under cursor

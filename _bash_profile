@@ -1,0 +1,490 @@
+#-----------------------------------
+# Source global definitions (if any)
+#-----------------------------------
+#if [ -f /etc/bashrc ]; then
+#				. /etc/bashrc
+#fi
+#if [ -f /etc/profile ]; then
+#				. /etc/profile
+#fi
+
+#---------------
+# Some settings
+#---------------
+
+ulimit -S -c 0				# Don't want any coredumps
+set -o notify
+set -o noclobber
+set -o ignoreeof
+set -o nounset
+set nocompatible
+set nodosfilewarnings		# turn off dos file warnings
+#set -o xtrace							# useful for debuging
+set -o vi								 # use VI for editing
+# k				previous command
+# j				next command
+# 0				start of command
+# $				end of command
+# /,n,N search
+export LC_ALL='C'																# sort ignores problem characters
+
+# Enable options:
+shopt -s cdspell
+shopt -s cdable_vars
+shopt -s checkhash
+shopt -s checkwinsize
+shopt -s sourcepath
+shopt -s no_empty_cmd_completion		# bash>=2.04 only
+shopt -s cmdhist
+shopt -s histappend histreedit histverify
+shopt -s extglob		# necessary for programmable completion
+
+if [[ ${BASH_VERSINFO[0]} == 4 ]]; then
+	shopt -s globstar										# enable '**' (recursive)
+fi
+
+# use this section for variables that append
+#if [ -z "$RANPROFILE" ]; then
+#		export RANPROFILE=true
+#fi
+
+export TIMEFORMAT=$'\nreal %3R	user %3U	sys %3S	pcpu %P\n'
+export HISTIGNORE="&:bg:fg:ll:h"
+export HOSTFILE=$HOME/.hosts		# Put a list of remote hosts in ~/.hosts
+export EDITOR=vi				# use the VI editor for line edting
+
+#-------------------------------------------------------------------------------
+# Environment Variables
+#-------------------------------------------------------------------------------
+
+function bashify { # Convert Win32-style paths to Cygwin-style
+	local p
+	for p ; do
+		if [[ $p != *cygdrive* && $p != *CYGDRIVE* ]] ; then  
+			if [ "${!p}" ] ; then
+				echo "${p}"
+				eval 'export '$p'=$(cygpath -pu "$'$p'")'
+			fi
+		fi
+	done
+}
+export -f bashify
+
+# ------------------------------------------------------------------------------
+ # add a line to the PATH if it doesn't exist
+ # @param path_1 {... path N}
+function addtopath {
+# ------------------------------------------------------------------------------
+	local p
+	for p ; do
+		# convert windows paths to cygwin format
+		if [ $p = *:* ] ; then
+			p=`cygpath -pu '${p}'`
+		fi
+		# if the value is not in the path, add it
+		if [[ "${PATH}" != *:"${p}":* ]] ; then
+			if [ "${PATH}" == "" ]; then
+				export PATH=$p
+			# if the path already exists, append it
+			else
+				export PATH=$PATH:$p
+			fi
+		fi
+	done
+}
+export -f addtopath
+
+export PATH=""
+if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+	bashify JAVA_HOME GIT_HOME NODEJS_HOME
+	addtopath /cygdrive/c/SysWOW64 /cygdrive/c/Windows 
+	export TEMP=~/AppData/Local/Temp
+	export TMP=~/AppData/Local/Temp
+fi
+if [ -f ~/.setenv ]; then 
+	source ~/.setenv
+fi
+#TODO do conditional adds if JAVA_HOME and GIT_HOME don't exist
+addtopath /usr/sbin /usr/local/bin /usr/bin /bin $JAVA_HOME/bin ~/bin $GIT_HOME/bin $NODEJS_HOME
+export PYTHON_HOME=/lib/python2.7/site-packages
+# include any local environment settings 
+
+set +x
+#-----------------------
+# Greeting, motd etc...
+#-----------------------
+
+# Define some colors first:
+red='\e[0;31m'
+RED='\e[1;31m'
+blue='\e[0;34m'
+BLUE='\e[1;34m'
+cyan='\e[0;36m'
+CYAN='\e[1;36m'
+NC='\e[0m'								# No Color
+# --> Nice. Has the same effect as using "ansi.sys" in DOS.
+
+# Looks best on a black background.....
+echo -e "${CYAN}This is BASH ${RED}${BASH_VERSION%.*}${CYAN}${NC}"
+date
+function _exit() { # function to run upon exit of shell
+	echo -e "${RED}Hasta la vista, baby${NC}"
+}
+trap _exit EXIT
+
+PS1="\n${cyan}[`date +%m/%d` \@][\u@\h][\w]${NC}\n\$ "
+
+#-----------------------------------------------------------------------
+# Aliases
+#-----------------------------------------------------------------------
+alias cdhist='dirs -v'
+alias co='collect.sh'
+alias cp='cp -i'					# -> Prevents accidentally clobbering files.
+alias dnt='echo -e `date "+%A %B %d, %Y"`" "`date "+%I:%M %p"` > /dev/clipboard'
+alias dtm='printf "[%s %s] " `date "+%y%m%d"` `date "+%H:%M"` > /dev/clipboard'
+alias fn='{ alias && export -f; } | egrep "\(\)|alias" | sed "s/alias //ig" | cut -d= -f1 | sort'
+alias h='history'
+alias igrep='grep -i'
+alias j='jobs -l'
+alias l='ls --color=tty -A -B -F --ignore="desktop.ini" --ignore="NTUSER*" --ignore="ntuser*" --ignore=".*"'
+alias ld='du -hs * | grep -e "^[0-9].*G\s" -e "^[0-9].*M\s" | sort -n -k 2,2 -s'
+alias markdown='perl /usr/local/bin/markdown.pl '				# call Perl markdown
+alias mkdir='mkdir -p'																		# Prevents accidentally clobbering files.
+alias more='less' # more is less
+alias mv='mv -i'																				# Prevents accidentally clobbering files.
+alias mydiff='diff -ywEa --suppress-common-lines --minimal' # personal zip preferences
+alias nospace="perl /usr/local/bin/rename 's/ /_' *"				# underscore all files in dir
+alias python=/bin/python
+alias r='fc -s' # execute last command
+alias rgrep='grep -r'
+alias rhino='java -cp "C:\PROGRA~1\rhino1_7R4\*;C:\Progra~1\Oracle\instantclient_12_1\*" org.mozilla.javascript.tools.shell.Main'
+alias rm='rm -i'					# -> Prevents accidentally clobbering files.
+alias rn='/usr/local/bin/rename '								# call Perl rename script
+alias vi='vim'								# cygwin installs a minimal vi
+
+#if [[ ${BASH_VERSINFO[0]} == 4 ]]; then
+#		alias l='ls -A -B --color --group-directories-first -F --ignore="desktop.ini" --ignore="NTUSER*" --ignore="ntuser*"'
+#fi
+
+if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+	alias dow='date "+%A" > /dev/clipboard'
+	alias fdt='date "+%B %d, %Y" > /dev/clipboard'
+	alias tts='date "+%I:%M %p" > /dev/clipboard'
+fi
+
+#------------------------------------------------------------------------------------
+# run on startup
+#------------------------------------------------------------------------------------
+fitterm () {																 # Truncate oversized lines on input. Mostly for display use. Example: grep foo log | fitterm
+	cut -c 1-$( tput cols ) ;
+}
+export -f fitterm
+
+#function ccd() {												 # Run LLS on CD
+#		builtin cd "$*" && lls "$*"
+#}
+#export -f ccd
+
+#----------------
+# a few fun ones
+#----------------
+function ll(){ ls -l "$@"| egrep "^d" ; ls -lXB "$@" 2>&-| egrep -v "^d|total "; }
+export -f ll
+
+#-----------------------------------
+# File & strings related functions:
+#-----------------------------------
+
+# Find a file with a pattern in name:
+function ff() { find . -type f -iname '*'$*'*' -ls ; }
+export -f ff
+# Find a file with pattern $1 in name and Execute $2 on it:
+function fe() { find . -type f -iname '*'$1'*' -exec "${2:-file}" {} \;		; }
+export -f fe
+
+function fstr() { # find pattern in a set of filesand highlight them
+	OPTIND=1
+	local case=""
+	local usage="fstr: find string in files.  Usage: fstr [-i] \"pattern\" [\"filename pattern\"] "
+	while getopts :it opt; do
+		case "$opt" in
+			i) case="-i " ;;
+			*) echo "$usage"; return;;
+		esac
+	done
+	shift $(( $OPTIND - 1 ))
+	if [ "$#" -lt 1 ]; then
+		echo "$usage"
+		return;
+	fi
+	local SMSO=$(tput smso)
+	local RMSO=$(tput rmso)
+	find . -type f -name "${2:-*}" -print0 | xargs -0 grep -sn ${case} "$1" 2>&- | \
+	sed "s/$1/${SMSO}\0${RMSO}/gI" | more
+}
+export -f fstr
+
+function cuttail() { # cut last n lines in file, 10 by default
+	nlines=${2:-10}
+	sed -n -e :a -e "1,${nlines}!{P;N;D;};N;ba" $1
+}
+
+function lowercase() { # move filenames to lowercase
+for file ; do
+filename=${file##*/}
+	case "$filename" in
+	*/*) dirname==${file%/*} ;;
+	*) dirname=.;;
+	esac
+	nf=$(echo $filename | tr A-Z a-z)
+	newname="${dirname}/${nf}"
+	if [ "$nf" != "$filename" ]; then
+		mv "$file" "$newname"
+		echo "lowercase: $file --> $newname"
+	else
+		echo "lowercase: $file not changed."
+	fi
+	done
+}
+export -f lowercase
+
+function ccd {										# clear the screen, change directory, list contents
+	clear
+	cd "$1"
+	l
+}
+export -f ccd
+
+function dateprefix {														# add YYYYMM to files in %CD%
+	date_prefix=$(date + %Y%m)
+	for file in *.*
+	do
+	mv $file		"$date_prefix ${file%.*}.${file##*.}"
+	done
+}
+
+function extract () {
+	if [ ! -f "$1" ] ; then
+		echo "'$1' is not a valid file!"
+		return 1
+	fi
+
+	# Assoc. array of commands for extracting archives
+	declare -A xcmd
+	xcmd=(
+		[.tar.bz2]="tar xvjf"
+		[.tar.gz]="tar xvzf"
+		[.bz2]="bunzip2"
+		[.rar]="unrar x"
+		[.gz]="gunzip"
+		[.tar]="tar xvf"
+		[.zip]="unzip"
+		[.Z]="uncompress"
+		[.7z]="7z x"
+	)
+	# extension aliases
+	xcmd[.tbz2]="${xcmd[.tar.bz2]}"
+	xcmd[.tgz]="${xcmd[.tar.gz]}"
+
+	# See which extension the given file uses
+	fext=""
+	for i in ${!xcmd[@]}; do
+		if [ $(grep -o ".\{${#i}\}$" <<< $1) == "$i" ]; then
+			fext="$i"
+			break
+		fi
+	done
+
+	# Die if we couldn't discover what archive type it is
+	if [ -z "$fext" ]; then
+		echo "don't know how to extract '$1'..."
+		return 1
+	fi
+
+	# Extract & cd if we can
+	fbase=$(basename "$1" "$fext")
+	if ${xcmd[$fext]} "$1" && [ -d "$fbase" ]; then
+		cd "$fbase"
+	fi
+}
+export -f extract
+
+function uppercase()		# move filenames to uppercase
+{
+	for file ; do
+	filename=${file##*/}
+	case "$filename" in
+	*/*) dirname==${file%/*} ;;
+	*) dirname=.;;
+	esac
+	nf=$(echo $filename | tr a-z A-Z)
+	newname="${dirname}/${nf}"
+	if [ "$nf" != "$filename" ]; then
+		mv "$file" "$newname"
+		echo "uppercase: $file --> $newname"
+	else
+		echo "uppercase: $file not changed."
+	fi
+	done
+}
+export -f uppercase
+
+function swap() {				 # swap 2 filenames around
+	local TMPFILE=tmp.$$
+	mv "$1" $TMPFILE
+	mv "$2" "$1"
+	mv $TMPFILE "$2"
+}
+export -f swap
+
+bak () { # save a copy of a file with a file stamp
+	filename="$(basename "$1")"
+	extension="${filename##*.}"
+	filename="${filename%.*}"
+	filetime=$(date -r "$1" +%Y%m%d$H%M%S)
+	cp "$1" ${filename}_${filetime}.${extension}
+}
+
+#-----------------------------------
+# Process/system related functions:
+#-----------------------------------
+
+function my_ps() { ps $@ -u $USER -o pid,%cpu,%mem,bsdtime,command ; }
+export -f my_ps
+function pp() { my_ps f | awk '!/awk/ && $0~var' var=${1:-".*"} ; }
+export -f pp
+
+function ii() { # get current host related info
+	echo -e "\nYou are logged on ${RED}$HOST"
+	echo -e "\nAdditionnal information:$NC " ; uname -a
+	echo -e "\n${RED}Users logged on:$NC " ; w -h
+	echo -e "\n${RED}Current date :$NC " ; date
+	echo -e "\n${RED}Memory stats :$NC " ; free
+	my_ip 2>&- ;
+	echo -e "\n${RED}Local IP Address :$NC" ; echo ${MY_IP:-"Not connected"}
+	echo -e "\n${RED}ISP Address :$NC" ; echo ${MY_ISP:-"Not connected"}
+	echo
+}
+export -f ii
+
+# Misc utilities:
+
+function repeat() {			 # repeat n times command
+	local i max
+	max=$1; shift;
+	for ((i=1; i <= max ; i++)); do		# --> C-like syntax
+	eval "$@";
+	done
+}
+export -f repeat
+
+function ask() {
+	echo -n "$@" '[y/n] ' ; read ans
+	case "$ans" in
+	y*|Y*) return 0 ;;
+	*) return 1 ;;
+	esac
+}
+export -f ask
+
+#=========================================================================
+#
+# PROGRAMMABLE COMPLETION - ONLY SINCE BASH-2.04
+# Most are taken from the bash 2.05 documentation and from Ian McDonalds
+# 'Bash completion' package (http://www.caliban.org/bash/index.shtml#completion)
+# You will in fact need bash-2.05a for some features
+#
+#=========================================================================
+
+if [ "${BASH_VERSION%.*}" \< "2.05" ]; then
+	echo "You will need to upgrade to version 2.05 for programmable completion"
+	return
+fi
+
+shopt -s extglob				# necessary
+set +o nounset						# otherwise some completions will fail
+
+complete -A hostname		 rsh rcp telnet rlogin r ftp ping disk
+complete -A export		 printenv
+complete -A variable		 export local readonly unset
+complete -A enabled		builtin
+complete -A alias				alias unalias
+complete -A function		 function
+complete -A user				 su mail finger
+
+complete -A helptopic		help		 # currently same as builtins
+complete -A shopt				shopt
+complete -A stopped -P '%' bg
+complete -A job -P '%'		 fg jobs disown
+
+complete -A directory		mkdir rmdir
+complete -A directory		 -o default cd
+
+# Compression
+complete -f -o default -X '*.+(zip|ZIP)'		zip
+complete -f -o default -X '!*.+(zip|ZIP)' unzip
+complete -f -o default -X '*.+(z|Z)'				compress
+complete -f -o default -X '!*.+(z|Z)'		 uncompress
+complete -f -o default -X '*.+(gz|GZ)'		gzip
+complete -f -o default -X '!*.+(gz|GZ)'		 gunzip
+complete -f -o default -X '*.+(bz2|BZ2)'		bzip2
+complete -f -o default -X '!*.+(bz2|BZ2)' bunzip2
+# Postscript,pdf,dvi.....
+complete -f -o default -X '!*.ps'		gs ghostview ps2pdf ps2ascii
+complete -f -o default -X '!*.dvi' dvips dvipdf xdvi dviselect dvitype
+complete -f -o default -X '!*.pdf' acroread pdf2ps
+complete -f -o default -X '!*.+(pdf|ps)' gv
+complete -f -o default -X '!*.texi*' makeinfo texi2dvi texi2html texi2pdf
+complete -f -o default -X '!*.tex' tex latex slitex
+complete -f -o default -X '!*.lyx' lyx
+complete -f -o default -X '!*.+(htm*|HTM*)' lynx html2ps
+# Multimedia
+complete -f -o default -X '!*.+(jp*g|gif|xpm|png|bmp)' xv gimp
+complete -f -o default -X '!*.+(mp3|MP3)' mpg123 mpg321
+complete -f -o default -X '!*.+(ogg|OGG)' ogg123
+
+complete -f -o default -X '!*.pl'		perl perl5
+
+function cdb() {
+	USAGE="Usage: cdb [-c|-g|-d|-l] [bookmark]" ;
+	if		[ ! -e ~/.cd_bookmarks ] ; then
+	mkdir ~/.cd_bookmarks
+	fi
+
+	case $1 in
+		# create bookmark
+		-c) shift
+			if [ ! -f ~/.cd_bookmarks/$1 ] ; then
+				echo "cd `pwd`" > ~/.cd_bookmarks/"$1" ;
+			else
+				echo "Try again! Looks like there is already a bookmark '$1'"
+			fi
+			;;
+		# goto bookmark
+		-g) shift
+			if [ -f ~/.cd_bookmarks/$1 ] ; then
+				source ~/.cd_bookmarks/"$1"
+			else
+				echo "Mmm...looks like your bookmark has spontaneously combusted. What I mean to say is that your bookmark does not exist." ;
+			fi
+			;;
+		# delete bookmark
+		-d) shift
+			if [ -f ~/.cd_bookmarks/$1 ] ; then
+				rm -rf ~/.cd_bookmarks/"$1" ;
+			else
+				echo "Oops, forgot to specify the bookmark" ;
+			fi
+			;;
+		# list bookmarks
+		-l) shift
+			ls -l ~/.cd_bookmarks/ ;
+			;;
+		*) echo "$USAGE" ;
+			;;
+	esac
+}
+export -f cdb
+
+complete -o default -F _my_command nohup exec eval trace truss strace sotruss gwb
+complete -o default -F _my_command command type which man nice
