@@ -94,8 +94,8 @@ function addtopath {
 }
 export -f addtopath
 
-export PATH=""
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+	export PATH=""
 	bashify JAVA_HOME GIT_HOME NODEJS_HOME
 	addtopath /cygdrive/c/SysWOW64 /cygdrive/c/Windows 
 	export TEMP=~/AppData/Local/Temp
