@@ -60,7 +60,7 @@ export EDITOR=vi				# use the VI editor for line edting
 function bashify { # Convert Win32-style paths to Cygwin-style
 	local p
 	for p ; do
-		if [[ $p != *cygdrive* && $p != *CYGDRIVE* ]] ; then  
+		if [[ $p != *cygdrive* && $p != *CYGDRIVE* ]] ; then
 			if [ "${!p}" ] ; then
 				echo "${p}"
 				eval 'export '$p'=$(cygpath -pu "$'$p'")'
@@ -95,19 +95,19 @@ function addtopath {
 export -f addtopath
 
 export PATH=""
+# include any windows-specific environment variables
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
-	bashify JAVA_HOME GIT_HOME NODEJS_HOME
-	addtopath /cygdrive/c/SysWOW64 /cygdrive/c/Windows 
-	export TEMP=~/AppData/Local/Temp
-	export TMP=~/AppData/Local/Temp
+	bashify JAVA_HOME GIT_HOME NODEJS_HOME TEMP TMP
+	addtopath /cygdrive/c/SysWOW64 /cygdrive/c/Windows
 fi
-if [ -f ~/.setenv ]; then 
+#include any local environment variables
+if [ -f ~/.setenv ]; then
 	source ~/.setenv
 fi
 #TODO do conditional adds if JAVA_HOME and GIT_HOME don't exist
 addtopath /usr/sbin /usr/local/bin /usr/bin /bin $JAVA_HOME/bin ~/bin $GIT_HOME/bin $NODEJS_HOME
 export PYTHON_HOME=/lib/python2.7/site-packages
-# include any local environment settings 
+# include any local environment settings
 
 set +x
 #-----------------------
