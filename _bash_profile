@@ -163,6 +163,7 @@ alias rhino='java -cp "C:\PROGRA~1\rhino1_7R4\*;C:\Progra~1\Oracle\instantclient
 alias rm='rm -i'					# -> Prevents accidentally clobbering files.
 alias rn='/usr/local/bin/rename '								# call Perl rename script
 alias vi='vim'								# cygwin installs a minimal vi
+alias gitlog='git log --pretty=format:"[%h] %ae, %ar: %s" --stat'
 
 #if [[ ${BASH_VERSINFO[0]} == 4 ]]; then
 #		alias l='ls -A -B --color --group-directories-first -F --ignore="desktop.ini" --ignore="NTUSER*" --ignore="ntuser*"'
