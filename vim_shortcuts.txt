@@ -75,3 +75,9 @@ normal	{#}w   		move to beginning of next word
 visual	U			set uppercase
 visual	u			set lowercase
 visual	~			toggle case under cursor
+
+================================================================================
+== COMMAND LINE
+================================================================================
+{range}				specify from line, to line or from line,% for end of file
+{range}sort u		sort lines uniquely within range
