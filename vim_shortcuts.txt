@@ -31,33 +31,9 @@ normal	M   		move to middle of screen
 normal	N   		previous matching search pattern
 normal	^   		move to first non-blank char of the line
 normal	_   		same as above, but can take a count to go to a different line
-normal	$   		move to end of line
-normal	n			next matching search pattern
-
-================================================================================
-== EDITING
-================================================================================
-normal	gU			set lowercase
-normal	gU			set uppercase
-normal	gUU			uppercase current line
-normal	gu			set lowercase
-normal	g~			toggle case
-
-
-================================================================================
-== PLUGINS
-================================================================================
-normal	gcc         Toggle comment for the current line
-normal	gcc         Toggle comment for the current line
-normal	gc{motion}	Toggle comments (for small comments within one line the &filetype_inline style will be used, if defined)
-normal	gc{motion}  Toggle comments (for small comments within one line the &filetype_inline style will be used, if defined)
-normal	gCc         Comment the current line
-normal	gCc         Comment the current line
-normal	gC{motion}  Comment region
-normal	gC{motion}  Comment region
-
 normal	g_  		move to last non-blank char of the line (can also take a count as above)
 normal	gg  		move to first line
+normal	n			next matching search pattern
 normal	nG  		move to n'th line of file (where n is a number)
 normal	z.  		put the line with the cursor at the center
 normal	zb  		put the line with the cursor at the bottom of the screen
@@ -72,6 +48,25 @@ normal	{#}j   		move one row down
 normal	{#}k   		move one row up
 normal	{#}l   		move one character right
 normal	{#}w   		move to beginning of next word
+
+================================================================================
+== EDITING
+================================================================================
+normal	gU			set lowercase
+normal	gU			set uppercase
+normal	gUU			uppercase current line
+normal	gu			set lowercase
+normal	g~			toggle case
+
+================================================================================
+== PLUGINS
+================================================================================
+normal	gCc         Comment the current line
+normal	gC{motion}  Comment region
+normal	gcc         Toggle comment for the current line
+normal	gc{motion}	Toggle comments (for small comments within one line the &filetype_inline style will be used, if defined)
+normal	gc{motion}  Toggle comments (for small comments within one line the &filetype_inline style will be used, if defined)
+normal	cs{a}{b}	Change surrounding value from A to B
 visual	U			set uppercase
 visual	u			set lowercase
 visual	~			toggle case under cursor

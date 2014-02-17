@@ -217,8 +217,17 @@ try
 catch
 endtry
 
-" activate EasyAlign plugin
-"vnoremap <silent> ea :EasyAlign<CR>
+" ------------------------------------------------------------------------------
+" Plugin Settings
+" ------------------------------------------------------------------------------
+" Easy Align Plugin
+noremap <silent> ea :EasyAlign<CR>
+" TComment Map Settings
+"let g:tcommentMapLeaderOp1=
+"let g:tcommentMapLeaderOp2=
+autocmd BufReadPost * :DetectIndent
+let g:detectindent_preferred_expandtab=0
+let g:detectindent_preferred_indent=4
 
 " ------------------------------------------------------------------------------
 " Vim Grep Utility

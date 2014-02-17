@@ -118,6 +118,7 @@ acp-thanks	acp.txt	/*acp-thanks*
 acp-usage	acp.txt	/*acp-usage*
 acp.txt	acp.txt	/*acp.txt*
 autocomplpop	acp.txt	/*autocomplpop*
+cs	surround.txt	/*cs*
 delimitMate	delimitMate.txt	/*delimitMate*
 delimitMate#JumpAny()	delimitMate.txt	/*delimitMate#JumpAny()*
 delimitMate#ShouldJump()	delimitMate.txt	/*delimitMate#ShouldJump()*
@@ -144,6 +145,7 @@ delimitMateSmartMatchpairs	delimitMate.txt	/*delimitMateSmartMatchpairs*
 delimitMateSmartQuotes	delimitMate.txt	/*delimitMateSmartQuotes*
 delimitMateSyntax	delimitMate.txt	/*delimitMateSyntax*
 delimitMateTodo	delimitMate.txt	/*delimitMateTodo*
+ds	surround.txt	/*ds*
 easy-align	easy_align.txt	/*easy-align*
 easy_align.txt	easy_align.txt	/*easy_align.txt*
 g:acp_behavior	acp.txt	/*g:acp_behavior*
@@ -181,6 +183,8 @@ g:easy_align_ignore_unmatched	easy_align.txt	/*g:easy_align_ignore_unmatched*
 g:easy_align_indentation	easy_align.txt	/*g:easy_align_indentation*
 g:easy_align_interactive_modes	easy_align.txt	/*g:easy_align_interactive_modes*
 g:easy_align_last_command	easy_align.txt	/*g:easy_align_last_command*
+i_CTRL-G_S	surround.txt	/*i_CTRL-G_S*
+i_CTRL-G_s	surround.txt	/*i_CTRL-G_s*
 signature	signature.txt	/*signature*
 signature-commands	signature.txt	/*signature-commands*
 signature-contents	signature.txt	/*signature-contents*
@@ -189,4 +193,17 @@ signature-credits	signature.txt	/*signature-credits*
 signature-customization	signature.txt	/*signature-customization*
 signature-license	signature.txt	/*signature-license*
 signature-mappings	signature.txt	/*signature-mappings*
+surround	surround.txt	/*surround*
+surround-customizing	surround.txt	/*surround-customizing*
+surround-issues	surround.txt	/*surround-issues*
+surround-mappings	surround.txt	/*surround-mappings*
+surround-replacements	surround.txt	/*surround-replacements*
+surround-targets	surround.txt	/*surround-targets*
+surround.txt	surround.txt	/*surround.txt*
+vS	surround.txt	/*vS*
+vgS	surround.txt	/*vgS*
 vim-easy-align	easy_align.txt	/*vim-easy-align*
+yS	surround.txt	/*yS*
+ySS	surround.txt	/*ySS*
+ys	surround.txt	/*ys*
+yss	surround.txt	/*yss*
