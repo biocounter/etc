@@ -97,8 +97,9 @@ export -f addtopath
 # include any windows-specific environment variables
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
 	export PATH=""
-	bashify JAVA_HOME GIT_HOME NODEJS_HOME TEMP TMP
-	addtopath /cygdrive/c/SysWOW64 /cygdrive/c/Windows 
+	# fix
+	# bashify JAVA_HOME GIT_HOME NODEJS_HOME TEMP TMP
+	addtopath /cygdrive/c/SysWOW64 /cygdrive/c/Windows
 	export TEMP=~/AppData/Local/Temp
 	export TMP=~/AppData/Local/Temp
 fi
