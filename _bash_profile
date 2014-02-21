@@ -94,23 +94,26 @@ function addtopath {
 }
 export -f addtopath
 
-# include any windows-specific environment variables
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
 	export PATH=""
-	# fix
+fi
+
+#include any local environment variables
+if [ -f ~/.setenv ]; then
+	source ~/.setenv
+fi
+
+#TODO do conditional adds if JAVA_HOME and GIT_HOME don't exist
+addtopath /usr/sbin /usr/local/bin /usr/bin /bin $JAVA_HOME/bin ~/bin $GIT_HOME/bin $NODEJS_HOME
+export PYTHON_HOME=/lib/python2.7/site-packages
+
+# include any windows-specific environment variables
+if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
 	# bashify JAVA_HOME GIT_HOME NODEJS_HOME TEMP TMP
 	addtopath /cygdrive/c/Windows/SysWOW64 /cygdrive/c/Windows/System32/
 	export TEMP=~/AppData/Local/Temp
 	export TMP=~/AppData/Local/Temp
 fi
-#include any local environment variables
-if [ -f ~/.setenv ]; then
-	source ~/.setenv
-fi
-#TODO do conditional adds if JAVA_HOME and GIT_HOME don't exist
-addtopath /usr/sbin /usr/local/bin /usr/bin /bin $JAVA_HOME/bin ~/bin $GIT_HOME/bin $NODEJS_HOME
-export PYTHON_HOME=/lib/python2.7/site-packages
-# include any local environment settings
 
 set +x
 #-----------------------

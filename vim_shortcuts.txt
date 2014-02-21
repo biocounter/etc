@@ -18,12 +18,12 @@ normal	$   		move to end of line
 normal	%   		jump to matching bracket { } [ ] ( )
 normal	*   		next word under cursor
 normal	0			move to beginning of line
-normal	Ctrl-B  	page up
-normal	Ctrl-D		move half-page down
-normal	Ctrl-F  	page down
-normal	Ctrl-U  	move half-page up
-normal	Ctrl-i  	jump to next cursor position
-normal	Ctrl-o  	jump to last cursor position
+normal	ctl-B  	page up
+normal	ctl-D		move half-page down
+normal	ctl-F  	page down
+normal	ctl-U  	move half-page up
+normal	ctl-i  	jump to next cursor position
+normal	ctl-o  	jump to last cursor position
 normal	G   		move to last line
 normal	H   		move to top of screen
 normal	L   		move to bottom of screen
@@ -76,3 +76,16 @@ visual	~			toggle case under cursor
 ================================================================================
 {range}				specify from line, to line or from line,% for end of file
 {range}sort u		sort lines uniquely within range
+
+================================================================================
+== WINDOWING
+================================================================================
+normal  ctl-w s     split the current window
+normal  ctl-w v     split the current window vertically
+normal  ctl-w hjkl  navigate w/ movement keys between windows
+command :bnext      go to next buffer w/in current window
+command :bprevious  go to prior buffer w/in current window
+command :bd         delete buffer
+command :ls         list files in buffer
+command :bw         wipe the buffer and close window
+command :b {string} go to buffer w/ tab completion
