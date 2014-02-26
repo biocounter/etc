@@ -1,1 +1,2 @@
 delimitMate-2.6.vba: call delete('C:\Users\furashg\vimfiles/plugin/delimitMate.vim')|call delete('C:\Users\furashg\vimfiles/autoload/delimitMate.vim')|call delete('C:\Users\furashg\vimfiles/doc/delimitMate.txt')
+tcomment.vba: call delete('C:\Users\furashg\vimfiles/doc/tcomment.txt')|call delete('C:\Users\furashg\vimfiles/plugin/tcomment.vim')|call delete('C:\Users\furashg\vimfiles/autoload/tcomment.vim')
