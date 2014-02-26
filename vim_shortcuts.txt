@@ -70,12 +70,25 @@ normal	cs{a}{b}	Change surrounding value from A to B
 visual	U			set uppercase
 visual	u			set lowercase
 visual	~			toggle case under cursor
+normal  <ll>vv      Grep for the word under the cursor, match all occurences,
+normal  <ll>vV      Grep for the word under the cursor, match whole word, like
+normal  <ll>va      Like vv, but add to existing list
+normal  <ll>vA      Like vV, but add to existing list
+normal  <ll>vr      Perform a global search search on the word under the cursor
+normal  <ll>vo      Select the files to search in and set grep options
 
 ================================================================================
 == COMMAND LINE
 ================================================================================
-{range}				specify from line, to line or from line,% for end of file
-{range}sort u		sort lines uniquely within range
+:{range}			specify from line, to line or from line,% for end of file
+:{range}sort u	    sort lines uniquely within range
+:Bgrep /{expr}      put all matching lines in the quickfix list
+:copen              open the quickfix window
+:ccl                close the quickfix window
+:cw                 open the quickfix window if there are errors, else close
+:cn                 Go to the next error in the quickfix window
+:Grep [arg]         search for the specified argument
+:Replace [target] [replace]
 
 ================================================================================
 == WINDOWING
@@ -89,3 +102,27 @@ command :bd         delete buffer
 command :ls         list files in buffer
 command :bw         wipe the buffer and close window
 command :b {string} go to buffer w/ tab completion
+
+
+================================================================================
+== TComment Plugin
+================================================================================
+normal  gc{motion}  Toggle comments (for small comments within one line
+normal  gcc         Toggle comment for the current line
+normal  gC{motion}  Comment region
+normal  gCc         Comment the current line
+normal  <c-_><c-_>  :TComment
+normal  <c-_><space>:TComment <QUERY COMMENT-BEGIN ?COMMENT-END>
+normal  <c-_>b      :TCommentBlock
+normal  <c-_>a      :TCommentAs <QUERY COMMENT TYPE>
+normal  <c-_>n      :TCommentAs &filetype <QUERY COUNT>
+normal  <c-_>s      :TCommentAs &filetype_<QUERY COMMENT SUBTYPE>
+normal  <c-_>i      :TCommentInline
+normal  <c-_>r      :TCommentRight
+normal  <c-_>p      Comment the current inner paragraph
+
+
+================================================================================
+== TComment Plugin
+================================================================================
+
