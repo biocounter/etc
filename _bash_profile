@@ -1,12 +1,12 @@
 #-----------------------------------
 # Source global definitions (if any)
 #-----------------------------------
-#if [ -f /etc/bashrc ]; then
-#				. /etc/bashrc
-#fi
-#if [ -f /etc/profile ]; then
-#				. /etc/profile
-#fi
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
+if [ -f /etc/profile ]; then
+	. /etc/profile
+fi
 
 #---------------
 # Some settings
@@ -16,7 +16,7 @@ ulimit -S -c 0				# Don't want any coredumps
 set -o notify
 set -o noclobber
 set -o ignoreeof
-set -o nounset
+#set -o nounset				# error 'unbound variable' if expanded variable not set
 set nocompatible
 set nodosfilewarnings		# turn off dos file warnings
 #set -o xtrace							# useful for debuging
@@ -70,26 +70,24 @@ function bashify { # Convert Win32-style paths to Cygwin-style
 }
 export -f bashify
 
-# ------------------------------------------------------------------------------
- # add a line to the PATH if it doesn't exist
- # @param path_1 {... path N}
-function addtopath {
-# ------------------------------------------------------------------------------
+function addtopath { # add value to path if it does not exist
 	local p
 	for p ; do
-		# convert windows paths to cygwin format
-		if [ $p = *:* ] ; then
-			p=`cygpath -pu '${p}'`
-		fi
-		# if the value is not in the path, add it
-		if [[ "${PATH}" != *:"${p}":* ]] ; then
-			if [ "${PATH}" == "" ]; then
-				export PATH=$p
-			# if the path already exists, append it
-			else
-				export PATH=$PATH:$p
-			fi
-		fi
+	   if [ -d "$p" ]; then
+		 # convert windows paths to cygwin format
+		 if [ $p = *:* ] ; then
+			 p=`cygpath -pu '${p}'`
+		 fi
+		 # if the value is not in the path, add it
+		 if [[ "${PATH}" != *:"${p}":* ]] ; then
+			 if [ "${PATH}" == "" ]; then
+				 export PATH=$p
+			 # if the path already exists, append it
+			 else
+				 export PATH=$PATH:$p
+			 fi
+		 fi
+	   fi
 	done
 }
 export -f addtopath
@@ -100,12 +98,26 @@ fi
 
 #include any local environment variables
 if [ -f ~/.setenv ]; then
-	source ~/.setenv
+	addtopath source ~/.setenv
 fi
 
-#TODO do conditional adds if JAVA_HOME and GIT_HOME don't exist
-addtopath /usr/sbin /usr/local/bin /usr/bin /bin $JAVA_HOME/bin ~/bin $GIT_HOME/bin $NODEJS_HOME
+addtopath /usr/sbin /usr/local/bin /usr/bin /bin ~/bin
+if [ -n "$JAVA_HOME" ]; then
+	addtopath $JAVA_HOME/bin
+fi
+
+if [ -n "$GIT_HOME" ]; then
+	addtopath $GIT_HOME/bin
+fi
+
+if [ -n "$NODEJS_HOME" ]; then
+	addtopath $NODEJS_HOME
+fi
+
 export PYTHON_HOME=/lib/python2.7/site-packages
+if [ -d "~/node_modules" ]; then
+	export $NODE_PATH=~/node_modules
+fi
 
 # include any windows-specific environment variables
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
