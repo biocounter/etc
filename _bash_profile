@@ -57,84 +57,55 @@ export EDITOR=vi				# use the VI editor for line edting
 # Environment Variables
 #-------------------------------------------------------------------------------
 
-function bashify { # Convert Win32-style paths to Cygwin-style
+function bashify {	# convert environment variable to cygwin format
 	local p
 	for p ; do
-		if [[ $p != *cygdrive* && $p != *CYGDRIVE* ]] ; then
-			if [ "${!p}" ] ; then
-				echo "${p}"
-				eval 'export '$p'=$(cygpath -pu "$'$p'")'
-			fi
+		if [ "${!p}" ] ; then
+			eval 'export '$p'=$(cygpath -pu "$'$p'")'
 		fi
 	done
 }
 export -f bashify
 
 function addtopath { # add value to path if it does not exist
-	local p
-	for p ; do
-	   if [ -d "$p" ]; then
-		 # convert windows paths to cygwin format
-		 if [ $p = *:* ] ; then
-			 p=`cygpath -pu '${p}'`
-		 fi
-		 # if the value is not in the path, add it
-		 if [[ "${PATH}" != *:"${p}":* ]] ; then
-			 if [ "${PATH}" == "" ]; then
-				 export PATH=$p
-			 # if the path already exists, append it
-			 else
-				 export PATH=$PATH:$p
-			 fi
-		 fi
-	   fi
-	done
+	local p=$1
+	if [ -d "$p" ]; then
+		if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+			p=`cygpath -pu $p`
+		fi
+		if [[ "${PATH}" != *:"${p}":* ]] ; then
+			export PATH=$PATH:$p
+		fi
+   fi
 }
 export -f addtopath
 
-if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
-	export PATH=""
-fi
-
 #include any local environment variables
 if [ -f ~/.setenv ]; then
-	addtopath source ~/.setenv
+	. ~/.setenv
 fi
 
-addtopath /usr/sbin /usr/local/bin /usr/bin /bin ~/bin
-if [ -n "$JAVA_HOME" ]; then
-	addtopath $JAVA_HOME/bin
-fi
-
-if [ -n "$GIT_HOME" ]; then
-	addtopath $GIT_HOME/bin
-fi
-
-if [ -n "$NODEJS_HOME" ]; then
-	addtopath $NODEJS_HOME
-fi
-
-<<<<<<< HEAD
-#TODO do conditional adds if JAVA_HOME and GIT_HOME don't exist
-addtopath /usr/sbin /usr/local/bin /usr/bin /bin $JAVA_HOME/bin ~/bin 
-addtopath $GIT_HOME/bin $NODEJS_HOME 
-export NODE_PATH=~/node_modules
-=======
->>>>>>> a91ab3a5ff581d41653b83d35410a6ae63ad05b4
+addtopath /usr/sbin 
+addtopath /usr/local/bin 
+addtopath /usr/bin 
+addtopath /bin 
+addtopath ~/bin
+bashify NODE_PATH
+bashify GIT_HOME
+addtopath $GIT_HOME/bin
+bashify NODEJS_HOME
+bashify JAVA_HOME
+addtopath $JAVA_HOME/bin
 export PYTHON_HOME=/lib/python2.7/site-packages
-if [ -d "~/node_modules" ]; then
-	export $NODE_PATH=~/node_modules
-fi
 
 # include any windows-specific environment variables
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
-	# bashify JAVA_HOME GIT_HOME NODEJS_HOME TEMP TMP
-	addtopath /cygdrive/c/Windows/SysWOW64 /cygdrive/c/Windows/System32/
+	addtopath /cygdrive/c/Windows/SysWOW64 
+	addtopath /cygdrive/c/Windows/System32
 	export TEMP=~/AppData/Local/Temp
 	export TMP=~/AppData/Local/Temp
 fi
 
-set +x
 #-----------------------
 # Greeting, motd etc...
 #-----------------------
