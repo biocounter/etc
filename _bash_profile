@@ -104,7 +104,9 @@ if [ -f ~/.setenv ]; then
 fi
 
 #TODO do conditional adds if JAVA_HOME and GIT_HOME don't exist
-addtopath /usr/sbin /usr/local/bin /usr/bin /bin $JAVA_HOME/bin ~/bin $GIT_HOME/bin $NODEJS_HOME
+addtopath /usr/sbin /usr/local/bin /usr/bin /bin $JAVA_HOME/bin ~/bin 
+addtopath $GIT_HOME/bin $NODEJS_HOME 
+export NODE_PATH=~/node_modules
 export PYTHON_HOME=/lib/python2.7/site-packages
 
 # include any windows-specific environment variables
