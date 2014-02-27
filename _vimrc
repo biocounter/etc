@@ -80,7 +80,7 @@ set shiftround                                   " when at 3 spaces, and I hit >
 set smartindent                                  " perform c-like indenting
 set wildmode=list:longest                        " turn on wild mode huge list
 set wildignore=*.dll,*.o,*.obj,*.bak,*.exe,*.pyc,*.jpg,*.gif,*.png " ignore these list file extensions
-set noexpandtab									 " use real tabs instead of spaces
+set noexpandtab					 " use real tabs instead of spaces
 set tabstop=4
 set shiftwidth=4                                 " auto-indent amount when using cindent, >>, << and stuff like that
 set softtabstop=4                                " when hitting tab or backspace, how many spaces should a tab be (see expandtab)
@@ -226,8 +226,8 @@ noremap <silent> ea :EasyAlign<CR>
 "let g:tcommentMapLeaderOp1=
 "let g:tcommentMapLeaderOp2=
 autocmd BufReadPost * :DetectIndent
-let g:detectindent_preferred_expandtab=0
-let g:detectindent_preferred_indent=4
+let g:detectindent_preferred_expandtab=0    " if indent not detected use tabs
+let g:detectindent_preferred_indent=4	    " set default TS to 4
 
 " ------------------------------------------------------------------------------
 " Vim Grep Utility
@@ -248,7 +248,7 @@ vnoremap <silent> <leader>r :call VisualSelection('replace')<CR>
 " Autocommands (run on ... for filetype ...)
 " ------------------------------------------------------------------------------
 " TODO: create custom fold function for sqr
-autocmd FileType sqr setlocal tabstop=2 shiftwidth=2 softtabstop=0 expandtab
+autocmd FileType sqr setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 autocmd BufRead,BufNewFile *.sqr,*.sqc setlocal tabstop=2 shiftwidth=2 softtabstop=0 expandtab
 
 " ------------------------------------------------------------------------------
