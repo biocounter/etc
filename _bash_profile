@@ -85,22 +85,23 @@ if [ -f ~/.setenv ]; then
 	. ~/.setenv
 fi
 
-addtopath /usr/sbin 
-addtopath /usr/local/bin 
-addtopath /usr/bin 
-addtopath /bin 
+addtopath /bin
+addtopath /usr/sbin
+addtopath /usr/local/bin
+addtopath /usr/bin
 addtopath ~/bin
-bashify NODE_PATH
 bashify GIT_HOME
 addtopath $GIT_HOME/bin
-bashify NODEJS_HOME
 bashify JAVA_HOME
 addtopath $JAVA_HOME/bin
-export PYTHON_HOME=/lib/python2.7/site-packages
+
+# configure python3 environment
+#alias python=python3
+#export PYTHONHOME=/usr/lib/python3.2:/usr/lib/python3.2/plat-cygwin:/usr/lib/python3.2/lib-tk:/usr/lib/python3.2/lib-dynload:/usr/lib/python3.2/site-packages
 
 # include any windows-specific environment variables
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
-	addtopath /cygdrive/c/Windows/SysWOW64 
+	addtopath /cygdrive/c/Windows/SysWOW64
 	addtopath /cygdrive/c/Windows/System32
 	export TEMP=~/AppData/Local/Temp
 	export TMP=~/AppData/Local/Temp
