@@ -15,6 +15,7 @@
 :AcpEnable	acp.txt	/*:AcpEnable*
 :AcpLock	acp.txt	/*:AcpLock*
 :AcpUnlock	acp.txt	/*:AcpUnlock*
+:DetectIndent	detectindent.txt	/*:DetectIndent*
 :Grep	easygrep.txt	/*:Grep*
 :GrepAdd	easygrep.txt	/*:GrepAdd*
 :GrepOptions	easygrep.txt	/*:GrepOptions*
@@ -87,6 +88,11 @@ acp-usage	acp.txt	/*acp-usage*
 acp.txt	acp.txt	/*acp.txt*
 autocomplpop	acp.txt	/*autocomplpop*
 cs	surround.txt	/*cs*
+detectindent	detectindent.txt	/*detectindent*
+detectindent-changelog	detectindent.txt	/*detectindent-changelog*
+detectindent-contents	detectindent.txt	/*detectindent-contents*
+detectindent-settings	detectindent.txt	/*detectindent-settings*
+detectindent.txt	detectindent.txt	/*detectindent.txt*
 ds	surround.txt	/*ds*
 g:SignatureMap['Leader']	signature.txt	/*g:SignatureMap['Leader']*
 g:acp_behavior	acp.txt	/*g:acp_behavior*
