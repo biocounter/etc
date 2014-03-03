@@ -58,12 +58,14 @@ export EDITOR=vi				# use the VI editor for line edting
 #-------------------------------------------------------------------------------
 
 function bashify {	# convert environment variable to cygwin format
-	local p
-	for p ; do
-		if [ "${!p}" ] ; then
-			eval 'export '$p'=$(cygpath -pu "$'$p'")'
-		fi
-	done
+	if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+	  local p
+	  for p ; do
+		 if [ "${!p}" ] ; then
+			   eval 'export '$p'=$(cygpath -pu "$'$p'")'
+		 fi
+	  done
+	fi
 }
 export -f bashify
 
