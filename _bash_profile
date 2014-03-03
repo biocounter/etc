@@ -131,6 +131,11 @@ trap _exit EXIT
 
 PS1="\n${cyan}[`date +%m/%d` \@][\u@\h][\w]${NC}\n\$ "
 
+# show today's agenda
+if [ -f /bin/google ] ; then
+   echo "Today's Agenda:"; google calendar today --fields title,when,where
+fi
+
 #-----------------------------------------------------------------------
 # Aliases
 #-----------------------------------------------------------------------
