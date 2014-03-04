@@ -228,6 +228,8 @@ noremap <silent> ea :EasyAlign<CR>
 autocmd BufReadPost * :DetectIndent
 let g:detectindent_preferred_expandtab=0    " if indent not detected use tabs
 let g:detectindent_preferred_indent=4	    " set default TS to 4
+" turn off delimitmate by type
+" au FileType mail let b:delimitMate_autoclose = 0
 
 " ------------------------------------------------------------------------------
 " Vim Grep Utility

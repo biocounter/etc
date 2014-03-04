@@ -89,7 +89,8 @@ normal  <ll>vo      Select the files to search in and set grep options
 :cn                 Go to the next error in the quickfix window
 :Grep [arg]         search for the specified argument
 :Replace [target] [replace]
-:g/{pattern}d       delete all lines matching a pattern
+:g/{pattern}/d      delete all lines matching a pattern
+:g!/[pattern]/d     delete all lines not containing a pattern
 
 ================================================================================
 == WINDOWING
