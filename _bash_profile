@@ -19,14 +19,14 @@ set -o ignoreeof
 #set -o nounset				# error 'unbound variable' if expanded variable not set
 set nocompatible
 set nodosfilewarnings		# turn off dos file warnings
-#set -o xtrace							# useful for debuging
-set -o vi								 # use VI for editing
-# k				previous command
-# j				next command
-# 0				start of command
-# $				end of command
+#set -o xtrace				# useful for debuging
+set -o vi					# use VI for editing
+							# k		previous command
+							# j		next command
+							# 0		start of command
+							# $		end of command
 # /,n,N search
-export LC_ALL='C'																# sort ignores problem characters
+export LC_ALL='C'			# sort ignores problem characters
 
 # Enable options:
 shopt -s cdspell
@@ -37,7 +37,7 @@ shopt -s sourcepath
 shopt -s no_empty_cmd_completion		# bash>=2.04 only
 shopt -s cmdhist
 shopt -s histappend histreedit histverify
-shopt -s extglob		# necessary for programmable completion
+shopt -s extglob			# necessary for programmable completion
 
 if [[ ${BASH_VERSINFO[0]} == 4 ]]; then
 	shopt -s globstar										# enable '**' (recursive)
@@ -50,7 +50,7 @@ fi
 
 export TIMEFORMAT=$'\nreal %3R	user %3U	sys %3S	pcpu %P\n'
 export HISTIGNORE="&:bg:fg:ll:h"
-export HOSTFILE=$HOME/.hosts		# Put a list of remote hosts in ~/.hosts
+export HOSTFILE=$HOME/.hosts	# Put a list of remote hosts in ~/.hosts
 export EDITOR=vi				# use the VI editor for line edting
 
 #-------------------------------------------------------------------------------
@@ -374,7 +374,7 @@ export -f ii
 
 # Misc utilities:
 
-function repeat() {			 # repeat n times command
+function repeat() { # repeat n times command
 	local i max
 	max=$1; shift;
 	for ((i=1; i <= max ; i++)); do		# --> C-like syntax

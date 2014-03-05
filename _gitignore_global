@@ -1,3 +1,6 @@
+# ln -s ~/etc/_gitignore_global ~/.gitignore_global
+# git config --global core.excludefiles ~/gitignore_global
+
 # Compiled source #
 ###################
 *.com
