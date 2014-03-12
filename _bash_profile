@@ -141,14 +141,12 @@ fi
 #-----------------------------------------------------------------------
 # Aliases
 #-----------------------------------------------------------------------
-alias cdhist='dirs -v'
-alias co='collect.sh'
 alias cp='cp -i'					# -> Prevents accidentally clobbering files.
 alias dnt='echo -e `date "+%A %B %d, %Y"`" "`date "+%I:%M %p"` > /dev/clipboard'
 alias dtm='printf "[%s %s] " `date "+%y%m%d"` `date "+%H:%M"` > /dev/clipboard'
 alias fn='{ alias && export -f; } | egrep "\(\)|alias" | sed "s/alias //ig" | cut -d= -f1 | sort'
+alias gitlog='git log --pretty=format:"[%h] %ae, %ar: %s" --stat'
 alias h='history'
-alias igrep='grep -i'
 alias j='jobs -l'
 alias l='ls --color=tty -A -B -F --ignore="desktop.ini" --ignore="NTUSER*" --ignore="ntuser*" --ignore=".*"'
 alias ld='du -hs * | grep -e "^[0-9].*G\s" -e "^[0-9].*M\s" | sort -n -k 2,2 -s'
@@ -158,14 +156,10 @@ alias more='less' # more is less
 alias mv='mv -i'																				# Prevents accidentally clobbering files.
 alias mydiff='diff -ywEa --suppress-common-lines --minimal' # personal zip preferences
 alias nospace="perl /usr/local/bin/rename 's/ /_' *"				# underscore all files in dir
-alias python=/bin/python
 alias r='fc -s' # execute last command
-alias rgrep='grep -r'
-alias rhino='java -cp "C:\PROGRA~1\rhino1_7R4\*;C:\Progra~1\Oracle\instantclient_12_1\*" org.mozilla.javascript.tools.shell.Main'
 alias rm='rm -i'					# -> Prevents accidentally clobbering files.
 alias rn='/usr/local/bin/rename '								# call Perl rename script
 alias vi='vim'								# cygwin installs a minimal vi
-alias gitlog='git log --pretty=format:"[%h] %ae, %ar: %s" --stat'
 
 #if [[ ${BASH_VERSINFO[0]} == 4 ]]; then
 #		alias l='ls -A -B --color --group-directories-first -F --ignore="desktop.ini" --ignore="NTUSER*" --ignore="ntuser*"'
