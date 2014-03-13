@@ -92,6 +92,7 @@ addtopath /usr/sbin
 addtopath /usr/local/bin
 addtopath /usr/bin
 addtopath ~/bin
+addtopath ~/scripts
 bashify GIT_HOME
 addtopath $GIT_HOME/bin
 bashify JAVA_HOME
@@ -229,36 +230,36 @@ function cuttail() { # cut last n lines in file, 10 by default
 }
 
 function lowercase() { # move filenames to lowercase
-for file ; do
-filename=${file##*/}
-	case "$filename" in
-	*/*) dirname==${file%/*} ;;
-	*) dirname=.;;
-	esac
-	nf=$(echo $filename | tr A-Z a-z)
-	newname="${dirname}/${nf}"
-	if [ "$nf" != "$filename" ]; then
-		mv "$file" "$newname"
-		echo "lowercase: $file --> $newname"
-	else
-		echo "lowercase: $file not changed."
-	fi
+   for file ; do
+	  filename=${file##*/}
+	  case "$filename" in
+		 */*) dirname==${file%/*} ;;
+		 *) dirname=.;;
+	  esac
+	  nf=$(echo $filename | tr A-Z a-z)
+	  newname="${dirname}/${nf}"
+	  if [ "$nf" != "$filename" ]; then
+		 mv "$file" "$newname"
+		 echo "lowercase: $file --> $newname"
+	  else
+		 echo "lowercase: $file not changed."
+	  fi
 	done
 }
 export -f lowercase
 
-function ccd {										# clear the screen, change directory, list contents
+function ccd {	# clear the screen, change directory, list contents
 	clear
 	cd "$1"
 	l
 }
 export -f ccd
 
-function dateprefix {														# add YYYYMM to files in %CD%
+function dateprefix { # add YYYYMM to files in %CD%
 	date_prefix=$(date + %Y%m)
 	for file in *.*
 	do
-	mv $file		"$date_prefix ${file%.*}.${file##*.}"
+	  mv $file		"$date_prefix ${file%.*}.${file##*.}"
 	done
 }
 
@@ -372,7 +373,7 @@ function repeat() { # repeat n times command
 	local i max
 	max=$1; shift;
 	for ((i=1; i <= max ; i++)); do		# --> C-like syntax
-	eval "$@";
+	  eval "$@";
 	done
 }
 export -f repeat
