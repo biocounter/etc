@@ -92,7 +92,6 @@ addtopath /usr/sbin
 addtopath /usr/local/bin
 addtopath /usr/bin
 addtopath ~/bin
-addtopath ~/scripts
 bashify GIT_HOME
 addtopath $GIT_HOME/bin
 bashify JAVA_HOME
