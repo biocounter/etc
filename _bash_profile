@@ -94,10 +94,8 @@ addtopath /usr/bin
 addtopath ~/bin
 bashify GIT_HOME
 addtopath $GIT_HOME/bin
-set -x
 bashify JAVA_HOME
 addtopath $JAVA_HOME/bin
-set +x
 
 # configure python3 environment
 #alias python=python3

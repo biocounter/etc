@@ -9,7 +9,7 @@ if !exists("syntax_on")
 endif
 
 set ch=2			" Make command line two lines high
-set guifont=DejaVu_Sans_Mono:h9:cANSI
+set guifont=Consolas:h9:cANSI
 set guioptions+=aegimrLt
 set guioptions-=T
 set hlsearch		" Switch on search pattern highlighting.
