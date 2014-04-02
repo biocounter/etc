@@ -1,0 +1,905 @@
+!**********************************************************************!
+! Manage Workgroup Enrollments
+!**********************************************************************!
+!                                                                      *
+!               Confidentiality Information:                           *
+!                                                                      *
+! This module is the confidential and proprietary information of       *
+! PS Monkey, Inc.; it is not to be copied, reproduced, or transmitted  *
+! in any form, by any means, in whole or in part, nor is it to be used *
+! for any purpose other than that for which it is expressly provided   *
+! without the written permission of PeopleSoft Monkey.                 *
+!                                                                      *
+! Copyright (c) 2000 PS Monkey Inc. All Rights Reserved                *
+!                                                                      *
+!***********************************************************************
+! PS Tables Referenced:		
+!
+! Oracle Tables Referenced:	
+!***********************************************************************
+!                                                                      *             
+!                                                                      *
+!***********************************************************************
+!  Modifications                                                       *
+!                                                                      *
+!  By          Date          Description                               *
+!  ----------- ----------   ------------------------------------------ *
+!  abeecham     8/1/2009     Initial Version - ported from app engine  *
+!  abeecham     10/15/2009   Maintenance	  													 *
+!  jskalsi      07/08/2010   Commented out the procedure               *
+!                            'enroll-new-inact' as it was inserting    * 
+!                            wrong data into TL_EMPL_DATA              *
+!***********************************************************************
+!
+
+#include 'setenv.sqc'              !set environment                      
+#Include 'setup32.sqc'   !Printer and page-size initialization
+
+
+#define ColSQLTag       1      
+#define ColMessage     10     
+#define ColEmplid      55     
+#define ColEmplRcd     65
+#define ColName        70     
+#define ColEffdt       95     
+#define ColWorkgroup  110   
+#define ColRptgType   120
+#define ColDeptid     125 
+#define ColWorkgroup2 135 
+
+begin-setup
+declare-variable
+   date $pay_end_dt
+   date $pay_begin_dt
+   date $TERMINATION_DT
+   date $tl_start_dt
+   date $effdt
+end-declare
+end-setup
+
+begin-heading 5
+  move 'Automate Workgroup Enrollment' to $ReportTitle  
+
+#Include 'stdhdg01.sqc'                                    
+print 'Action'    (+1, {ColSQLTag})    
+print 'Message'   (  , {ColMessage})   
+print 'Emplid'    (  , {ColEmplid})    
+Print 'Rcd'       (  , {ColEmplRcd})   
+Print 'Name'      (  , {ColName})   
+print 'Effdt'     (  , {ColEffdt})     
+print 'Workgroup' (  , {ColWorkgroup}) 
+print 'Deptid'    (  , {ColDeptid}) 
+print 'Type'      (  , {ColRptgType}) 
+end-heading
+
+
+!**********************************************************************!
+begin-report
+!**********************************************************************!
+  move 'UATL0002' to $ReportID    
+  move ' ' to $sp
+  move '/' to $sl
+   
+  do stdapi-init
+  do Init-Report
+  
+do get-cal             !Get Pay Cycle begin, end dates.
+do clear-work-table    !Clears the work table UA_TL002_AET that will be repopulated in the next step.
+do fill-work-table     !Fills the work table UA_TL002_AET that contains all the data required to enroll employees in TL_EMPL_DATA.
+do assign-punch        !This procedure determines if an employee is both a punch and an elapsed time reporter and it deletes the elapsed record to
+                       !to make the employee punch only.
+do delete-future       !This procedure finds employees that have a row in their TL_EMPL_DATA which is in the future (greater than the effdt 
+                       !on the work table) and does not have any row on TL_EMPL_DATA (<=SYSDATE). It then deletes the rows that are in the future.
+do enroll-new          !This procedure enrolls employees in TL_EMPL_DATA who do not have ANY data in the TL_EMPL_DATA table (<=SYSDATE) 
+                       !While enrolling, it deletes any rows in TL_EMPL_DATA that is greater than or equal to the EFFDT from the work table.
+!do enroll-new-inact   !This procedure finds employees that are currently inactive and that went inactive in between a pay period and 
+											 !activates them within rptg + ppa period.
+do find-inactive       !This procedure finds employees that are currently inactive but have an active TL_EMPL_DATA enrollment and fixes them.
+
+new-page
+do report-totals       !This procedure reports out that totals on the summary page
+do stdapi-term
+end-report
+
+
+
+!**********************************************************************!
+begin-procedure Init-Report
+!**********************************************************************!
+  do Init-DateTime
+  do Get-Current-DateTime
+  do Init-Variables
+      
+end-procedure
+!********************************
+begin-procedure init-variables
+!********************************
+MOVE ' '    TO $PERIOD_ID
+MOVE 'MSTA' TO $TIMEZONE
+MOVE ' '    TO $TASK_PROFILE_ID 
+MOVE ' '    TO $TCD_GROUP_ID 
+MOVE ' '    TO $RESTRICTION_PRF_ID 
+MOVE ' '    TO $RULE_ELEMENT_1 
+MOVE ' '    TO $RULE_ELEMENT_2 
+MOVE ' '    TO $RULE_ELEMENT_3 
+MOVE ' '    TO $RULE_ELEMENT_4 
+MOVE ' '    TO $RULE_ELEMENT_5  
+MOVE 'Y'    TO $TL_TIME_TO_PAY 
+
+end-procedure
+
+!********************************
+begin-procedure clear-work-table
+!********************************
+  do Get-Current-DateTime
+show 'Clearing Work Tabl UA_TL002_AET from previous run at ' $AsOfNow
+begin-sql
+DELETE FROM PS_UA_TL002_AET
+end-sql
+show '..finished'
+end-procedure
+
+!********************************
+begin-procedure get-cal
+!********************************
+begin-select DISTINCT
+C.PAY_BEGIN_DT
+C.PAY_END_DT
+C.PAY_END_DT-28 &CMP_BEGIN
+
+  MOVE &C.PAY_BEGIN_DT  To $PAY_BEGIN_DT
+  MOVE &C.PAY_END_DT    To $PAY_END_DT  
+  
+  SHOW 'NEXT PAY CYCLE BEGIN DT '  $PAY_BEGIN_DT
+  SHOW 'NEXT PAY CYCLE END   DT '  $PAY_END_DT
+  SHOW 'NEXT PAY CYCLE BEGIN-28 '  &CMP_BEGIN
+
+
+FROM PS_PAY_CALENDAR C
+WHERE  C.PAY_END_DT = (SELECT MIN(C1.PAY_END_DT)  
+  FROM PS_PAY_CALENDAR C1  
+ WHERE C1.COMPANY = C.COMPANY  
+   AND C1.PAYGROUP = C.PAYGROUP  
+   AND C1.PAY_CONFIRM_RUN = 'N'  
+   AND C1.PAY_OFF_CYCLE_CAL = 'N')  
+end-select
+end-procedure
+
+!********************************
+begin-procedure fill-work-table
+! fill work table with logical active tl population
+!********************************
+  do Get-Current-DateTime
+Show 'Filling work table UA_TL002_AET for current run at ' $AsOfNow
+BEGIN-SQL
+INSERT INTO PS_UA_TL002_AET (PROCESS_INSTANCE 
+ , EMPLID 
+ , EMPL_RCD 
+ , COMPANY 
+ , PAYGROUP 
+ , DEPTID 
+ , JOBCODE 
+ , EMPL_CLASS 
+ , BENEFIT_PROGRAM 
+ , BENEFIT_RCD_NBR 
+ , WORKGROUP 
+ , NEW_EFFDT 
+ , EMPL_STATUS
+ , TERMINATION_DT
+ , TIME_RPTG_STATUS 
+ , TIME_RPTR_IND 
+ , ELP_TR_TMPLT_ID 
+ , PCH_TR_TMPLT_ID 
+ , TASKGROUP 
+ , RULE_ELEMENT_1 
+ , RULE_ELEMENT_2 
+ , RULE_ELEMENT_3 
+ , RULE_ELEMENT_4 
+ , RULE_ELEMENT_5)  
+ SELECT  DISTINCT 0 
+ , G.EMPLID 
+ , G.EMPL_RCD 
+ , ' ' 
+ , J.PAYGROUP 
+ , J.DEPTID
+ , ' ' 
+ , J.EMPL_CLASS 
+ , ' ' 
+ , 0 
+ , B.WORKGROUP 
+ , J.EFFDT   
+ , J.EMPL_STATUS
+ , J.TERMINATION_DT+1
+ , CASE WHEN J.EMPL_STATUS = 'A' THEN 'A' ELSE 'I' END
+ , B.TIME_RPTR_IND 
+ , B.ELP_TR_TMPLT_ID 
+ , B.PCH_TR_TMPLT_ID 
+ , B.TASKGROUP 
+ , ' ' 
+ , ' ' 
+ , ' ' 
+ , ' ' 
+ , ' '  
+  FROM PS_TL_GROUP_DTL G  
+  , PS_UA_TL_WG_ENRL B  
+  , PS_JOB J  
+ WHERE B.GROUP_ID = G.GROUP_ID  
+ AND G.GROUP_ID IN 
+ (SELECT G1.GROUP_ID FROM PS_UA_TL_WG_ENRL G1) 
+   AND J.EMPLID = G.EMPLID  
+   AND J.EMPL_RCD = G.EMPL_RCD  
+   AND J.EFFDT = (  
+ SELECT MAX(J1.EFFDT)  
+  FROM PS_JOB J1  
+ WHERE J1.EMPLID = J.EMPLID  
+   AND J1.EMPL_RCD = J.EMPL_RCD  
+   AND J1.EFFDT <= SYSDATE)  
+   AND J.EFFSEQ = (  
+ SELECT MAX(J1.EFFSEQ)  
+  FROM PS_JOB J1  
+ WHERE J1.EMPLID = J.EMPLID  
+   AND J1.EMPL_RCD = J.EMPL_RCD  
+   AND J1.EFFDT = J.EFFDT)  
+   AND NOT EXISTS (  
+ SELECT 'X'  
+  FROM PS_UA_TL_WG_OVRD V  
+ WHERE V.EMPLID = G.EMPLID  
+   AND V.EMPL_RCD = G.EMPL_RCD)   
+END-SQL
+END-PROCEDURE
+
+!********************************
+begin-procedure delete-future
+!********************************
+! Delete any TL reporter enrollment record
+! Dated after the current job record.
+do Get-Current-DateTime
+Show 'Future Dated Enrollment' $AsOfNow
+
+begin-select
+A.EMPLID
+A.EMPL_RCD
+A.NEW_EFFDT 
+A.DEPTID
+A.TIME_RPTR_IND 
+D.WORKGROUP
+D.EFFDT
+ 
+  move &A.EMPLID        to $EMPLID  
+  move &A.EMPL_RCD      to #EMPL_RCD
+  move &D.EFFDT         to $EFFDT   
+  move &A.DEPTID        to $DEPTID        
+  move &A.TIME_RPTR_IND to $TIME_RPTR_IND 
+  move &D.WORKGROUP     to $WORKGROUP
+    
+ Move 'TL Empl Data Effdt > Current Job Effdt' to $Message
+  
+  do delete-tlm
+        
+  FROM PS_UA_TL002_AET A, PS_TL_EMPL_DATA D  
+ WHERE D.EMPLID = A.EMPLID  
+   AND D.EMPL_RCD = A.EMPL_RCD  
+   AND D.EFFDT > A.NEW_EFFDT  
+   AND NOT EXISTS (  
+ SELECT 'X'  
+  FROM PS_TL_EMPL_DATA B  
+ WHERE B.EMPLID = A.EMPLID  
+   AND B.EMPL_RCD = A.EMPL_RCD  
+   AND B.EFFDT = (  
+ SELECT MAX(B1.EFFDT)  
+  FROM PS_TL_EMPL_DATA B1  
+ WHERE B1.EMPLID = B.EMPLID  
+   AND B1.EMPL_RCD = B.EMPL_RCD  
+   AND B1.EFFDT <= SYSDATE)  
+   AND B.WORKGROUP = A.WORKGROUP  
+   AND B.TIME_RPTG_STATUS = A.TIME_RPTG_STATUS)
+ AND NOT EXISTS (  
+ SELECT 'X'  
+  FROM PS_UA_TL_WG_OVRD V  
+ WHERE V.EMPLID = D.EMPLID  
+   AND V.EMPL_RCD = D.EMPL_RCD)
+end-select
+end-procedure
+
+!********************************
+begin-procedure assign-punch
+! when assigned to both elapsed and punch group
+! punch group takes priority
+!********************************
+do Get-Current-DateTime
+Show 'Assigning Punch Reporters at ' $AsOfNow
+BEGIN-SQL
+DELETE  
+  FROM PS_UA_TL002_AET  
+ WHERE TIME_RPTR_IND = 'E'  
+   AND EXISTS (  
+ SELECT 'X'  
+  FROM PS_UA_TL002_AET B  
+ WHERE B.TIME_RPTR_IND = 'P'  
+   AND B.EMPLID = PS_UA_TL002_AET.EMPLID  
+   AND B.EMPL_RCD = PS_UA_TL002_AET.EMPL_RCD)
+END-SQL
+END-PROCEDURE
+
+
+!********************************
+begin-procedure dup-check
+! when assigned to both elapsed and punch group
+! punch group takes priority
+!********************************
+do Get-Current-DateTime
+Show 'Check for Duplicates at ' $AsOfNow
+
+move 'Duplicate Entry in staging table' to $Message
+BEGIN-SELECT 
+T.EMPLID
+T.EMPL_RCD
+T.WORKGROUP
+T.NEW_EFFDT
+T.DEPTID
+T.TIME_RPTR_IND
+
+   move &T.EMPLID      to $EMPLID   
+   move &T.EMPL_RCD    to #EMPL_RCD 
+   move &T.WORKGROUP   to $WORKGROUP
+   move &T.NEW_EFFDT   to $EFFDT
+
+  do print-report
+FROM PS_UA_TL002_AET T
+WHERE EXISTS
+(SELECT 'X'
+FROM PS_UA_TL002_AET T1
+ WHERE T1.EMPLID = T.EMPLID
+ AND T1.EMPL_RCD = T.EMPL_RCD
+ AND T1.NEW_EFFDT = T.NEW_EFFDT
+GROUP BY T1.EMPLID, T1.EMPL_RCD, T1.NEW_EFFDT
+HAVING COUNT(*) > 1)
+ORDER BY T.EMPLID, T.EMPL_RCD
+END-SELECT
+
+move ' ' to $Message
+END-PROCEDURE
+
+!********************************
+begin-procedure enroll-new
+!********************************
+do Get-Current-DateTime
+Show 'Assigning New Enrollees at ' $AsOfNow
+ move 'Missing or Mismatched Enrollment' to $Message
+
+begin-select
+A1.EMPLID 
+A1.EMPL_RCD 
+A1.NEW_EFFDT 
+A1.TIME_RPTG_STATUS 
+A1.TIME_RPTR_IND 
+A1.ELP_TR_TMPLT_ID  
+A1.PCH_TR_TMPLT_ID 
+A1.WORKGROUP  
+A1.TASKGROUP 
+A1.RULE_ELEMENT_1 
+A1.RULE_ELEMENT_2 
+A1.RULE_ELEMENT_3 
+A1.RULE_ELEMENT_4 
+A1.RULE_ELEMENT_5  
+A1.DEPTID
+
+  move &A1.EMPLID            to $EMPLID           
+  move &A1.EMPL_RCD          to #EMPL_RCD         
+  move &A1.NEW_EFFDT         to $EFFDT        
+  move &A1.TIME_RPTG_STATUS  to $TIME_RPTG_STATUS 
+  move &A1.TIME_RPTR_IND     to $TIME_RPTR_IND    
+  move &A1.ELP_TR_TMPLT_ID   to $ELP_TR_TMPLT_ID  
+  move &A1.PCH_TR_TMPLT_ID   to $PCH_TR_TMPLT_ID  
+  move &A1.WORKGROUP         to $WORKGROUP        
+  move &A1.TASKGROUP         to $TASKGROUP        
+  move &A1.RULE_ELEMENT_1    to $RULE_ELEMENT_1   
+  move &A1.RULE_ELEMENT_2    to $RULE_ELEMENT_2   
+  move &A1.RULE_ELEMENT_3    to $RULE_ELEMENT_3   
+  move &A1.RULE_ELEMENT_4    to $RULE_ELEMENT_4   
+  move &A1.RULE_ELEMENT_5    to $RULE_ELEMENT_5  
+  move &A1.DEPTID            to $DEPTID  
+  
+  DO DELETE-TLM  !THIS IS NEEDED IN CASE WE ARE CORRECTING AN EXISTING EFFDT
+  !SHOW 'INSERTING ' $EMPLID ' '#EMPL_RCD ' ' $EFFDT
+  !Do find-active-start  !handle case where effdt after period start date.
+  
+  DO insert-tlm
+ 
+  FROM PS_UA_TL002_AET A1  
+ WHERE NOT EXISTS (  
+ SELECT 'X'  
+  FROM PS_TL_EMPL_DATA B  
+ WHERE B.EMPLID = A1.EMPLID  
+   AND B.EMPL_RCD = A1.EMPL_RCD  
+   AND B.EFFDT = (  
+ SELECT MAX(B1.EFFDT)  
+  FROM PS_TL_EMPL_DATA B1  
+ WHERE B1.EMPLID = B.EMPLID  
+   AND B1.EMPL_RCD = B.EMPL_RCD  
+   AND B1.EFFDT <= sysdate)  
+   AND B.WORKGROUP = A1.WORKGROUP
+   AND B.TIME_RPTR_IND = A1.TIME_RPTR_IND  
+   AND B.TIME_RPTG_STATUS = A1.TIME_RPTG_STATUS)
+   AND A1.EMPL_STATUS = 'A'
+ AND NOT EXISTS (  
+ SELECT 'X'  
+  FROM PS_UA_TL_WG_OVRD V  
+ WHERE V.EMPLID = A1.EMPLID  
+   AND V.EMPL_RCD = A1.EMPL_RCD)   
+END-SELECT
+END-PROCEDURE
+
+!!********************************
+!begin-procedure find-active-start
+!!********************************
+!! for current active without enorllment, look back to find last active effdt
+!! within the time reporting period
+!MOVE 'N' TO $FOUND_ACTIVE
+!begin-select loops=1 
+!JA1.EMPLID
+!JA1.EMPL_RCD
+!LEAST(JA1.EFFDT, $PAY_BEGIN_DT) &ACT_DT  !CHANGE TO &CMP_BEGIN AFTER 28 DAYS
+!JA1.EFFDT
+!JA1.EMPL_STATUS
+!  !SHOW 'FOUND ACTIVE FOR CURRENT INACTIVE ' $EMPLID ' ' #EMPL_RCD ' ' &ACT_DT
+!  MOVE 'Y' TO $FOUND_ACTIVE
+!FROM PS_JOB JA1
+!WHERE JA1.EMPLID = $EMPLID
+!AND   JA1.EMPL_RCD = #EMPL_RCD
+!AND   JA1.EFFDT <= &A1.NEW_EFFDT
+!AND   JA1.EMPL_STATUS = 'A'
+!ORDER BY JA1.EFFDT DESC
+!end-select
+!end-procedure
+
+
+!********************************
+begin-procedure enroll-new-inact
+!********************************
+! new procedure to create enrollment records for employees 
+! who are not currently active but were active within the last 30 days.
+! allows time entry for reporting window up to termination
+do Get-Current-DateTime
+Show 'Assigning New Enrollees at ' $AsOfNow
+ move 'Missing or Mismatched Enrollment' to $Message
+
+begin-select
+AT.EMPLID 
+AT.EMPL_RCD 
+AT.NEW_EFFDT 
+AT.TIME_RPTG_STATUS 
+AT.TIME_RPTR_IND 
+AT.ELP_TR_TMPLT_ID  
+AT.PCH_TR_TMPLT_ID 
+AT.WORKGROUP  
+AT.TASKGROUP 
+AT.RULE_ELEMENT_1 
+AT.RULE_ELEMENT_2 
+AT.RULE_ELEMENT_3 
+AT.RULE_ELEMENT_4 
+AT.RULE_ELEMENT_5  
+AT.DEPTID
+AT.TERMINATION_DT
+AT.EMPL_STATUS
+
+  move &AT.EMPLID            to $EMPLID           
+  move &AT.EMPL_RCD          to #EMPL_RCD         
+  move &AT.NEW_EFFDT         to $EFFDT        
+  move &AT.TIME_RPTG_STATUS  to $TIME_RPTG_STATUS 
+  move &AT.TIME_RPTR_IND     to $TIME_RPTR_IND    
+  move &AT.ELP_TR_TMPLT_ID   to $ELP_TR_TMPLT_ID  
+  move &AT.PCH_TR_TMPLT_ID   to $PCH_TR_TMPLT_ID  
+  move &AT.WORKGROUP         to $WORKGROUP        
+  move &AT.TASKGROUP         to $TASKGROUP        
+  move &AT.RULE_ELEMENT_1    to $RULE_ELEMENT_1   
+  move &AT.RULE_ELEMENT_2    to $RULE_ELEMENT_2   
+  move &AT.RULE_ELEMENT_3    to $RULE_ELEMENT_3   
+  move &AT.RULE_ELEMENT_4    to $RULE_ELEMENT_4   
+  move &AT.RULE_ELEMENT_5    to $RULE_ELEMENT_5  
+  move &AT.DEPTID            to $DEPTID 
+  move &AT.TERMINATION_DT    to $TERMINATION_DT 
+  move &AT.EMPL_STATUS       to $EMPL_STATUS
+  
+  DO DELETE-TLM  !THIS IS NEEDED IN CASE WE ARE CORRECTING AN EXISTING EFFDT
+  !SHOW 'INSERTING ' $EMPLID ' '#EMPL_RCD ' ' $EFFDT
+  IF not isblank($TERMINATION_DT)
+    !show 'term date found '   $emplid ' ' #empl_rcd ' ' $EMPL_STATUS
+    DO find-active
+  else
+   !show 'term dt not found ' $emplid ' ' #empl_rcd ' ' $EMPL_STATUS
+   move &AT.NEW_EFFDT to $termination_dt
+   do find-active
+  end-if
+  if $FOUND_ACTIVE = 'Y'
+     move &ACT_DT TO   $EFFDT
+     MOVE 'A'     TO   $TIME_RPTG_STATUS
+     DO insert-tlm
+  end-if
+   
+  FROM PS_UA_TL002_AET AT  
+ WHERE NOT EXISTS (  
+ SELECT 'X'  
+  FROM PS_TL_EMPL_DATA B  
+ WHERE B.EMPLID = AT.EMPLID  
+   AND B.EMPL_RCD = AT.EMPL_RCD  
+   AND B.EFFDT = (  
+ SELECT MAX(B1.EFFDT)  
+  FROM PS_TL_EMPL_DATA B1  
+ WHERE B1.EMPLID = B.EMPLID  
+   AND B1.EMPL_RCD = B.EMPL_RCD  
+   AND B1.EFFDT <= sysdate)    
+   AND B.WORKGROUP = AT.WORKGROUP
+   AND B.TIME_RPTR_IND = AT.TIME_RPTR_IND  
+   AND B.TIME_RPTG_STATUS = 'A')
+   AND AT.EMPL_STATUS <> 'A'
+ AND NOT EXISTS (  
+ SELECT 'X'  
+  FROM PS_UA_TL_WG_OVRD V  
+ WHERE V.EMPLID = AT.EMPLID  
+   AND V.EMPL_RCD = AT.EMPL_RCD)   
+   !AND AT.EMPLID = '01342656'
+   
+END-SELECT
+END-PROCEDURE
+
+!********************************
+begin-procedure find-active
+!********************************
+! for current inactive without enorllment, look back to find last active effdt
+! within the time reporting period
+MOVE 'N' TO $FOUND_ACTIVE
+begin-select loops=1 
+JA.EMPLID
+JA.EMPL_RCD
+GREATEST(JA.EFFDT, $PAY_BEGIN_DT) &ACT_DT  !CHANGE TO &CMP_BEGIN AFTER 28 DAYS
+JA.EFFDT
+JA.EMPL_STATUS
+  !SHOW 'FOUND ACTIVE FOR CURRENT INACTIVE ' $EMPLID ' ' #EMPL_RCD ' ' &ACT_DT
+  MOVE 'Y' TO $FOUND_ACTIVE
+FROM PS_JOB JA
+WHERE JA.EMPLID = $EMPLID
+AND   JA.EMPL_RCD = #EMPL_RCD
+AND   JA.EFFDT <= $TERMINATION_DT
+AND   JA.EMPL_STATUS = 'A'
+ORDER BY JA.EFFDT DESC
+end-select
+ if $FOUND_ACTIVE = 'N'
+   !show 'active not found '   $EMPLID ' ' #EMPL_RCD ' ' &ACT_DT
+ end-if
+end-procedure
+
+
+!********************************
+begin-procedure find-inactive
+!********************************
+!find active wg enrollment not in tl2 tmp table - inactivate these
+do Get-Current-DateTime
+Show 'Check for Inactivations at ' $AsOfNow
+ move 'Inactivate Enrollment' to $Message
+
+BEGIN-SELECT
+AI.EMPLID
+AI.EMPL_RCD
+AI.EFFDT
+AI.WORKGROUP
+AI.TIME_RPTG_STATUS
+AI.TIME_RPTR_IND
+AI.ELP_TR_TMPLT_ID
+AI.PCH_TR_TMPLT_ID
+AI.TASKGROUP
+TI.TERMINATION_DT
+
+  move &AI.EMPLID           To $EMPLID   
+  move &AI.EMPL_RCD         To #EMPL_RCD 
+  !move &AI.EFFDT            To $EFFDT    
+  move &AI.WORKGROUP        To $WORKGROUP
+  MOVE &AI.TIME_RPTR_IND    To $TIME_RPTR_IND  
+  MOVE &AI.ELP_TR_TMPLT_ID  To $ELP_TR_TMPLT_ID
+  MOVE &AI.PCH_TR_TMPLT_ID  To $PCH_TR_TMPLT_ID
+  MOVE &AI.TASKGROUP        To $TASKGROUP      
+  MOVE &TI.TERMINATION_DT   To $EFFDT
+
+ !SHOW 'FOUND INACTIVATION ' $EMPLID
+
+
+
+  !first, delete future
+  
+  
+  MOVE 'I'   To $TIME_RPTG_STATUS
+  
+  IF NOT ISBLANK(&TI.TERMINATION_DT) 
+    MOVE &TI.TERMINATION_DT   To $EFFDT
+  ELSE
+    do get-current-job-inact
+  END-IF
+  do delete-tlm
+  DO INSERT-TLM
+
+
+FROM PS_TL_EMPL_DATA AI
+,    PS_UA_TL002_AET TI
+ WHERE AI.EFFDT = (SELECT MAX(AT1.EFFDT) FROM PS_TL_EMPL_DATA AT1
+  WHERE AT1.EMPLID   = AI.EMPLID
+  AND   AT1.EMPL_RCD = AI.EMPL_RCD
+  AND   AT1.EFFDT <= SYSDATE)
+ AND    AI.TIME_RPTG_STATUS = 'A'
+ AND    TI.EMPLID = AI.EMPLID
+ AND    TI.EMPL_RCD = AI.EMPL_RCD
+ AND    TI.EMPL_STATUS <> 'A'
+AND NOT EXISTS (  
+ SELECT 'X'  
+  FROM PS_UA_TL_WG_OVRD G  
+ WHERE AI.EMPLID = G.EMPLID  
+   AND AI.EMPL_RCD = G.EMPL_RCD) 
+ !and ai.emplid = '01096526'
+END-SELECT
+end-procedure
+
+!********************************
+begin-procedure get-current-job-inact
+! get current inactive job record
+! to prepare to inactivate WG enrollment
+!********************************
+
+BEGIN-SELECT loops=1
+J.EMPLID
+J.EMPL_RCD
+J.EFFDT
+J.EFFSEQ
+J.EMPL_STATUS
+J.PAYGROUP
+J.EMPL_CLASS
+J.ACTION
+J.ACTION_REASON
+J.TERMINATION_DT
+J.EXPECTED_END_DATE
+J.DEPTID
+
+  MOVE &J.EMPLID             To $EMPLID       
+  MOVE &J.EMPL_RCD           To #EMPL_RCD     
+  MOVE &J.EFFDT              To $EFFDT        
+  MOVE &J.EFFSEQ             To #EFFSEQ       
+  MOVE &J.EMPL_STATUS        To $EMPL_STATUS  
+  MOVE &J.PAYGROUP           To $PAYGROUP     
+  MOVE &J.EMPL_CLASS         To $EMPL_CLASS   
+  MOVE &J.ACTION             To $ACTION       
+  MOVE &J.ACTION_REASON      To $ACTION_REASON   
+  MOVE &J.TERMINATION_DT     To $TERMINATION_DT  
+  MOVE &J.EXPECTED_END_DATE  To $EXPECTED_END_DATE
+  MOVE &J.DEPTID             To $DEPTID
+  
+  !MOVE 'I'                   To $TIME_RPTG_STATUS
+  !first, delete future
+  !do delete-tlm-gt
+  !DO INSERT-TLM
+  
+FROM PS_JOB J
+WHERE J.EMPLID   = $EMPLID
+AND   J.EMPL_RCD = #EMPL_RCD
+AND   J.EMPL_STATUS <> 'A'
+AND   J.EFFDT <= SYSDATE
+ORDER BY J.EFFDT DESC
+END-SELECT
+end-procedure
+
+!********************************
+begin-procedure insert-tlm 
+!********************************
+let $tl_start_dt = '21-SEP-2009'
+ 
+ if $effdt < $tl_start_dt
+   show 'move start date from ' $effdt ' to  ' $tl_start_dt
+   let $effdt = $tl_start_dt
+ end-if
+move 'Insert' to $SQLTag
+MOVE 'TL_EMPL_DATA' TO $TBNAME
+begin-sql                on-error = err-sql-tlm
+INSERT INTO PS_TL_EMPL_DATA 
+  (EMPLID 
+ , EMPL_RCD 
+ , EFFDT 
+ , TIME_RPTG_STATUS 
+ , TIME_RPTR_IND 
+ , ELP_TR_TMPLT_ID 
+ , PCH_TR_TMPLT_ID 
+ , PERIOD_ID 
+ , WORKGROUP 
+ , TASKGROUP 
+ , TASK_PROFILE_ID 
+ , TCD_GROUP_ID 
+ , RESTRICTION_PRF_ID 
+ , TL_TIME_TO_PAY 
+ , RULE_ELEMENT_1 
+ , RULE_ELEMENT_2 
+ , RULE_ELEMENT_3 
+ , RULE_ELEMENT_4 
+ , RULE_ELEMENT_5 
+ , TIMEZONE)
+ VALUES
+ 	($EMPLID 
+ , #EMPL_RCD 
+ , $EFFDT 
+ , $TIME_RPTG_STATUS 
+ , $TIME_RPTR_IND 
+ , $ELP_TR_TMPLT_ID 
+ , $PCH_TR_TMPLT_ID 
+ , $PERIOD_ID 
+ , $WORKGROUP 
+ , $TASKGROUP 
+ , $TASK_PROFILE_ID 
+ , $TCD_GROUP_ID 
+ , $RESTRICTION_PRF_ID 
+ , $TL_TIME_TO_PAY 
+ , $RULE_ELEMENT_1 
+ , $RULE_ELEMENT_2 
+ , $RULE_ELEMENT_3 
+ , $RULE_ELEMENT_4 
+ , $RULE_ELEMENT_5 
+ , $TIMEZONE
+ )
+end-sql
+  Add 1 to #Inserted
+  do create-status-record
+  do print-report
+  
+ end-procedure
+
+
+!********************************
+begin-procedure update_tlm
+!********************************
+MOVE 'TL_EMPL_DATA' TO $TBNAME
+MOVE 'Update' to $SQLTag
+begin-sql               on-error = err-sql-tlm
+UPDATE PS_TL_EMPL_DATA
+SET TIME_RPTG_STATUS = $TIME_RPTG_STATUS 
+   ,WORKGROUP        = $WORKGROUP
+   ,TASKGROUP        = $TASKGROUP
+   ,TIME_RPTR_IND    = $TIME_RPTR_IND
+WHERE EMPLID   = $EMPLID
+AND   EMPL_RCD = #EMPL_RCD
+AND   EFFDT    = #EFFDT
+END-SQL
+Add 1 to #Updated
+do print-report
+END-PROCEDURE
+
+
+!********************************
+begin-procedure create-status-record
+!********************************
+BEGIN-SQL
+INSERT INTO PS_TL_TR_STATUS  
+ SELECT A.EMPLID  
+ ,A.EMPL_RCD  
+ ,'Y'  
+ ,A.EFFDT  
+ ,SYSDATE  
+ , 0  
+  FROM PS_TL_EMPL_DATA A  
+ WHERE A.EMPLID = $EMPLID
+ AND   A.EMPL_RCD = #EMPL_RCD
+ AND NOT EXISTS(  
+ SELECT 'X'  
+  FROM PS_TL_TR_STATUS B  
+ WHERE B.EMPLID = A.EMPLID  
+   AND B.EMPL_RCD = A.EMPL_RCD)  
+   AND A.TIME_RPTG_STATUS = 'A'  
+   AND A.EFFDT = (  
+ SELECT MIN(A1.EFFDT)  
+  FROM PS_TL_EMPL_DATA A1  
+ WHERE A1.EMPLID = A.EMPLID  
+   AND A1.EMPL_RCD = A.EMPL_RCD)
+END-SQL
+END-PROCEDURE
+
+
+!********************************
+begin-procedure delete-tlm
+!********************************
+
+MOVE 'TL_EMPL_DATA' TO $TBNAME
+MOVE 'Delete' to $SQLTag
+begin-sql               on-error = err-sql-tlm
+DELETE FROM  PS_TL_EMPL_DATA 
+WHERE EMPLID    = $EMPLID
+AND   EMPL_RCD  = #EMPL_RCD
+AND   EFFDT    >= $EFFDT
+end-sql
+  add 1 to #Deleted
+  do print-report
+end-procedure
+
+!********************************
+begin-procedure delete-tlm-gt
+!********************************
+MOVE 'TL_EMPL_DATA' TO $TBNAME
+MOVE 'Delete' to $SQLTag
+!show 'delete-tlm-gt ' $emplid ' ' #empl_rcd ' ' $effdt
+begin-sql               on-error = err-sql-tlm
+DELETE FROM  PS_TL_EMPL_DATA 
+WHERE EMPLID    = $EMPLID
+AND   EMPL_RCD  = #EMPL_RCD
+AND   EFFDT    > $EFFDT
+end-sql
+  !add 1 to #Deleted
+  !do print-report
+end-procedure
+
+
+
+!********************************
+begin-procedure err-sql-tlm
+!********************************
+show  'error on ' $SQLTag ' from table ' $tbname ' having key values ' $emplid ' ' #empl_rcd ' '  $EFFDT
+
+add 1 to #Errors
+let $Message = $SQLTag || ' ' || $tbname
+MOVE 'Error' to $SqlTag
+  add 1 to #Error
+  do print-report
+end-procedure
+
+
+!********************************
+begin-procedure print-report
+!********************************
+
+  !show 'printing'
+
+print $SQLTag        (+1, {ColSQLTag})                         
+print $Message       (  , {ColMessage})                        
+print $emplid        (  , {ColEmplid})                         
+Print #empl_rcd      (  , {ColEmplRcd})   EDIT 999 
+ do get-name                
+Print $Name          (  , {ColName})   
+print $effdt         (  , {ColEffdt})     EDIT YYYY-MM-DD      
+print $workgroup     (  , {ColWorkgroup})                      
+print $TIME_RPTR_IND (  , {ColRptgType})                      
+print $deptid        (  , {ColDeptid})                      
+print $tgt_wg        (  , {ColWorkgroup2})                     
+end-procedure
+
+
+!********************************
+begin-procedure get-name
+!********************************
+begin-select
+N.NAME
+ move &N.NAME TO $NAME
+FROM PS_PERSONAL_DATA N
+WHERE N.EMPLID = $EMPLID
+end-select
+end-procedure
+
+!********************************
+begin-procedure report-totals
+!********************************
+print 'Total Rows Inserted : ' (+10, 1)
+print #Inserted               ()      edit 999,999
+print 'Total Rows Deleted  : ' (+2, 1)
+print #Deleted                ()      edit 999,999
+print 'Total Rows Updated  : ' (+2, 1)
+print #Updated                ()      edit 999,999
+print 'Total Rows In Error : ' (+2, 1)
+print #Errors                 ()      edit 999,999
+
+ show  'Total Rows Inserted: ' #Inserted               
+ show  'Total Rows Deleted : ' #Deleted                
+ show  'Total Rows Updated : ' #Updated                
+ show  'Total SQL Errors   : ' #Errors
+
+end-procedure
+
+#Include 'curdttim.sqc'  !Get-Current-DateTime procedure
+#Include 'datetime.sqc'  !Routines for date and time formatting
+#Include 'number.sqc'    !Routines to format numbers
+#Include 'readxlat.sqc'  !Read-Translate-Table procedure
+#Include 'stdapi.sqc'    !Update Process API
+#include 'datemath.sqc'  !Routines for date and time formatting
+#Include 'sqrtrans.sqc'  !Translate SQR strings to given language
+
+
+

@@ -94,8 +94,10 @@ addtopath /usr/bin
 addtopath ~/bin
 bashify GIT_HOME
 addtopath $GIT_HOME/bin
+set -x
 bashify JAVA_HOME
 addtopath $JAVA_HOME/bin
+set +x
 
 # configure python3 environment
 #alias python=python3
@@ -148,6 +150,7 @@ alias fn='{ alias && export -f; } | egrep "\(\)|alias" | sed "s/alias //ig" | cu
 alias gitlog='git log --pretty=format:"[%h] %ae, %ar: %s" --stat'
 alias h='history'
 alias j='jobs -l'
+alias jjs='rlwrap $JAVA_HOME/bin/jjs'
 alias l='ls --color=tty -A -B -F --ignore="desktop.ini" --ignore="NTUSER*" --ignore="ntuser*" --ignore=".*"'
 alias ld='du -hs * | grep -e "^[0-9].*G\s" -e "^[0-9].*M\s" | sort -n -k 2,2 -s'
 alias markdown='perl /usr/local/bin/markdown.pl '				# call Perl markdown

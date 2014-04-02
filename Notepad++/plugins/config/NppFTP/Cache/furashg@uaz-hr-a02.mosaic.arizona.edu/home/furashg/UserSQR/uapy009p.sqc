@@ -1,0 +1,1648 @@
+!***********************************************************************
+!  Modifications                                                       *
+!                                                                      *
+!  By          Date       Description                                  *
+!  ----------- ---------- -------------------------------------------- *
+!  SHIMEL      04/11/2011 HCM-1936 Added new edits related to locality tax data.
+!  TGOSTAS     12/21/2010 HRP-146 (HRP-1) Add new edits for Multi-state taxation.
+!                         Modify 2 existing edits to accomodate multi-state.
+!  TGOSTAS     08/02/2010 HCM-1034 Added check for invalid timecard status
+!  TGOSTAS     06/23/2010 HCM-1001 - project UA_PY_TAX_10C - Changed default
+!                         state tax rate from 20.3 to 2.7.
+!  SWATSON     01/11/2010 UA_PY_0009 - Added PS_STATE_TAX_DATA.RES_ADDL_ALLOW.
+!       The field was added as part of tax patch.
+!  furashg     11/4/2009  R02192 added edit for garnishments
+!  ABEECHAM    6/23/2009  UA_PY_0009 - UA Additions to PAY034
+!                         All aliases should begin with Y
+!                         UA_PY_0009 - maintenance
+!  OGH         07/11/12   HCM-4097  - Removed unneeded procedure and added criteria
+!                         to exclude events older than 90 days in procedure
+!                         listing new hires with a business address
+!  FRILLERA    09/11/12   HCM-1669 - Added an edit when the non-resident
+!                         tax status on the Federal Tax Data tab does 
+!                         not match the State Tax Data tab.  The edit
+!                         message should be “Non-Resident Alien
+!                         Federal Special Tax Withholding Tax Status
+!                         does not match the State Tax Data Special
+!                         Tax Status.”
+!  LLSWANSO    04/17/13   HCM-5547 fix Visa permit type to include all F% or J% types
+!
+!	 ANDYO			 03/12/14   UA_HCM_6196 Andy Orta Revise procedure P01-Visa-New-Hire 
+!													to look for new visa types <> H1B or PR. Also, to look for only 
+!													job rows with a HIRE or NEW HIRE action with in the last 30days.
+!													Should also meet other criteria.
+!  FURASHG     04/01/14   HCM-6776 revised P06-Missing-BUSN-Addr to exclude employees
+!                         who have since returned to the state
+!***********************************************************************
+! SQR References:
+! Tables:     PS_R_PAY034
+! Variables $RunID, $ReportOption
+!
+!*********************************************************************
+! begin-procedure Print-Error-Message
+!   print $Company                (+1,1)
+!   print $Emplid                 (0,7)
+!   print #EMPL_RCD               (0,20)  edit 99999
+!   print $Message                (0,28) ! Changed to match heading start posn
+!   print $Message-Data1          (0,90)
+!   print $Message-Data2          (0,105)
+! end-procedure
+!***********************************************************************
+! Sample Procdure
+!***********************************************************************
+!  Procedure-Name userid project date
+!begin-procedure Procedure-Name
+!!***********************************************************************
+!  move 'Saple Procedure' to $Message
+!  do Get-Current-DateTime
+!  show 'Start ' $Message ' at ' $AsOfNow
+!  print $Message (+1,1)
+!
+!begin-SELECT
+!
+!&col1
+!&col2
+!&col3
+!&col4
+!&col5
+!&col6
+!
+!  move &col1                 to $Company                !populate these variables with any data that fits and supports your error routine
+!  move &col2                 to $Emplid                 !populate these variables with any data that fits and supports your error routine
+!  move &col3                 to #EMPL_RCD               !populate these variables with any data that fits and supports your error routine
+!  move &col4                 to $Message-Data1          !populate these variables with any data that fits and supports your error routine
+!  move &col5                 to $Message-Data2          !populate these variables with any data that fits and supports your error routine
+!  Let $Message = $Message || to_char(&col5) || to_char(&col6) !optional, concat other values onto message
+!
+!  do Print-Error-Message
+!  add 1 to #Records
+!
+!FROM   [tables]
+!
+![where clause causing error condition]
+!
+!end-SELECT
+!end-procedure
+!***********************************************************************
+begin-procedure UA-Payroll-Edits
+!***********************************************************************
+do P01-Visa-New-Hire
+do P02-NRA-No-Visa
+do P03-Reset-AZ-UI
+do P04-garnish-not-deduct
+do P05-Identify-PD-Timecards-Without-PayrollReqNum                ! HCM-1034
+do P06-Missing-BUSN-Addr                                          ! HRP-146
+do P07-State-Mismatch                                             ! HRP-146
+do P08-NewHire-with-Business-Addr                                 ! HRP-146
+do P09-Employee-with-Multiple-Tax-Distributions                   ! HRP-146
+do P10-Check-Special-SWT-Status-None-AZ-Withholding-Pct-Zero      ! HCM-1936
+do P11-Check-Local-Tax-Data                                       ! HCM-1936
+do P12-Mismatch-Non-Resident-State-Federal-Special-Status         ! HCM-1669
+end-procedure
+
+
+!** UA_HCM_6196 03/12/2014 Andy Orta ANDYO  
+!**
+!** Start Revised procedure - 
+!** This revised procedure will look at any employees who in the last 30days have
+!** had a action of HIRE or REHIRE in job data, and meet the other criteria. 
+!** It also now looks at all visa permit types other then H1B or PR. 
+!** 
+!** Original procedure by ABEECHAM 6/23/2009 UA_PY_0009.
+!***********************************************************************
+begin-procedure P01-Visa-New-Hire  
+!***********************************************************************
+
+	move 'Visa New Hire' to $Message
+	show 'Start ' $Message ' at ' $AsOfNow
+	print $Message (+1,1)
+	move ' '                   to $Message-Data1 !** Andy Orta ANDYO - Moved these here so only happens once. You can un-comment same line below to use. 
+	move ' '                   to $Message-Data2 !** Andy Orta ANDYO - Moved these here so only happens once. You can un-comment same line below to use. 
+
+BEGIN-SELECT
+VD.VISA_PERMIT_TYPE
+FT.EMPLID
+
+  move &VD.VISA_PERMIT_TYPE  to $Company                !populate these variables with any data that fits and supports your error routine
+  move &FT.EMPLID            to $Emplid                 !populate these variables with any data that fits and supports your error routine
+  move 0                     to #EMPL_RCD               !populate these variables with any data that fits and supports your error routine
+!  move ' '                   to $Message-Data1         !populate these variables with any data that fits and supports your error routine
+!  move ' '                   to $Message-Data2         !populate these variables with any data that fits and supports your error routine
+  move 'Visa New Hire' to $Message
+  Let $Message = $Message || ' - Set Fed Tax WH Status to NRA' !optional, concat other values onto message
+
+  do Print-Error-Message
+  add 1 to #Records
+
+FROM PS_VISA_PMT_DATA VD
+INNER JOIN PS_FED_TAX_DATA FT
+ON (
+    VD.EMPLID = FT.EMPLID AND
+    FT.COMPANY = 'UAZ'
+  )
+INNER JOIN PS_JOB JOB
+ON (
+    FT.EMPLID = JOB.EMPLID
+  )
+WHERE VD.EFFDT = 
+  	(
+    SELECT MAX(VD2.EFFDT)
+    FROM PS_VISA_PMT_DATA VD2
+    WHERE VD.EMPLID = VD2.EMPLID AND
+	    VD.DEPENDENT_ID = VD2.DEPENDENT_ID AND
+	    VD.COUNTRY = VD2.COUNTRY AND
+	    !VD.VISA_PERMIT_TYPE = VD2.VISA_PERMIT_TYPE AND -- !** Andy Orta ANDYO - We don't care about the visa type, just want the max effdt'd row.
+	    VD2.EFFDT <= SYSDATE
+    )
+AND VD.VISA_PERMIT_TYPE NOT IN ('H1B', 'PR') 
+AND FT.EFFDT =
+  	(
+    SELECT MAX(FT2.EFFDT)
+    FROM PS_FED_TAX_DATA FT2
+    WHERE FT.EMPLID = FT2.EMPLID AND
+	    FT.COMPANY 		= FT2.COMPANY AND
+	    FT2.EFFDT 		<= SYSDATE
+	   )
+AND FT.SPECIAL_FWT_STATUS <> 'A'
+AND JOB.EFFDT = 
+  	(
+    SELECT MAX(JOB2.EFFDT)
+    FROM PS_JOB JOB2
+    WHERE JOB.EMPLID  = JOB2.EMPLID AND
+	    JOB.EMPL_RCD 		= JOB2.EMPL_RCD AND
+	    JOB2.ACTION IN ('HIR', 'REH') AND
+	    JOB2.EFFDT BETWEEN trunc(sysdate) - 30 AND trunc(sysdate)
+	   )
+AND JOB.EFFSEQ =
+ 	 (
+    SELECT MAX(JOB3.EFFSEQ)
+    FROM PS_JOB JOB3
+    WHERE JOB.EMPLID = JOB3.EMPLID AND
+	    JOB.EMPL_RCD 	 = JOB3.EMPL_RCD AND
+	    JOB3.ACTION IN ('HIR', 'REH') AND
+	    JOB.EFFDT = JOB3.EFFDT 
+  	)
+AND JOB.HR_STATUS = 'A'
+ORDER BY JOB.EFFDT
+END-SELECT
+
+End-Procedure !P01-Visa-New-Hire
+!** End Revised procedure - UA_HCM_6196 03/12/2013 Andy Orta ANDYO 
+
+!** UA_HCM_6196 03/12/2013 Andy Orta ANDYO 
+!** Start Commenting out old procedure.
+!!***********************************************************************
+!begin-procedure P01-Visa-New-Hire  !ABEECHAM 6/23/2009 UA_PY_0009
+!!***********************************************************************
+!  move 'Visa New Hire' to $Message
+!  do Get-Current-DateTime
+!  show 'Start ' $Message ' at ' $AsOfNow
+!  print $Message (+1,1)
+!! Begin HCM-5547 fix Visa permit type to include all F% or J% types
+!begin-SELECT
+!Y2.VISA_PERMIT_TYPE
+!Y1.EMPLID
+!
+!
+!  move &Y2.VISA_PERMIT_TYPE  to $Company                !populate these variables with any data that fits and supports your error routine
+!  move &Y1.EMPLID            to $Emplid                 !populate these variables with any data that fits and supports your error routine
+!  move 0                     to #EMPL_RCD               !populate these variables with any data that fits and supports your error routine
+!  move ' '                   to $Message-Data1          !populate these variables with any data that fits and supports your error routine
+!  move ' '                   to $Message-Data2          !populate these variables with any data that fits and supports your error routine
+!  move 'Visa New Hire' to $Message
+!  Let $Message = $Message || ' - Set Fed Tax WH Status to NRA' !optional, concat other values onto message
+!
+!  do Print-Error-Message
+!  add 1 to #Records
+!
+!FROM   PS_FED_TAX_DATA Y1
+!      ,PS_VISA_PMT_DATA Y2
+!      ,PS_R_PAY034 Y1A
+!WHERE Y2.EMPLID = Y1.EMPLID
+!AND   Y1.LAST_ACTION IN ('D')
+!AND   Y1.SPECIAL_FWT_STATUS <> 'A'
+!AND   Y1.EFFDT = 
+!	(
+!		SELECT MAX(Y1E.EFFDT) 
+!		FROM PS_FED_TAX_DATA Y1E
+!   	WHERE Y1E.COMPANY = Y1.COMPANY
+!	   	AND   Y1E.EMPLID  = Y1.EMPLID
+!	   	AND   Y1E.EFFDT  <= $AsOfToday
+!   )
+!!AND   Y2.VISA_PERMIT_TYPE IN ('F1','J1')  HCM-5547 remove this line replace with line below
+!AND   (
+!				Y2.VISA_PERMIT_TYPE LIKE 'F%' 
+!					OR 
+!				Y2.VISA_PERMIT_TYPE LIKE 'J%' 
+!			)
+!AND Y2.VISA_PERMIT_TYPE NOT IN ('H1B', 'PR') 
+!AND Y2.EFFDT = 
+!	(
+!		SELECT MAX(Y2E.EFFDT) 
+!		FROM PS_VISA_PMT_DATA Y2E
+!		WHERE Y2E.EMPLID = Y2.EMPLID
+!	   	AND   Y2E.DEPENDENT_ID = Y2.DEPENDENT_ID
+!	   	AND   Y2E.COUNTRY = Y2.COUNTRY
+!	   	AND   Y2E.EFFDT  <= $AsOfToday
+!   )
+!AND Y1A.EMPLID = Y1.EMPLID
+!
+!end-SELECT
+!! End HCM-5547 fix Visa permit type to include all F% or J% types
+!end-procedure
+!** UA_HCM_6196 03/12/2013 Andy Orta ANDYO 
+!** End Commenting out old procedure.
+
+
+!***********************************************************************
+begin-procedure P02-NRA-No-Visa  !ABEECHAM 6/23/2009 UA_PY_0009
+!***********************************************************************
+  move 'Fed Tax NRA w/No Visa' to $Message
+  do Get-Current-DateTime
+  show 'Start ' $Message ' at ' $AsOfNow
+  print $Message (+1,1)
+
+begin-SELECT
+Y4.EMPLID
+
+
+  move ' '  to $Company                !populate these variables with any data that fits and supports your error routine
+  move &Y4.EMPLID            to $Emplid                 !populate these variables with any data that fits and supports your error routine
+  move 0                     to #EMPL_RCD               !populate these variables with any data that fits and supports your error routine
+  move ' '                   to $Message-Data1          !populate these variables with any data that fits and supports your error routine
+  move ' '                   to $Message-Data2          !populate these variables with any data that fits and supports your error routine
+  move 'FED Tax NRA/No Visa Data' to $Message
+  Let $Message = $Message || ' - Populate EE Visa Data' !optional, concat other values onto message
+
+  do Print-Error-Message
+  add 1 to #Records
+
+FROM   PS_FED_TAX_DATA Y4
+      ,PS_R_PAY034 Y6
+WHERE Y4.SPECIAL_FWT_STATUS = 'A'
+AND   Y4.EFFDT = (SELECT MAX(Y1E.EFFDT) FROM PS_FED_TAX_DATA Y1E
+   WHERE Y1E.COMPANY = Y4.COMPANY
+   AND   Y1E.EMPLID  = Y4.EMPLID
+   AND   Y1E.EFFDT  <= $AsOfToday)
+   AND   Y6.EMPLID = Y4.EMPLID
+AND NOT EXISTS
+(SELECT 'X' FROM PS_VISA_PMT_DATA Y5
+WHERE   Y5.EMPLID = Y4.EMPLID
+!AND Y5.VISA_PERMIT_TYPE IN ('F1','J1')             ! REPORT ON THIS ERROR REGARDLESS OF VISA TYPE
+AND   Y5.EFFDT = (SELECT MAX(Y2E.EFFDT) FROM PS_VISA_PMT_DATA Y2E
+   WHERE Y2E.EMPLID = Y5.EMPLID
+   AND   Y2E.DEPENDENT_ID = Y5.DEPENDENT_ID
+   AND   Y2E.COUNTRY = Y5.COUNTRY
+   AND   Y2E.VISA_PERMIT_TYPE = Y5.VISA_PERMIT_TYPE  !ABEECHAM 9/30/2009 LINE MISSING FROM ORIGINAL VERSION
+   AND   Y2E.EFFDT  <= $AsOfToday)
+   )
+end-SELECT
+end-procedure
+
+!***********************************************************************
+begin-procedure P03-Reset-AZ-UI  !ABEECHAM 6/23/2009 UA_PY_0009
+!***********************************************************************
+  move 'Reset AZ UI to $99M' to $Message
+  do Get-Current-DateTime
+  show 'Start ' $Message ' at ' $AsOfNow
+  print $Message (+1,1)
+
+begin-SELECT
+Y3.STATE
+Y3.MAX_GROSS
+
+
+
+  move &Y3.STATE             to $Company                !populate these variables with any data that fits and supports your error routine
+  move ' '                   to $Emplid                 !populate these variables with any data that fits and supports your error routine
+  move &Y3.MAX_GROSS         to #EMPL_RCD               !populate these variables with any data that fits and supports your error routine
+  move ' '                   to $Message-Data1          !populate these variables with any data that fits and supports your error routine
+  move ' '                   to $Message-Data2          !populate these variables with any data that fits and supports your error routine
+  move  'SetUp HRMS>Product Related>Payroll for North America>Federal/State Taxes>Tax Table>AZ>Additional Rates>Max Gross'  to $Message
+  do Print-Error-Message
+  add 1 to #Records
+
+FROM  PS_ST_OTH_TAX_TBL Y3
+WHERE Y3.STATE = 'AZ'
+AND   Y3.TAX_CLASS = 'U'
+AND   Y3.EFFDT = (SELECT MAX(Y3E.EFFDT) FROM PS_ST_OTH_TAX_TBL Y3E
+   WHERE Y3E.STATE = Y3.STATE
+   AND   Y3E.TAX_CLASS = Y3.TAX_CLASS
+   AND   Y3E.EFFDT <= $AsOfToday)
+AND Y3.MAX_GROSS < 99999999
+end-SELECT
+end-procedure
+
+!***********************************************************************
+! insert-procedure ps_tax_distrib
+!***********************************************************************
+begin-PROCEDURE insert_ps_tax_distrib
+      LET $procedure_name = 'insert_ps_tax_distrib'
+
+BEGIN-SQL ON-ERROR=error-procedure
+insert into ps_tax_distrib(
+       EMPLID
+     , EMPL_RCD
+     , EFFDT
+     , STATE
+     , LOCALITY
+     , DIST_PCT )
+     values(
+    $emplid   ! EMPLID from PER_ORG_ASGN_VW
+  , #empl_rcd ! EMPL_RCD from PER_ORG_ASGN_VW Create a record for each EMPL_RCD the employee has.
+  , $effdt    ! EFFDT POP0200_EXEMPT_CHG_DATE in PSOS would be a good Effective Date to use for Tax Data
+  , 'AZ'  ! STATE  default to 'AZ'
+  , ' ' ! LOCALITY  default to ' ' space
+  , '100')  ! DIST_PCT  default to '100'
+END-SQL
+
+end-procedure !insert_ps_tax_distrib
+
+!***********************************************************************
+! insert-procedure ps_tax_dist_effdt
+!***********************************************************************
+begin-PROCEDURE insert_ps_tax_dist_effdt
+      LET $procedure_name = 'insert_ps_tax_dist_effdt'
+
+BEGIN-SQL ON-ERROR=error-procedure
+insert into ps_tax_dist_effdt(
+       EMPLID
+     , EMPL_RCD
+     , EFFDT
+     , COUNTRY
+     , INSERT_PRE_FILLED
+     , UNIQUE_DIST )
+     values(
+    $emplid   ! EMPLID from crosswalk table ps_uax_emplid
+  , #empl_rcd ! EMPL_RCD PER_ORG_ASGN_VW Create a record for each EMPL_RCD the employee has.
+  , $effdt    ! EFFDT POP0200_EXEMPT_CHG_DATE in PSOS would be a good Effective Date to use for Tax Data
+  , 'USA'     ! COUNTRY  default to 'USA'
+  , 'N'       ! INSERT_PRE_FILLED  default to 'N'
+  , '2')      ! UNIQUE_DIST  default to '2'
+END-SQL
+
+end-procedure !insert_ps_tax_dist_effdt
+
+
+begin-PROCEDURE insert_ps_fed_tax_data
+      LET $procedure_name = 'insert_ps_fed_tax_data'
+
+BEGIN-SQL ON-ERROR=error-procedure
+insert into ps_fed_tax_data(
+       EMPLID
+     , COMPANY
+     , EFFDT
+     , SPECIAL_FWT_STATUS
+     , FWT_MAR_STATUS
+     , FWT_ALLOWANCES
+     , FWT_ADDL_AMT
+     , FWT_ADDL_PCT
+     , FUT_EXEMPT
+     , EIC_STATUS
+     , STATUTORY_EE
+     , DECEASED
+     , PENSION_PLAN
+     , LEGAL_REP
+     , DEFERRED_COMP
+     , USE_TOTAL_WAGE
+     , LAST_ACTION
+     , W4_PRCSS
+     , W5_PRCSS
+     , LOCK_IN_RECVD
+     , LOCK_IN_LIMIT
+     , LAST_UPDATE_DATE
+     , DATE_OF_ENTRY
+     , COUNTRY
+     , FORM_1001_RECD
+     , FORM_1001_SUBMT_DT
+     , FORM_1001_EXP_DT
+     , FORM_8233_RECD
+     , FORM_8233_SUBMT_DT
+     , FORM_8233_EXP_DT
+     , TAXPAYER_ID_NO
+     , TREATY_EXP_DT
+     , TREATY_ID
+     , FORM_1078_RECD
+     , FORM_1078_SUBMT_DT
+     , THIRDPARTY_SICKPAY
+     , W4_NAME_CHECK
+     , PY_FLAG_FOR_IRS
+     , PY_FLAG_FOR_IRS_DT
+     , CREATION_DT
+     , MARRIED_FILE_SINGL
+     , NRA_EXEMPT_WHRULE
+     , NQDC_W2_RPTG )
+     values(
+          $emplid               ! EMPLID from crosswalk table ps_uax_emplid
+        , 'UAZ'                 ! COMPANY  Default to 'UAZ'.
+        , $effdt                ! EFFDT POP0200_EXEMPT_CHG_DATE in PSOS would be a good Effective Date to use for Tax Data
+        , 'N'                   ! SPECIAL_FWT_STATUS pop0200_federal_exemptions from psos 99 = A 96,97,98 = E else N
+        , 'S'                   ! FWT_MAR_STATUS pop0200_marital_status from psos P,M = M else S
+        , 0                     ! FWT_ALLOWANCES pop0200_federal_exemptions from psos > 95 = 0 else pop0200_federal_exemptions
+        , 0                     ! FWT_ADDL_AMT leg_ded_bal code 019 & type G = amt else 0
+        , 0                     ! FWT_ADDL_PCT Default to 0
+        , 'Y'                   ! FUT_EXEMPT Default to 'Y'
+        , 'N'                   ! EIC_STATUS led_ded_bal code 051 & type G 1 = 'S' 2 = 'U' 3 = 'M' else 'N'
+        , 'N'                   ! STATUTORY_EE     Default to 'N'
+        , 'N'                   ! DECEASED ps_person.dt_of_death not null 'Y' else 'N'
+        , 'N'                   ! PENSION_PLAN Default to 'N'
+        , 'N'                   ! LEGAL_REP Default to 'N'
+        , 'N'                   ! DEFERRED_COMP Default to 'N'
+        , 'N'                   ! USE_TOTAL_WAGE Default to 'N'
+        , 'D'                   ! LAST_ACTION Default to 'D'.  This value was the default in our trace file.
+        , ' '                   ! W4_PRCSS Default to Null (space).
+        , ' '                   ! W5_PRCSS Default to Null (space).
+        , 'N'                   ! LOCK_IN_RECVD Default to 'N'
+        , '0'                   ! LOCK_IN_LIMIT Default to 0 (zero).
+        , TRUNC(SYSDATE)        ! LAST_UPDATE_DATE Default to TRUNC(SYSDATE) no timestamp.
+        , NULL                  ! DATE_OF_ENTRY     ! Will come from leg_8233_demo $dt_of_entry
+        , ' '                   ! COUNTRY           8233demo home country 1042country xlat $home_country
+        , 'N'                   ! FORM_1001_RECD    Default to 'N'.
+        , ''                    ! FORM_1001_SUBMT_DT Default to ''.
+        , ''                    ! FORM_1001_EXP_DT   Default to ''.
+        , 'N'                   ! FORM_8233_RECD   If exp_dt not null set to 'Y' else 'N" &8233_recd
+        , NULL                  ! FORM_8233_SUBMT_DT 8233_start_date or 8233_eff_date else null $trty_st_dt
+        , NULL                  ! FORM_8233_EXP_DT   8233_stop_date else null $trty_exp_dt
+        , ' '                   ! TAXPAYER_ID_NO     Default to null (space)
+        , NULL                  ! TREATY_EXP_DT      8233_expiration_date else null
+        , ' '                   ! TREATY_ID         treaty id from ps_treaty_nra_tbl
+        , 'N'                   ! FORM_1078_RECD     ! Default to 'N'
+        , ''                    ! FORM_1078_SUBMT_DT ! Default to ''
+        , 'N'                   ! THIRDPARTY_SICKPAY Default to 'N'.
+        , 'N'                   ! W4_NAME_CHECK Default to 'N'.
+        , 'N'                   ! PY_FLAG_FOR_IRS Default to 'N'.
+        , ''                    ! PY_FLAG_FOR_IRS_DT Default to Null (no space).
+        , TRUNC(SYSDATE)        ! CREATION_DT Default to TRUNC(SYSDATE) no timestamp.
+        , 'N'                   ! MARRIED_FILE_SINGL pop0200_marital_status P = 'Y' else 'N'
+        , 'N'                   ! NRA_EXEMPT_WHRULE  If employee has deduction code 163
+        , 'N')                  ! NQDC_W2_RPTG )  ! Default to 'N'.
+END-SQL
+
+end-procedure !insert_ps_fed_tax_data
+
+!***********************************************************************
+! insert-procedure   ps_state_tax_data
+!***********************************************************************
+begin-PROCEDURE insert_ps_state_tax_data
+      LET $procedure_name = 'insert_ps_state_tax_data'
+      SHOW 'EMPLID ' $EMPLID
+BEGIN-SQL ON-ERROR=error-procedure
+insert into ps_state_tax_data(
+       EMPLID
+     , COMPANY
+     , EFFDT
+     , STATE
+     , RESIDENT
+     , NON_RES_DECLARED
+     , SPECIAL_SWT_STATUS
+     , SWT_MAR_STATUS
+     , SWT_ALLOWANCES
+     , SWT_ADDL_ALLOWNCES
+     , WAGE_PLAN_CD
+     , ANNL_EXEMPTION_AMT
+     , PERCENT_OF_FWT
+     , SWT_ADDL_AMT
+     , SWT_ADDL_PCT
+     , SDI_STATUS
+     , SUT_EXEMPT
+     , UI_JURISDICTION
+     , ADDL_AMT_ADJ
+     , WT4A_FILED
+     , LOCK_IN_RECVD
+     , LOCK_IN_LIMIT
+     , RETIREMENT_PLAN
+     , EIC_STATUS_ST
+     , HLTH_COV_IND
+     , CREATION_DT
+     , PNA_FLI_STATUS
+     , RES_ADDL_ALLOW)
+     values(
+       $EMPLID               ! EMPLID from crosswalk table ps_uax_emplid
+     , 'UAZ'                 ! COMPANY  Default to 'UAZ'.
+     , $EFFDT                ! EFFDT POP0200_EXEMPT_CHG_DATE in PSOS would be a good Effective Date to use for Tax Data
+     , 'AZ'                  ! STATE Default to 'AZ' for Arizona.  PSOS only taxes in AZ.
+     , 'Y'                   ! RESIDENT Default everybody to 'Y'
+     , 'N'                   ! NON_RES_DECLARED  default to 'N'
+     , 'N'                   ! SPECIAL_SWT_STATUS  Look At Sean's Notes!!!!!!!
+     , 'N'                   ! SWT_MAR_STATUS Default to 'N'
+     , 0                     ! SWT_ALLOWANCES Default to 0 (zero).  The state of AZ does not calulate taxes based on exemptions.
+     , 0                     ! SWT_ADDL_ALLOWNCES Default to 0 (zero).  This is not allowed in PSOS.
+     , 'S'                   ! WAGE_PLAN_CD Default to 'S'
+     , 0                     ! ANNL_EXEMPTION_AMT Default to 0 (Zero)
+!     , 20.3                  ! PERCENT_OF_FWT                                  ! HCM-1001
+     , 2.7                   ! PERCENT_OF_FWT                                   ! HCM-1001
+     , '0'                   ! SWT_ADDL_AMT Default to 0 (Zero)
+     , '0'                   ! SWT_ADDL_PCT Default to 0 (Zero)
+     , 'N'                   ! SDI_STATUS Default to 'N'
+     , 'N'                   ! SUT_EXEMPT Default to 'N'
+     , 'Y'                   ! UI_JURISDICTION Default to 'Y'
+     , 'I'                   ! ADDL_AMT_ADJ Default to 'I' (Increase Additional Amount)
+     , ' '                   ! WT4A_FILED  Default to ' ' space
+     , 'N'                   ! LOCK_IN_RECVD  Default to 'N'
+     , '0'                   ! LOCK_IN_LIMIT Default to 0 (Zero)
+     , 'N'                   ! RETIREMENT_PLAN  Default to 'N'
+     , 'N'                   ! EIC_STATUS_ST Default to 'N'
+     , 'N'                   ! HLTH_COV_IND Default to 'N'
+     , TRUNC(SYSDATE)  ! CREATION_DT  Default to TRUNC(SYSDATE)  No timestamp.
+     , 'N'                   ! PNA_FLI_STATUS Default to 'N'
+     , 0)        ! RES_ADDL_ALLOW Default to 0       !! Added SW - 01/11/2009 - New column added in Tax patch.
+END-SQL
+
+end-procedure !insert_ps_state_tax_data
+
+!***********************************************************************
+! error-procedure
+!***********************************************************************
+! abeecham 10/2009 updated procedure, comment out stop stmt and add display of keys.
+begin-PROCEDURE error-procedure
+
+    show 'Had problems in procedure ' $procedure_name
+    show 'SQL error = ' #sql-status edit 9999999 noline
+    show ' - '$sql-error
+    show 'keys: emplid=' $emplid ' #empl_rcd=' #empl_rcd ' $effdt=' $effdt  !abeecham 10/2009
+    show '******* PROGRAM TERMINATING UNSUCCESSFULLY *******'
+    show 'RETURN-STATUS = ' #RETURN-STATUS
+    !stop quiet                                                             !abeecham 10/2009
+
+
+end-PROCEDURE
+
+!-- begin modification furashg 11/4/2009 R02192 added edit for garnishments --
+!***********************************************************************
+! Procedure Name: P04-garnish-not-deduct
+! Called By:      ua-payroll-edits
+! Description:    find garnishments that have not been set up as general
+!                 deductions
+!***********************************************************************
+begin-procedure P04-garnish-not-deduct
+  move 'Garnishment w/out general deduction' to $Message
+  do Get-Current-DateTime
+  show 'Start ' $Message ' at ' $AsOfNow
+
+begin-select
+y3a.emplid
+y3a.garnid
+y3a.doc_rcvd_dt
+y3a.company
+
+  let $company = &y3a.company
+  let $emplid = &y3a.emplid
+  let #empl_rcd = ''
+  let $message-data1 = &y3a.garnid
+  let $message-data2 = &y3a.doc_rcvd_dt
+  do Print-Error-Message
+  add 1 to #Records
+
+from ps_GARN_SPEC y3a
+where garn_status in ('A', 'R')
+AND NOT EXISTS (SELECT 'X' FROM PS_GENL_DEDUCTION y3b
+WHERE y3b.emplid = y3a.emplid and y3b.company = y3a.company and y3b.dedcd = 'GARN'
+AND y3b.effdt <= sysdate)
+and exists (select 'x' from PS_R_PAY034 y3c where y3c.emplid = y3a.emplid)
+end-select
+end-procedure
+!-- end modification furashg 11/4/2009 R02192 added edit for garnishments --
+
+!-- HCM-1034 start
+!***********************************************************************
+! Procedure Name: P05-Identify-PD-Timecards-Without-PayrollReqNum
+! Called By:      ua-payroll-edits
+! Description:    Locate and report timecards with payable status PD
+!                 that are missing their payroll_req_num
+!***********************************************************************
+begin-procedure P05-Identify-PD-Timecards-Without-PayrollReqNum
+  move 'Timesheet in PD status w/PayReqNum=0' to $Message
+  do Get-Current-DateTime
+  show 'Start ' $Message ' at ' $AsOfNow
+
+begin-select
+uapt.emplid,
+uapt.empl_rcd,
+uapt.dur,
+uapt.trc,
+uapt.tl_quantity,
+uapt.seq_nbr,
+uapt.payable_status,
+uapt.payroll_req_num,
+uapt.frozen_sw,
+uapt.frozen_date
+uapt.orig_seq_nbr,
+uapt.tl_pybl_reason_cd,
+uapt.initial_seq_nbr
+
+  move 'UAZ' to $Company
+  move &uapt.emplid to $Emplid
+  move &uapt.empl_rcd to #EMPL_RCD
+  let $Message-Data1 = substr(&uapt.dur,1,11)
+  let $Message-Data2 = &uapt.trc || ' ' || edit(&uapt.tl_quantity,'999.999') ! || ' ' || edit(&uap.seq_nbr,'999999999999999')
+  do Print-Error-Message
+  add 1 to #Records
+
+from Ps_tl_payable_time uapt
+where payable_status = 'PD'
+and payroll_req_num = 0
+end-select
+
+end-procedure !P05-Identify-PD-Timecards-Without-PayrollReqNum
+!-- HCM-1034 end
+
+!-- HRP-146 start
+
+!***********************************************************************
+! Procedure Name: P06-Missing-BUSN-Addr
+! Called By:      ua-payroll-edits
+! Description:    Two edits:
+!                 1. Report employee with DTA/LOC job record who does not have
+!                 a BUSN address.  If the employee is working out of state,
+!                 they are required to have a BUSN address to record the location
+!                 for taxation purposes.
+!                 2. Report employee if tax location code on job is out of state,
+!                 but they have no business address.
+!***********************************************************************
+begin-procedure P06-Missing-BUSN-Addr
+! EDIT # 1
+  move 'Missing BUSN Address, but job says working out of state' to $Message
+  do Get-Current-DateTime
+  show 'Start ' $Message ' at ' $AsOfNow
+
+begin-select
+UAR.EMPLID
+UAR.EMPL_RCD
+UAN.NAME
+
+  move 'UAZ' to $Company
+  move &uar.emplid to $Emplid
+  move &uar.empl_rcd to #EMPL_RCD
+  let $Message-Data1 = &uan.name
+  let $Message-Data2 = ''
+  do Print-Error-Message
+  add 1 to #Records
+
+FROM PS_R_PAY034 UAR,
+PS_PERSON_NAME UAN,
+PS_JOB UAJJ
+,PS_JOB UAJL                                    ! 04/01/14 G. Furash HCM-6776
+WHERE UAR.EMPLID = UAN.EMPLID
+! ** BEGIN MODIFICATION 04/01/14 FURASHG HCM-6776 **
+! AND EXISTS (SELECT 'X' FROM PS_JOB UAJ
+!               WHERE UAR.EMPLID = UAJ.EMPLID
+!                 AND UAR.EMPL_RCD = UAJ.EMPL_RCD
+!                 AND UAJ.ACTION = 'DTA'
+!                 AND UAJ.ACTION_REASON = 'LOC')
+! ** END MODIFICATION 04/01/14 FURASHG HCM-6776 **
+AND NOT EXISTS (SELECT 'X' FROM PS_ADDRESSES UAA
+              WHERE UAA.EMPLID = UAR.EMPLID
+                AND UAA.ADDRESS_TYPE = 'BUSN')
+AND UAJJ.EMPLID = UAR.EMPLID
+AND UAJJ.EMPL_RCD = UAR.EMPL_RCD
+AND UAJJ.EFFDT = UAR.EFFDT
+AND UAJJ.EFFSEQ = (SELECT MAX(UARJ1.EFFSEQ) FROM PS_JOB UARJ1
+              WHERE UAJJ.EMPLID = UARJ1.EMPLID
+                AND UAJJ.EMPL_RCD = UARJ1.EMPL_RCD
+                AND UAJJ.EFFDT = UARJ1.EFFDT)
+AND UAJJ.EMPL_STATUS IN ('A', 'P', 'Q', 'U')
+! ** BEGIN MODIFICATION 04/01/14 FURASHG HCM-6776 **
+AND UAJL.EMPLID        = UAJJ.EMPLID
+AND UAJL.EMPL_RCD      = UAJJ.EMPL_RCD
+AND UAJL.ACTION        = 'DTA'
+AND UAJL.ACTION_REASON = 'LOC'
+AND UAJL.EFFDT         =
+  (SELECT MAX(EFFDT)
+  FROM PS_JOB
+  WHERE EMPLID      = UAJL.EMPLID
+  AND EMPL_RCD      = UAJL.EMPL_RCD
+  AND ACTION        = UAJL.ACTION
+  AND ACTION_REASON = UAJL.ACTION_REASON
+  )
+AND NOT EXISTS (
+  SELECT 'X'
+  FROM PS_JOB RTJ
+  WHERE RTJ.EMPLID      = UAJL.EMPLID
+  AND RTJ.EMPL_RCD      = UAJL.EMPL_RCD
+  AND RTJ.EFFDT        >= UAJL.EFFDT
+  AND RTJ.ACTION        = 'DTA'
+  AND RTJ.ACTION_REASON = 'LCR')
+! ** END MODIFICATION 04/01/14 FURASHG HCM-6776 **
+  end-select
+
+! EDIT # 2
+  move 'Out of state tax location, missing BUSN Address: ' to $MessageRoot
+  move '' to $Message-Data1
+  move '' to $Message-Data2
+  do Get-Current-DateTime
+  show 'Start ' $MessageRoot ' at ' $AsOfNow
+
+begin-select
+UAXR.EMPLID
+UAXR.EMPL_RCD
+UAXN.NAME
+UAXJJ.TAX_LOCATION_CD
+
+  move 'UAZ' to $Company
+  move &uaxr.emplid to $Emplid
+  move &uaxr.empl_rcd to #EMPL_RCD
+  let $Message = $MessageRoot || &uaxn.name || ' '
+  let $Message = $Message || ', tax location ' || &UAXJJ.TAX_LOCATION_CD
+  do Print-Error-Message
+  add 1 to #Records
+
+FROM PS_R_PAY034 UAXR,
+PS_PERSON_NAME UAXN,
+PS_JOB UAXJJ
+WHERE UAXR.EMPLID = UAXN.EMPLID
+AND UAXJJ.EMPLID = UAXR.EMPLID
+AND UAXJJ.EMPL_RCD = UAXR.EMPL_RCD
+AND UAXJJ.EFFDT = UAXR.EFFDT
+AND UAXJJ.EFFSEQ = (SELECT MAX(UAXRJ1.EFFSEQ) FROM PS_JOB UAXRJ1
+              WHERE UAXJJ.EMPLID = UAXRJ1.EMPLID
+                AND UAXJJ.EMPL_RCD = UAXRJ1.EMPL_RCD
+                AND UAXJJ.EFFDT = UAXRJ1.EFFDT)
+AND UAXJJ.EMPL_STATUS IN ('A', 'P', 'Q', 'U')
+AND SUBSTR(UAXJJ.TAX_LOCATION_CD,1,2) <> 'AZ'
+AND UAXJJ.ACTION_REASON <> 'LOC'                               ! =LOC are captured in the edit above
+AND NOT EXISTS (SELECT 'X' FROM PS_ADDRESSES UAAX
+              WHERE UAAX.EMPLID = UAXR.EMPLID
+                AND UAAX.ADDRESS_TYPE = 'BUSN'
+                AND UAAX.EFFDT <=UAXJJ.EFFDT)
+end-select
+
+end-procedure P06-Missing-BUSN-Addr
+
+!***********************************************************************
+! Procedure Name: P07-UA-Load-Addr-Lookups
+! Called By:      report
+! Description:    Load lookup tables to speed performance.  These lookups
+!                 will be used by P07-State-Mismatch.
+!***********************************************************************
+begin-procedure P07-UA-Load-Addr-Lookups
+  move 'Load UA Addr Lookups' to $Message
+  do Get-Current-DateTime
+  show 'Start ' $Message ' at ' $AsOfNow
+
+LOAD-LOOKUP
+NAME=Tax_Distrib
+TABLE='PS_UA_TAXDIST_ST_V'
+KEY=EMPLID||to_char(EMPL_RCD)
+RETURN_VALUE=UPPER(STATE)
+
+LOAD-LOOKUP
+NAME=Tax_Data
+TABLE='PS_UA_ST_TAX_DTA_V'
+KEY=EMPLID
+RETURN_VALUE=UPPER(STATE)
+
+LOAD-LOOKUP
+NAME=Tax_Loc_Job
+TABLE='PS_TAX_LOCATION1'
+KEY=TAX_LOCATION_CD
+RETURN_VALUE=UPPER(STATE)
+
+LOAD-LOOKUP
+NAME=Home_Addr
+TABLE='PS_PERSON_ADDR_HOM'
+KEY=EMPLID
+RETURN_VALUE=UPPER(STATE)
+
+LOAD-LOOKUP
+NAME=Busn_Addr
+TABLE='PS_UA_ADDR_BUS_VW'
+KEY=EMPLID
+RETURN_VALUE=UPPER(STATE)
+
+  do Get-Current-DateTime
+  show 'End lookup loads at ' $AsOfNow
+
+end-procedure P07-UA-Load-Addr-Lookups
+
+!***********************************************************************
+! Procedure Name: P07-State-Mismatch
+! Called By:      ua-payroll-edits
+! Description:    Ensure that the state recorded on Tax Distribution, State Tax Data,
+!                 and Tax Location Code match the correct address record.
+! Logic:          1. Acquire state values from records subject to edit.
+!                 2. If no BUSN address exists, we assume there is no out-of-state
+!                    work location, and we proceed to the AZ edit check.  (See edit P06
+!                    for missing BUSN edit.)
+!                 3. If a BUSN address exists, the employee was/is at an out-of-state
+!                    location.
+!                      a. Proceed to acquire their most current status (in/out)
+!                         based on job action/reason.
+!                      b. Based on on most current status, proceed to either AZ or
+!                         out-of-state edit check.
+!***********************************************************************
+begin-procedure P07-State-Mismatch
+  move 'Tax State Mismatch: ' to $MessageRoot
+  move '' to $Message-Data1
+  move '' to $Message-Data2
+  do Get-Current-DateTime
+  show 'Start ' $MessageRoot ' at ' $AsOfNow
+
+! Inspect reporting population
+begin-select
+UARR.EMPLID
+UARR.EMPL_RCD
+UARR.EFFDT
+UARN.NAME
+UARJ.TAX_LOCATION_CD
+
+  move 'UAZ' to $Company
+  move &uarr.emplid to $Emplid
+  move &uarr.empl_rcd to #EMPL_RCD
+  let  $uarr.effdt = datetostr(&uarr.effdt, 'DD-MON-YYYY')
+  move &uarj.tax_location_cd to $TaxLocCd
+
+  ! Get state values for this employee
+  LET $lookup_key = $Emplid || to_char(#EMPL_RCD)
+  lookup Tax_Distrib $lookup_key $TaxDistST
+
+  LET $lookup_key = $TaxLocCd
+  lookup Tax_Loc_Job $lookup_key $TaxLocST
+
+  LET $lookup_key = $Emplid
+  lookup Tax_Data $lookup_key $TaxDataST
+  lookup Home_Addr $lookup_key $HomeAddrST
+  lookup Busn_Addr $lookup_key $BusinessAddrST
+
+  ! If they have no business address, all states should match home,
+  ! and we're done with the edit.
+  if $BusinessAddrST = ''
+    do P07-Home-Edit
+  else
+    ! They have a business address, meaning they worked/are working out of state.
+    ! We need to determine where they should be. Are they currently under a LOC or LCR condition?
+    ! DTA LOC = working out of state
+    ! DTA LCR = return from out of state
+    do P07-Check-Job-For-LOC
+    if $LOCdate = '19000101'
+      ! issue error message that they have a business address with no out of state job row.
+      let $Message = 'BUSN address with no DTA/LOC job row: ' || &uarn.name
+      do Print-Error-Message
+      add 1 to #Records
+    else
+      do P07-Check-Job-For-LCR
+      if $LCRdate > $LOCdate
+        ! they are back - edit against the home address.
+        do P07-Home-Edit
+      else
+        ! they are out - edit against the business address.
+        do P07-Busn-Edit
+      end-if
+    end-if
+  end-if
+
+FROM PS_R_PAY034 UARR,
+PS_PERSON_NAME UARN,
+PS_JOB UARJ
+WHERE UARR.EMPLID = UARN.EMPLID
+AND UARJ.EMPLID = UARR.EMPLID
+AND UARJ.EMPL_RCD = UARR.EMPL_RCD
+AND UARJ.EFFDT = UARR.EFFDT
+AND UARJ.EFFSEQ = (SELECT MAX(UARJ1.EFFSEQ) FROM PS_JOB UARJ1
+              WHERE UARJ.EMPLID = UARJ1.EMPLID
+                AND UARJ.EMPL_RCD = UARJ1.EMPL_RCD
+                AND UARJ.EFFDT = UARJ1.EFFDT)
+AND UARJ.EMPL_STATUS IN ('A', 'P', 'Q', 'U')
+end-select
+
+end-procedure P07-State-Mismatch
+
+!***********************************************************************
+! Procedure Name: P07-Check-Job-For-LOC
+! Called By:      P07-State-Mismatch
+! Description:    Retrieve the most current LOC action reason from PS_JOB.
+!                 This gives us the most recent date they started working
+!                 out of state.
+!***********************************************************************
+begin-procedure P07-Check-Job-For-LOC
+  show 'Checking job for LOC on emplid ' $Emplid
+  move '19000101' to $LOCdate
+
+begin-select
+UAJ7.EFFDT
+  do Format-DateTime(&UAJ7.EFFDT, $LOCdate, {DEFCMP}, '', '')               !YYYYMMDD
+  show $Emplid ' went out of state on ' $LOCdate
+from PS_JOB UAJ7
+where UAJ7.EFFDT = (select max(UAJ71.EFFDT)
+                    from PS_JOB UAJ71
+                    where UAJ7.EMPLID = UAJ71.EMPLID
+                    and   UAJ7.EMPL_RCD = UAJ71.EMPL_RCD
+                    and   UAJ71.ACTION = 'DTA'
+                    and   UAJ71.ACTION_REASON = 'LOC'
+                    and   UAJ71.EFFDT <=$AsOfToday)
+and UAJ7.EMPLID = $Emplid
+and UAJ7.EMPL_RCD = #EMPL_RCD
+end-select
+
+end-procedure P07-Check-Job-For-LOC
+
+!***********************************************************************
+! Procedure Name: P07-Check-Job-For-LCR
+! Called By:      P07-State-Mismatch
+! Description:    Retrieve the most current LCR action reason from PS_JOB.
+!                 This gives us the most recent date they returned from working
+!                 out of state.
+!***********************************************************************
+begin-procedure P07-Check-Job-For-LCR
+  show 'Checking job for LCR on emplid ' $Emplid
+  move '19000101' to $LCRdate
+
+begin-select
+UAJ77.EFFDT
+  do Format-DateTime(&UAJ77.EFFDT, $LCRdate, {DEFCMP}, '', '')               !YYYYMMDD
+  show $Emplid ' returned from out of state on ' $LCRdate
+from PS_JOB UAJ77
+where UAJ77.EFFDT = (select max(UAJ771.EFFDT)
+                    from PS_JOB UAJ771
+                    where UAJ77.EMPLID = UAJ771.EMPLID
+                    and   UAJ77.EMPL_RCD = UAJ771.EMPL_RCD
+                    and   UAJ771.ACTION = 'DTA'
+                    and   UAJ771.ACTION_REASON = 'LCR'
+                    and   UAJ771.EFFDT <=$AsOfToday)
+and UAJ77.EMPLID = $Emplid
+and UAJ77.EMPL_RCD = #EMPL_RCD
+end-select
+
+end-procedure P07-Check-Job-For-LCR
+
+
+!***********************************************************************
+! Procedure Name: P07-Home-Edit
+! Called By:      P07-State-Mismatch
+! Description:    Edit all address values to ensure they match the Home
+!                 address state.
+!                 NOTE: Current business practice makes this too restrictive.
+!                 For multi-state go-live, we're just ensuring the other 3 values match.
+!***********************************************************************
+begin-procedure P07-Home-Edit
+    if $TaxDistST = $TaxLocST
+      and $TaxLocST = $TaxDataST
+      ! and $TaxDataST = $HomeAddrST
+     	  ! All is well
+    else
+        ! Error - Report mis matched values
+        let $Message = $MessageRoot || &uarn.name || ' '
+        let $Message = $Message || 'TaxDist=' ||$TaxDistST || ', TaxLoc=' ||$TaxLocST || ', TaxData=' ||$TaxDataST || ', HomeAddr=' || $HomeAddrST || '.'
+        do Print-Error-Message
+        add 1 to #Records
+    end-if
+end-procedure P07-Home-Edit
+
+!***********************************************************************
+! Procedure Name: P07-Busn-Edit
+! Called By:      P07-State-Mismatch
+! Description:    Edit all address values to ensure they match the Business
+!                 address state.
+!***********************************************************************
+begin-procedure P07-Busn-Edit
+    if $TaxDistST = $TaxLocST
+      and $TaxLocST = $TaxDataST
+      and $TaxDataST = $BusinessAddrST
+     	  ! All is well
+    else
+        ! Error - Report mis matched values
+        let $Message = $MessageRoot || &uarn.name || ' '
+        let $Message = $Message || 'TaxDist=' ||$TaxDistST || ', TaxLoc=' ||$TaxLocST || ', TaxData=' ||$TaxDataST || ', BusnAddr=' || $BusinessAddrST || '.'
+        do Print-Error-Message
+        add 1 to #Records
+    end-if
+end-procedure P07-Busn-Edit
+
+
+!***********************************************************************
+! Procedure Name: P08-NewHire-with-Business-Addr
+! Called By:      UA-Payroll-Edits
+! Description:    For information only: list new hires with a business address.
+!***********************************************************************
+begin-procedure P08-NewHire-with-Business-Addr
+  move 'INFORMATION ONLY: New Hire with BUSN address: ' to $MessageRoot
+  do Get-Current-DateTime
+  show 'Start ' $MessageRoot ' at ' $AsOfNow
+
+! Inspect reporting population
+begin-select
+UANR.EMPLID
+UANR.EMPL_RCD
+UANR.EFFDT
+UANN.NAME
+UANJ.ACTION
+UANJ.ACTION_REASON
+UABV.STATE
+
+  move &uanr.emplid to $Emplid
+  move &uanr.empl_rcd to #EMPL_RCD
+  let  $uanr.effdt = datetostr(&uanr.effdt, 'DD-MON-YYYY')
+  move &uanj.action to $Action
+  move &uanj.action_reason to $Reason
+  move &uabv.state to $BusnState
+
+  let $Message = $MessageRoot || &uann.name || ' '
+  let $Message = $Message || '(' || $Action || '/' || $Reason || '), business address in ' || $BusnState || '.'
+  do Print-Error-Message
+  add 1 to #Records
+
+FROM PS_R_PAY034 UANR,
+PS_PERSON_NAME UANN,
+PS_JOB UANJ,
+PS_UA_ADDR_BUS_VW UABV
+WHERE UANR.EMPLID = UANN.EMPLID
+AND UANJ.EMPLID = UANR.EMPLID
+AND UANJ.EMPL_RCD = UANR.EMPL_RCD
+AND UANJ.EFFDT = UANR.EFFDT            ! no effseq on this edit; the hire row is followed by a LOC row,
+                                       ! so we just look on that day for the hire row.
+AND UANJ.ACTION in ('HIR','REH','REC','RFL','RFP','SAB','RWB')
+AND UABV.EMPLID = UANJ.EMPLID
+AND UANJ.ACTION_DT >= SYSDATE - 90                        !HCM-4097  Added coded to look at action date less than 90 days
+end-select
+
+end-procedure P08-NewHire-with-Business-Addr
+
+!***********************************************************************
+! Procedure Name: P09-Employee-with-Multiple-Tax-Distributions
+! Called By:      UA-Payroll-Edits
+! Description:    For information only: list employees who have multiple
+!                 tax distributions.
+!***********************************************************************
+begin-procedure P09-Employee-with-Multiple-Tax-Distributions
+  move 'INFORMATION ONLY: Employee has multiple state tax distributions:' to $MessageRoot
+  do Get-Current-DateTime
+  show 'Start ' $MessageRoot ' at ' $AsOfNow
+
+! Inspect reporting population
+begin-select
+UAMR.EMPLID
+UAMR.EMPL_RCD
+UAMR.EFFDT
+UAMN.NAME
+
+  move &uamr.emplid to $Emplid
+  move &uamr.empl_rcd to #EMPL_RCD
+  let  $uamr.effdt = datetostr(&uamr.effdt, 'DD-MON-YYYY')
+
+  let $Message = $MessageRoot || &uamn.name
+  do Print-Error-Message
+  add 1 to #Records
+
+FROM PS_R_PAY034 UAMR,
+PS_PERSON_NAME UAMN,
+PS_UA_TAXDIST_ST_V UATD
+WHERE UAMR.EMPLID = UAMN.EMPLID
+AND UATD.EMPLID = UAMR.EMPLID
+AND UATD.STATE = 'MULTIPLE'
+end-select
+
+end-procedure P09-Employee-with-Multiple-Tax-Distributions
+
+!-- HRP-146 end
+!-- HCM-1936 start
+!***********************************************************************
+! Procedure Name: P10-Check-Special-SWT-Status-None-AZ-Withholding-Pct-Zero
+! Called By:      UA-Payroll-Edits
+! Description:    Checks for Employees with active Jobs with SPECIAL_SWT_STATUS = 'N'
+!                 and PERCENT_OF_FWT = 0 for AZ in PS_STATE_TAX_DATA.
+!***********************************************************************
+begin-procedure P10-Check-Special-SWT-Status-None-AZ-Withholding-Pct-Zero
+  let $P10_Message = 'AZ Special Tax Status = None with Zero Withholding Pct: '
+begin-select
+STX.EMPLID              &P10_emplid
+R34.EMPL_RCD            &P10_empl_rcd
+STX.STATE               &P10_state
+NM.NAME                 &P10_name
+STX.PERCENT_OF_FWT      &P10_percent_of_fwt
+STX.SPECIAL_SWT_STATUS  &P10_special_swt_status
+
+  move 'UAZ'                   to $Company
+  move &P10_emplid             to $Emplid
+  move &P10_empl_rcd           to #EMPL_RCD
+  move &P10_state              to $P10_state
+  move &P10_name               to $P10_name
+  move &P10_percent_of_fwt     to $P10_percent_of_fwt
+  move &P10_special_swt_status to $P10_special_swt_status
+
+  Let $Message = $P10_Message || $P10_name
+
+  do Print-Error-Message
+  add 1 to #Records
+
+FROM PS_STATE_TAX_DATA STX,
+     PS_R_PAY034 R34,
+     PS_PERSON_NAME NM
+WHERE
+      STX.EMPLID = R34.EMPLID
+  AND STX.EMPLID = NM.EMPLID 
+  AND STX.EFFDT = (SELECT MAX(STX1.EFFDT)
+                   FROM PS_STATE_TAX_DATA STX1
+                   WHERE STX1.EMPLID = STX.EMPLID 
+                     AND STX1.COMPANY = STX.COMPANY 
+                     AND STX1.EFFDT <= SYSDATE) 
+  AND STX.PERCENT_OF_FWT = 0.00
+  AND STX.STATE = 'AZ'
+  AND STX.SPECIAL_SWT_STATUS = 'N'
+  AND R34.EMPL_RCD = (SELECT MIN(R34X.EMPL_RCD)
+                      FROM PS_R_PAY034 R34X
+                      WHERE R34X.EMPLID = R34.EMPLID
+                        AND R34X.EFFDT <= SYSDATE)
+  AND EXISTS (SELECT *
+              FROM PS_JOB JB10
+              WHERE R34.EMPLID = JB10.EMPLID
+                AND STX.COMPANY = JB10.COMPANY
+                AND JB10.EMPL_RCD = R34.EMPL_RCD
+                AND JB10.EFFDT = R34.EFFDT
+                AND JB10.EMPL_STATUS = 'A')
+ORDER BY STX.EMPLID
+end-select
+
+end-procedure   P10-Check-Special-SWT-Status-None-AZ-Withholding-Pct-Zero
+
+
+!***********************************************************************
+! Procedure Name: P11-Check-Local-Tax-Data
+! Called By:      UA-Payroll-Edits
+! Description:    Calls several procedures to perform edits against local tax data
+!***********************************************************************
+begin-procedure P11-Check-Local-Tax-Data
+  move 'Check Local Tax Data' to $MessageRoot
+  do Get-Current-DateTime
+  show 'Start ' $MessageRoot ' at ' $AsOfNow
+
+  do P11A-Check-County-Local-Tax-Data
+  do P11B-Busn-Address-State-Not-Found-In-Local-Tax-Data
+  do P11C-Locality-Code-Missing-LWT-Mar-Status
+  do P11D-UI-Jurisdiction-State-Tax-Data-Row-Not-Unchecked-HI-CT
+  do P11E-UI-Jurisdiction-AZ-State-Tax-Data-Row-Not-Checked-HI-CT
+  !do P11F-UI-Jurisdiction-State-Tax-Data-Row-Not-Checked-Not-HI-CT          !HCM-4097  Commented procedure out
+ 
+end-procedure   P11-Check-Local-Tax-Data
+
+
+!***********************************************************************
+! Procedure Name: P11A-Check-County-Local-Tax-Data
+! Called By:      P11-Check-Local-Tax-Data
+! Description:    If county is set on Business Address (BUSN), check for matching
+!                 state and county in PS_LOCAL_TAX_TBL.
+!***********************************************************************
+begin-procedure P11A-Check-County-Local-Tax-Data
+  let $P11a_Message = 'Check Local Tax Data: Mismatch of Localities: '
+begin-select
+UABV.EMPLID            &P11a_emplid
+R34.EMPL_RCD           &P11a_empl_rcd
+UPPER(UABV.COUNTY)     &P11a_busn_county
+UABV.STATE             &P11a_busn_state
+NM.NAME                &P11a_name
+
+  move 'UAZ'              to $Company
+  move &P11a_emplid       to $Emplid
+  move &P11a_empl_rcd     to #EMPL_RCD
+  move &P11a_busn_county  to $P11a_county
+  move &P11a_busn_state   to $P11a_state
+  move &P11a_name         to $P11a_name
+
+  Let $Message = $P11a_Message || $P11a_name || ', BUSN State = ' || $P11a_state || ', County = ' || $P11a_county
+
+  do Print-Error-Message
+  add 1 to #Records
+
+FROM PS_UA_ADDR_BUS_VW UABV,
+     PS_R_PAY034 R34,
+     PS_PERSON_NAME NM
+WHERE
+      UABV.EMPLID = R34.EMPLID
+  AND UABV.EMPLID = NM.EMPLID 
+  AND R34.EMPL_RCD = (SELECT MIN(R34X.EMPL_RCD)
+                      FROM PS_R_PAY034 R34X
+                      WHERE R34X.EMPLID = R34.EMPLID)
+  AND UABV.COUNTY <> ' '
+  AND EXISTS (SELECT LTT.*
+              FROM PS_LOCAL_TAX_TBL LTT
+              WHERE LTT.STATE = UABV.STATE
+                AND LTT.COUNTY = UPPER(UABV.COUNTY)
+                AND LTT.EFF_STATUS = 'A'
+                AND LTT.EFFDT = (SELECT MAX(LTTX.EFFDT)
+                                 FROM PS_LOCAL_TAX_TBL LTTX
+                                 WHERE LTTX.STATE = LTT.STATE
+                                   AND LTTX.LOCALITY = LTT.LOCALITY
+                                   AND LTTX.EFFDT <= SYSDATE))
+  AND NOT EXISTS (SELECT *
+                  FROM PS_LOCAL_TAX_DATA LTD
+                  WHERE LTD.EMPLID = UABV.EMPLID
+                    AND LTD.STATE = UABV.STATE
+                    AND LTD.EFFDT = (SELECT MAX(STDX.EFFDT)
+                                     FROM PS_STATE_TAX_DATA STDX
+                                      WHERE STDX.EMPLID = LTD.EMPLID
+                                        AND STDX.COMPANY = LTD.COMPANY
+                                        AND STDX.EFFDT <= SYSDATE))
+ORDER BY UABV.EMPLID
+end-select
+
+end-procedure   P11A-Check-County-Local-Tax-Data
+
+
+!***********************************************************************
+! Procedure Name: P11B-Busn-Address-State-Not-Found-In-Local-Tax-Data
+! Called By:      P11-Check-Local-Tax-Data
+! Description:    Perform edits against local tax data
+!***********************************************************************
+begin-procedure P11B-Busn-Address-State-Not-Found-In-Local-Tax-Data
+  let $P11b_Message = 'Check Local Tax Data: Missing Locality: '
+
+begin-select
+UABV.EMPLID            &P11b_emplid
+R34.EMPL_RCD           &P11b_empl_rcd
+UABV.STATE             &P11b_busn_state
+NM.NAME                &P11b_name
+
+  move 'UAZ'              to $Company
+  move &P11b_emplid       to $Emplid
+  move &P11b_empl_rcd     to #EMPL_RCD
+  move &P11b_busn_state   to $P11b_state
+  move &P11b_name         to $P11b_name
+
+  Let $Message = $P11b_Message || $P11b_name || ', BUSN State = ' || $P11b_state
+
+  do Print-Error-Message
+  add 1 to #Records
+
+FROM PS_UA_ADDR_BUS_VW UABV,
+     PS_R_PAY034 R34,
+     PS_PERSON_NAME NM
+WHERE UABV.EMPLID = R34.EMPLID
+  AND UABV.EMPLID = NM.EMPLID
+  AND EXISTS (SELECT *
+              FROM PS_LOCAL_TAX_TBL LTT
+              WHERE LTT.STATE = UABV.STATE
+                AND LTT.EFFDT = (SELECT MAX(LTTX.EFFDT)
+                                 FROM PS_LOCAL_TAX_TBL LTTX
+                                 WHERE LTTX.STATE = LTT.STATE
+                                   AND LTTX.LOCALITY = LTT.LOCALITY
+                                   AND LTTX.EFFDT <= SYSDATE))
+  AND EXISTS (SELECT *
+              FROM PS_CO_LOCALTAX_VW LTV2
+              WHERE LTV2.STATE = UABV.STATE
+                AND NOT EXISTS (SELECT *
+                                FROM PS_LOCAL_TAX_DATA LTDX
+                                WHERE LTDX.EMPLID = UABV.EMPLID
+                                  AND LTDX.STATE = LTV2.STATE
+                                  AND LTDX.EFFDT = (SELECT MAX(LTDY.EFFDT)
+                                                    FROM PS_LOCAL_TAX_DATA LTDY
+                                                    WHERE LTDY.EMPLID = LTDX.EMPLID
+                                                      AND LTDY.COMPANY = LTDX.COMPANY
+                                                      AND LTDY.EFFDT <= SYSDATE)))
+
+ORDER BY UABV.EMPLID
+end-select
+
+end-procedure   P11B-Busn-Address-State-Not-Found-In-Local-Tax-Data
+
+
+!***********************************************************************
+! Procedure Name: P11C-Locality-Code-Missing-LWT-Mar-Status
+! Called By:      P11-Check-Local-Tax-Data
+! Description:    Check for EEs with locality code, but without LWT_MAR_STATUS
+!***********************************************************************
+begin-procedure P11C-Locality-Code-Missing-LWT-Mar-Status
+
+  let $P11c_Message = 'Missing Local Withholding Status: '
+
+begin-select
+UABV.EMPLID            &P11c_emplid
+R34.EMPL_RCD           &P11c_empl_rcd 
+UABV.STATE             &P11c_state
+NM.NAME                &P11c_name
+
+  move 'UAZ'           to $Company
+  move &P11c_emplid    to $Emplid
+  move &P11c_empl_rcd  to #EMPL_RCD
+  move &P11c_state     to $P11c_state
+  move &P11c_name      to $P11c_name
+
+  Let $Message = $P11c_Message || $P11c_name || ', BUSN State = ' || $P11c_state
+
+  do Print-Error-Message
+  add 1 to #Records
+
+
+FROM PS_UA_ADDR_BUS_VW UABV,
+     PS_R_PAY034 R34,
+     PS_PERSON_NAME NM
+WHERE UABV.EMPLID = R34.EMPLID
+  AND UABV.EMPLID = NM.EMPLID
+  AND EXISTS (SELECT *
+              FROM PS_LOCAL_TAX_TBL LTT
+              WHERE UABV.STATE = LTT.STATE
+                AND LTT.EFFDT = (SELECT MAX(LTTX.EFFDT)
+                                 FROM PS_LOCAL_TAX_TBL LTTX
+                                 WHERE LTTX.STATE = LTT.STATE
+                                   AND LTTX.LOCALITY = LTT.LOCALITY
+                                   AND LTTX.EFFDT <= SYSDATE))
+  AND EXISTS (SELECT *
+              FROM PS_LOCAL_TAX_DATA LTD
+              WHERE LTD.EMPLID = UABV.EMPLID
+                AND LTD.STATE = UABV.STATE
+                AND LTD.LWT_MAR_STATUS = ' '
+                AND LTD.EFFDT = (SELECT MAX(LTDX.EFFDT)
+                                 FROM PS_LOCAL_TAX_DATA LTDX
+                                 WHERE LTDX.EMPLID = LTD.EMPLID
+                                   AND LTDX.COMPANY = LTD.COMPANY
+                                   AND LTDX.EFFDT <= SYSDATE))
+ORDER BY UABV.EMPLID
+end-select
+
+end-procedure   P11C-Locality-Code-Missing-LWT-Mar-Status
+
+
+!***********************************************************************
+! Procedure Name: P11D-UI-Jurisdiction-State-Tax-Data-Row-Not-Unchecked-HI-CT
+! Called By:      P11-Check-Local-Tax-Data
+! Description:    Checks for EEs with a BUSN address in HI or CT that have a row
+!                 in PS_STATE_TAX_DATA where HI or CT has a UI_JURISDICTION = Y
+!***********************************************************************
+begin-procedure P11D-UI-Jurisdiction-State-Tax-Data-Row-Not-Unchecked-HI-CT
+
+  let $P11d_Message = 'Add Tax Data Row for UI in AZ: '
+
+begin-select
+UABV.EMPLID            &P11d_emplid  
+UABV.ADDRESS_TYPE      &P11d_addr_type
+UABV.STATE             &P11d_state
+NM.NAME                &P11d_name
+
+  move 'UAZ'           to $Company
+  move &P11d_emplid    to $Emplid
+  move &P11d_addr_type to $P11d_addr_type
+  move &P11d_state     to $P11d_state
+  move &P11d_name      to $P11d_name
+
+  Let $Message = $P11d_Message || $P11d_name || ', BUSN State = ' || $P11d_state
+
+  do Print-Error-Message
+  add 1 to #Records
+
+
+FROM PS_UA_ADDR_BUS_VW UABV,
+     PS_R_PAY034 R34,
+     PS_PERSON_NAME NM
+WHERE UABV.EMPLID = R34.EMPLID
+  AND UABV.EMPLID = NM.EMPLID
+  AND UABV.STATE IN ('HI','CT')
+  AND EXISTS (SELECT *
+              FROM PS_STATE_TAX_DATA STD
+              WHERE STD.EMPLID = UABV.EMPLID
+                AND STD.STATE = UABV.STATE
+                AND STD.UI_JURISDICTION = 'Y'
+                AND STD.EFFDT = (SELECT MAX(STDX.EFFDT)
+                                 FROM PS_STATE_TAX_DATA STDX
+                                 WHERE STDX.EMPLID = STD.EMPLID
+                                   AND STDX.COMPANY = STD.COMPANY
+                                   AND STDX.EFFDT <= SYSDATE))
+ORDER BY UABV.EMPLID
+end-select
+
+end-procedure   P11D-UI-Jurisdiction-State-Tax-Data-Row-Not-Unchecked-HI-CT
+
+
+!***********************************************************************
+! Procedure Name: P11E-UI-Jurisdiction-AZ-State-Tax-Data-Row-Not-Checked-HI-CT
+! Called By:      P11-Check-Local-Tax-Data
+! Description:    Checks for EEs with a BUSN address in HI or CT that have a row
+!                 in PS_STATE_TAX_DATA where AZ does not have a UI_JURISDICTION = Y
+!***********************************************************************
+begin-procedure P11E-UI-Jurisdiction-AZ-State-Tax-Data-Row-Not-Checked-HI-CT
+
+  let $P11e_Message = 'Add UI Jurisdiction on separate State Tax Data Row for AZ: '
+
+begin-select
+UABV.EMPLID            &P11e_emplid  
+UABV.ADDRESS_TYPE      &P11e_addr_type
+UABV.STATE             &P11e_state
+NM.NAME                &P11e_name
+
+  move 'UAZ'           to $Company
+  move &P11e_emplid    to $Emplid
+  move &P11e_addr_type to $P11e_addr_type
+  move &P11e_state     to $P11e_state
+  move &P11e_name      to $P11e_name
+
+  Let $Message = $P11e_Message || $P11e_name || ', BUSN State = ' || $P11e_state
+
+  do Print-Error-Message
+  add 1 to #Records
+
+
+FROM PS_UA_ADDR_BUS_VW UABV,
+     PS_R_PAY034 R34,
+     PS_PERSON_NAME NM
+WHERE UABV.EMPLID = R34.EMPLID
+  AND UABV.EMPLID = NM.EMPLID
+  AND UABV.STATE IN ('HI','CT')
+  AND NOT EXISTS (SELECT *
+                  FROM PS_STATE_TAX_DATA STD
+                  WHERE STD.EMPLID = UABV.EMPLID
+                    AND STD.STATE = 'AZ'
+                    AND STD.UI_JURISDICTION = 'Y'
+                    AND STD.EFFDT = (SELECT MAX(STDX.EFFDT)
+                                     FROM PS_STATE_TAX_DATA STDX
+                                     WHERE STDX.EMPLID = STD.EMPLID
+                                       AND STDX.COMPANY = STD.COMPANY
+                                       AND STDX.STATE = STD.STATE
+                                       AND STDX.UI_JURISDICTION = STD.UI_JURISDICTION
+                                       AND STDX.EFFDT <= SYSDATE))
+ORDER BY UABV.EMPLID
+end-select
+
+end-procedure   P11E-UI-Jurisdiction-AZ-State-Tax-Data-Row-Not-Checked-HI-CT
+
+
+!***********************************************************************
+! Procedure Name: P11F-UI-Jurisdiction-State-Tax-Data-Row-Not-Checked-Not-HI-CT
+! Called By:      P11-Check-Local-Tax-Data
+! Description:    Checks for EEs with a BUSN address not in HI or CT that have a row
+!                 in PS_STATE_TAX_DATA where does not exist UI_JURISDICTION = Y
+!                 for the BUSN state (or for the HOME State if there is a row in
+!                 PS_STTAX_RECIP_TBL where the BUSN State = STATE_WORK and HOME
+!                 State = STATE_RESIDENCE.)
+!***********************************************************************
+begin-procedure P11F-UI-Jurisdiction-State-Tax-Data-Row-Not-Checked-Not-HI-CT
+
+  let $P11f_Message = 'UI Jurisdiction Mismatch on Tax Data: '
+
+begin-select
+UABV.EMPLID            &P11f_emplid
+UABV.STATE             &P11f_busn_state
+NM.NAME                &P11f_name
+ADDR.STATE             &P11f_home_state
+
+  move 'UAZ'             to $Company
+  move &P11f_emplid      to $Emplid
+  move &P11f_busn_state  to $P11f_busn_state
+  move &P11f_name        to $P11f_name
+  move &P11f_home_state  to $P11f_home_state
+
+  Let $Message = $P11f_Message || $P11f_name || ', BUSN State = ' || $P11f_busn_state || ', HOME State = ' || $P11f_home_state
+
+  do Print-Error-Message
+  add 1 to #Records
+
+
+FROM PS_UA_ADDR_BUS_VW UABV,
+     PS_ADDRESSES ADDR,
+     PS_R_PAY034 R34,
+     PS_PERSON_NAME NM
+WHERE UABV.EMPLID = R34.EMPLID
+  AND UABV.EMPLID = NM.EMPLID
+  AND UABV.EMPLID = ADDR.EMPLID
+  AND ADDR.ADDRESS_TYPE = 'HOME'
+  AND ADDR.EFF_STATUS = 'A'
+  AND ADDR.EFFDT = (SELECT MAX(ADRX.EFFDT)
+                    FROM PS_ADDRESSES ADRX
+                    WHERE ADRX.EMPLID = ADDR.EMPLID
+                      AND ADRX.ADDRESS_TYPE = ADDR.ADDRESS_TYPE
+                      AND ADRX.EFFDT <= SYSDATE)
+  AND UABV.STATE NOT IN ('HI','CT')
+  AND NOT EXISTS (SELECT *
+              FROM PS_STATE_TAX_DATA STD
+              WHERE STD.EMPLID = UABV.EMPLID
+                AND STD.STATE = UABV.STATE
+                AND STD.UI_JURISDICTION = 'Y'
+                AND STD.EFFDT = (SELECT MAX(STDX.EFFDT)
+                                 FROM PS_STATE_TAX_DATA STDX
+                                 WHERE STDX.EMPLID = STD.EMPLID
+                                   AND STDX.COMPANY = STD.COMPANY
+                                   AND STDX.EFFDT <= SYSDATE))
+  AND NOT EXISTS (SELECT *
+                  FROM PS_STTAX_RECIP_TBL SRT
+                  WHERE SRT.EFF_STATUS = 'A'
+                    AND SRT.STATE_WORK = UABV.STATE
+                    AND SRT.STATE_RESIDENCE = ADDR.STATE
+                    AND SRT.EFFDT = (SELECT MAX(SRTX.EFFDT)
+                                     FROM PS_STTAX_RECIP_TBL SRTX
+                                     WHERE SRTX.STATE_RESIDENCE = SRT.STATE_RESIDENCE
+                                       AND SRTX.STATE_WORK = SRT.STATE_WORK
+                                       AND SRTX.EFFDT <= SYSDATE))
+ORDER BY UABV.EMPLID
+end-select
+
+end-procedure   P11F-UI-Jurisdiction-State-Tax-Data-Row-Not-Checked-Not-HI-CT
+!-- HCM-1936 end
+
+! Begin - 9/11/12 - HCM-1669 - FRILLERA
+!***********************************************************************
+! Procedure Name: P12-Mismatch-Non-Resident-State-Federal-Special-Status
+! Called By:      ua-payroll-edits
+! Description:    mismatch non-resident state and federal special status
+!***********************************************************************
+begin-procedure P12-Mismatch-Non-Resident-State-Federal-Special-Status
+  move 'NRA FWT Tax Status does not match SWT Special Tax Status' to $Message
+  do Get-Current-DateTime
+  show 'Start P12-Mismatch-Non-Resident-State-Federal-Special-Status at ' $AsOfNow
+
+move 0 to #P12_main_slct_cnt
+move 0 to #P12_active_cnt
+move 0 to #P12_inactive_cnt
+
+begin-select
+
+P12A.company    &P12A.company
+P12A.emplid     &P12A.emplid
+P12A.effdt      &P12A.effdt
+  add 1 to #P12_main_slct_cnt 
+
+  do P12-validate-status
+  
+  if $P12_active_flag  = 'Y'
+     add 1 to #P12_active_cnt
+     let $company = &P12A.company
+     let $emplid = &P12A.emplid
+     let #empl_rcd = ''
+     let $message-data1 = &P12A.effdt
+     let $message-data2 = $P12E.HR_STATUS
+     do Print-Error-Message
+     add 1 to #Records
+  else
+     add 1 to #P12_inactive_cnt
+  end-if   
+FROM PS_FED_TAX_DATA P12A, PS_STATE_TAX_DATA P12B
+WHERE P12A.EMPLID = P12B.EMPLID
+AND P12A.COMPANY = P12B.COMPANY
+AND P12A.SPECIAL_FWT_STATUS <> 'A'
+AND P12B.SPECIAL_SWT_STATUS = 'A'
+AND P12A.EFFDT = (SELECT MAX(P12A_ED.EFFDT) FROM PS_FED_TAX_DATA P12A_ED
+                 WHERE P12A.EMPLID = P12A_ED.EMPLID
+                 AND P12A.COMPANY = P12A_ED.COMPANY
+                 AND P12A_ED.EFFDT <= SYSDATE)
+AND P12B.EFFDT = (SELECT MAX(P12B_ED.EFFDT) FROM PS_STATE_TAX_DATA P12B_ED
+               WHERE P12B.EMPLID = P12B_ED.EMPLID
+               AND P12B.COMPANY = P12B_ED.COMPANY
+               AND P12B_ED.EFFDT <= SYSDATE)
+UNION ALL
+select P12C.company
+,P12C.emplid
+,P12C.effdt
+FROM PS_FED_TAX_DATA P12C, PS_STATE_TAX_DATA P12D
+WHERE P12C.EMPLID = P12D.EMPLID
+AND P12C.COMPANY = P12D.COMPANY
+AND P12C.SPECIAL_FWT_STATUS = 'A'
+AND P12D.SPECIAL_SWT_STATUS <> 'A'
+AND P12C.EFFDT = (SELECT MAX(P12C_ED.EFFDT) FROM PS_FED_TAX_DATA P12C_ED
+                 WHERE P12C.EMPLID = P12C_ED.EMPLID
+                 AND P12C.COMPANY = P12C_ED.COMPANY
+                 AND P12C_ED.EFFDT <= SYSDATE)
+AND P12D.EFFDT = (SELECT MAX(P12D_ED.EFFDT) FROM PS_STATE_TAX_DATA P12D_ED
+               WHERE P12D.EMPLID = P12D_ED.EMPLID
+               AND P12D.COMPANY = P12D_ED.COMPANY
+               AND P12D_ED.EFFDT <= SYSDATE)
+order by 2
+               
+end-select
+
+show 'P12 Main Select Count   =>  ' #P12_main_slct_cnt
+show 'P12 Active EEs Count    =>  ' #P12_active_cnt
+show 'P12 Inactive EEs Count  =>  ' #P12_inactive_cnt
+
+end-procedure
+
+!***********************************************************************
+! Procedure Name: P12-Validate-Status
+! Called By:      P12-Mismatch-Non-Resident-State-Federal-Special-Status
+! Description:    validate JOB status
+!***********************************************************************
+begin-procedure P12-Validate-Status
+
+let $P12_active_flag  = 'N'
+let $P12_begin_dt     = '01-JAN-' || substr($AsOfToday,8,4)
+
+begin-select distinct
+
+P12E.EMPLID
+P12E.HR_STATUS
+   let $P12_active_flag  = 'Y'
+   let $P12E.HR_STATUS = &P12E.HR_STATUS 
+FROM PS_JOB P12E
+WHERE P12E.EMPLID = &P12A.EMPLID
+AND   P12E.HR_STATUS = 'A'
+AND   P12E.EFFSEQ = (SELECT MAX(P12F.EFFSEQ) FROM PS_JOB P12F 
+                     WHERE P12F.EMPLID = P12E.EMPLID
+                     AND P12F.EMPL_RCD = P12E.EMPL_RCD
+                     AND P12F.EFFDT = P12E.EFFDT) 
+AND   P12E.EFFDT = (SELECT MAX(P12G.EFFDT) FROM PS_JOB P12G
+                    WHERE P12G.EMPLID = P12E.EMPLID
+                    AND P12G.EMPL_RCD = P12E.EMPL_RCD
+                    AND P12G.EFFDT <= SYSDATE)  
+UNION
+select
+P12E.EMPLID
+,P12E.HR_STATUS 
+FROM PS_JOB P12E
+WHERE P12E.EMPLID = &P12A.EMPLID
+AND   P12E.HR_STATUS = 'I'
+AND   P12E.EFFSEQ = (SELECT MAX(P12F.EFFSEQ) FROM PS_JOB P12F 
+                     WHERE P12F.EMPLID = P12E.EMPLID
+                     AND P12F.EMPL_RCD = P12E.EMPL_RCD
+                     AND P12F.EFFDT = P12E.EFFDT) 
+AND   P12E.EFFDT = (SELECT MAX(P12G.EFFDT) FROM PS_JOB P12G
+                    WHERE P12G.EMPLID = P12E.EMPLID
+                    AND P12G.EMPL_RCD = P12E.EMPL_RCD
+                    AND P12G.EFFDT <= SYSDATE)
+AND   P12E.EFFDT > $P12_begin_dt
+
+end-select  
+end-procedure
+! End - 9/11/12 - HCM-1669 - FRILLERA

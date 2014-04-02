@@ -1,0 +1,969 @@
+!***********************************************************************
+!     uabn0021.sqr: AIG 403(b) Inbound Interface
+!***********************************************************************
+!***********************************************************************
+!  Author:  Scott Watson, TBG
+!  Date:    07/09/2009
+!  Report Owner:  Benefits
+!***********************************************************************
+!***********************************************************************
+!  Program Summary: This program will load a flat file containing
+!                        employee 403(b) plan elections.
+!
+!
+!  Major Tables Used: The major tables used in the report should be
+!  listed here in the general order in which they are processed.  The
+!  actual table name should be given and an English description.  In
+!  addition, the type of table access should be included
+!  (ex. read, update, etc.)
+!
+!  TABLE                DESCRIPTION                 ACCESS
+!  -------------        ---------------------       --------------
+!
+!  Parameters:  The input and output parameters used in the program
+!  should be listed here with descriptions.
+!
+!  Parameter       In/Out    Description
+!  --------------- -------    -------------------------------------
+!
+!
+!  Modification history
+!  Developer       Date      Description
+!  --------------- -------   -------------------------------------
+!  Philip Lutz     20101008  HCM-928 - If waived/term clear the Benefit_Plan
+!
+!***********************************************************************
+
+
+!******************************************************************************
+!   Setup Section
+!******************************************************************************
+#Include 'setenv.sqc'                    !Set Environment
+
+
+begin-SETUP
+
+#Include 'ptset01.sqc'                   !Printer and page-size initialization
+
+declare-variable
+  date $service_dt
+  date $check_dt
+  date $pay_end_dt
+  date $pay_dt
+  date $pay_begin_dt
+  date $savings_effdt
+  date $new_effdt
+  date $end_dt
+end-declare
+
+end-SETUP
+
+!****************************************************************************
+! Heading
+!****************************************************************************
+begin-HEADING 6
+
+  #include 'uastdhdg.sqc'
+
+  print $report_title (,) CENTER
+
+  PRINT 'Emplid'      (+1,1)
+  PRINT 'First Name'  (,12)
+  PRINT 'Last Name'   (,28)
+  PRINT 'Ded Begin'   (,44)
+  PRINT 'Pay Check'   (,56)
+  PRINT 'Change'      (,68)
+  PRINT 'Amount'      (,80)
+  PRINT 'Result'      (,90)
+
+  GRAPHIC (+1,1,10)   HORZ-LINE
+  GRAPHIC (,12,14)    HORZ-LINE
+  GRAPHIC (,28,14)    HORZ-LINE
+  GRAPHIC (,44,10)    HORZ-LINE
+  GRAPHIC (,56,10)    HORZ-LINE
+  GRAPHIC (,68,10)    HORZ-LINE
+  GRAPHIC (,80,8)     HORZ-LINE
+  GRAPHIC (,90,30)    HORZ-LINE
+
+end-HEADING
+
+!******************************************************************************
+! Program Section
+!******************************************************************************
+begin-PROGRAM
+
+   DO initialization
+   DO process-main
+   DO terminate-program
+
+end-PROGRAM
+
+
+!***********************************************************************
+!  Procedure Name:  initialization
+!  Called By:  Program section
+!  Description:  Initialize variables
+!***********************************************************************
+begin-PROCEDURE initialization
+
+  move 1 to #return-status
+
+  DO Init-DateTime                       !datetime.sqc:Init-DateTime
+  DO Get-Current-DateTime                !curdttim.sqc:Get-Current-DateTime
+
+  MOVE 'uabn0021' to $ReportID
+  MOVE 'AIG 403(b) Inbound Interface' to $ReportTitle
+
+
+  SHOW $ReportID ' ' $ReportTitle ' started at ' $AsOfToday ' ' $AsOfNow
+
+  LET $Dbnamelower = lower($DatabaseName)
+
+  SHOW $ReportTitle
+  SHOW 'Database Name:' $DatabaseName
+  SHOW 'User Name:' $username
+
+  DO Stdapi-Init                         ! stdapi.sqc
+
+  DO initialize-variables
+
+end-PROCEDURE   initialization
+
+
+!***********************************************************************
+!   Procedure Name: initialize-variables
+!       Called By:   initialization
+!       Description:    Initialize variables specific to this program.
+!***********************************************************************
+begin-PROCEDURE initialize-variables
+
+   LET $company = 'UAZ'
+
+   LET $area = 'BN'
+
+   !Returns $process_dir and $bak_dir
+   DO get-file-paths  !uaparm.sqc
+
+   LET $datetimestamp = datetostr(datenow(),'YYYYMMDD_HHMI')
+
+   MOVE 1 to #file_in
+
+   LET $filename = $process_dir||'CCR_RM_UA.txt'
+   LET $backup_filename = $bak_dir || 'uabn0021_' || $datetimestamp || '.txt'
+
+end-PROCEDURE !initialize-variables
+
+!***********************************************************************
+!  Procedure Name: process-main
+!  Called By:  Program Section
+!  Description:  Main procedure of program.
+!***********************************************************************
+begin-PROCEDURE process-main
+
+   DO open-input-file
+
+   WHILE 1
+
+      LET $error_exists = 'N'
+
+      READ #file_in INTO $lineodata:465
+
+      IF ISNULL(LTRIM($lineodata,' '))
+         SHOW 'End of file encountered on line ' #inbound_count
+         BREAK
+      END-IF
+
+      ADD 1 TO #inbound_count
+
+      LET $format_code     = SUBSTR($lineodata,1,4)
+      LET $paygroup_id     = SUBSTR($lineodata,5,12)
+      LET $ssn             = SUBSTR($lineodata,17,9)
+      LET $emplid          = SUBSTR($lineodata,26,20)
+      LET $first_name      = SUBSTR($lineodata,46,30)
+      LET $middle_name     = SUBSTR($lineodata,76,30)
+      LET $last_name       = SUBSTR($lineodata,106,30)
+      LET $user_id         = SUBSTR($lineodata,136,20)
+      LET $pay_slot_cd     = SUBSTR($lineodata,156,12)
+      LET $pay_date        = SUBSTR($lineodata,168,8)
+      LET $pay_effdt       = SUBSTR($lineodata,176,8)
+      LET $cs1_type        = SUBSTR($lineodata,184,2)
+      LET $cs1_chg_status  = SUBSTR($lineodata,186,7)
+      LET $cs1_option    = SUBSTR($lineodata,193,1)
+      LET $cs1_amount     = SUBSTR($lineodata,194,7)
+      LET $cs1_election    = SUBSTR($lineodata,201,2)
+      LET $cs1_annual_ded  = SUBSTR($lineodata,203,7)
+      LET $cs2_type        = SUBSTR($lineodata,210,2)
+      LET $cs2_chg_status  = SUBSTR($lineodata,212,7)
+      LET $cs2_option    = SUBSTR($lineodata,219,1)
+      LET $cs2_amount     = SUBSTR($lineodata,220,7)
+      LET $cs2_election    = SUBSTR($lineodata,227,2)
+      LET $cs2_annual_ded  = SUBSTR($lineodata,229,7)
+      LET $cs3_type        = SUBSTR($lineodata,236,2)
+      LET $cs3_chg_status  = SUBSTR($lineodata,238,7)
+      LET $cs3_option    = SUBSTR($lineodata,245,1)
+      LET $cs3_amount     = SUBSTR($lineodata,246,7)
+      LET $cs3_election    = SUBSTR($lineodata,253,2)
+      LET $cs3_annual_ded  = SUBSTR($lineodata,255,7)
+      LET $cs4_type        = SUBSTR($lineodata,262,2)
+      LET $cs4_chg_status  = SUBSTR($lineodata,264,7)
+      LET $cs4_option    = SUBSTR($lineodata,271,1)
+      LET $cs4_amount     = SUBSTR($lineodata,272,7)
+      LET $cs4_election    = SUBSTR($lineodata,279,2)
+      LET $cs4_annual_ded  = SUBSTR($lineodata,281,7)
+      LET $cs5_type        = SUBSTR($lineodata,288,2)
+      LET $cs5_chg_status  = SUBSTR($lineodata,290,7)
+      LET $cs5_option    = SUBSTR($lineodata,297,1)
+      LET $cs5_amount     = SUBSTR($lineodata,298,7)
+      LET $cs5_election    = SUBSTR($lineodata,305,2)
+      LET $cs5_annual_ded  = SUBSTR($lineodata,307,7)
+      LET $hire_date    = SUBSTR($lineodata,314,8)
+      LET $birth_date    = SUBSTR($lineodata,322,8)
+      LET $phone    = SUBSTR($lineodata,330,15)
+      LET $location_code  = SUBSTR($lineodata,345,4)
+      LET $sub_area    = SUBSTR($lineodata,349,4)
+      LET $payroll_status  = SUBSTR($lineodata,353,2)
+      LET $annual_salary  = SUBSTR($lineodata,355,10)
+      LET $email_address   = SUBSTR($lineodata,365,100)
+      LET $plan_elig_grp_cd  = SUBSTR($lineodata,466,1)
+
+      LET $emplid = RTRIM($emplid,' ')
+
+      LET $new_effdt = STRTODATE($pay_effdt,'MMDDYYYY')
+      LET $pay_dt = STRTODATE($pay_date,'MMDDYYYY')
+      LET $msg = ''
+
+      SHOW 'Validate Data'
+
+      DO validate-data
+
+      IF $error_exists = 'N'
+        ADD 1 TO #processed_count
+        IF NOT ISNULL(LTRIM($cs1_type,' '))
+           LET $plan_type = '46'
+           LET $benefit_plan = 'TSA'
+           LET $type = $cs1_type
+           LET $chg_status = $cs1_chg_status
+           LET $option = $cs1_option
+           LET $amount = $cs1_amount
+           LET $election = $cs1_election
+           LET $annual_ded = $cs1_annual_ded
+           DO process-election
+        END-IF
+
+        !CS2 - 5 are not used at this time
+
+        IF NOT ISNULL(LTRIM($cs2_type,' '))
+           LET $plan_type = ''
+           LET $benefit_plan = ''
+           LET $type = $cs2_type
+           LET $chg_status = $cs2_chg_status
+           LET $option = $cs2_option
+           LET $amount = $cs2_amount
+           LET $election = $cs2_election
+           LET $annual_ded = $cs2_annual_ded
+           DO process-election
+        END-IF
+
+        IF NOT ISNULL(LTRIM($cs3_type,' '))
+           LET $plan_type = ''
+           LET $benefit_plan = ''
+           LET $type = $cs3_type
+           LET $chg_status = $cs3_chg_status
+           LET $option = $cs3_option
+           LET $amount = $cs3_amount
+           LET $election = $cs3_election
+           LET $annual_ded = $cs3_annual_ded
+           DO process-election
+        END-IF
+
+        IF NOT ISNULL(LTRIM($cs4_type,' '))
+           LET $plan_type = ''
+           LET $benefit_plan = ''
+           LET $type = $cs4_type
+           LET $chg_status = $cs4_chg_status
+           LET $option = $cs4_option
+           LET $amount = $cs4_amount
+           LET $election = $cs4_election
+           LET $annual_ded = $cs4_annual_ded
+           DO process-election
+        END-IF
+
+        IF NOT ISNULL(LTRIM($cs5_type,' '))
+           LET $plan_type = ''
+           LET $benefit_plan = ''
+           LET $type = $cs5_type
+           LET $chg_status = $cs5_chg_status
+           LET $option = $cs5_option
+           LET $amount = $cs5_amount
+           LET $election = $cs5_election
+           LET $annual_ded = $cs5_annual_ded
+           DO process-election
+        END-IF
+      ELSE
+         ADD 1 TO #error_count
+      END-IF
+
+      DO print-detail
+
+   END-WHILE
+
+   IF #inbound_count = 0
+      PRINT 'No records were found for processing.' (+2,1) CENTER
+   END-IF
+
+   MOVE #inbound_count to $inbound_count '999,999'
+   MOVE #processed_count to $processed_count '999,999'
+   MOVE #error_count to $error_count '999,999'
+
+   !Report Load Summary
+   PRINT 'Process Summary' (+3,1)
+   GRAPHIC (+1,1,17) horz-line
+
+   PRINT 'Rows read from file: ' (+1,1)
+   PRINT $inbound_count     (,22)
+
+   PRINT 'Rows processed: '      (+1,1)
+   PRINT $processed_count   (,22)
+
+   PRINT 'Rows in Error:'   (+1,1)
+   PRINT $error_count     (,22)
+
+   CLOSE #file_in
+
+   do backup-file
+
+end-PROCEDURE   process-main
+
+!***********************************************************************
+!   Procedure name: validate-data
+!  Called By:  process-main
+!  Description:  Validates data from input file
+!***********************************************************************
+begin-PROCEDURE validate-data
+
+   DO validate-emplid
+   IF $valid_emplid = 'N'
+      LET $error_exists = 'Y'
+      LET $msg = 'Emplid is invalid.  '
+   END-IF
+
+   DO get-pay-begin-dt
+   IF ISNULL($pay_begin_dt)
+      LET $error_exists = 'Y'
+      LET $msg = $msg || 'Could not calculate pay begin dt.  '
+   END-IF
+
+end-PROCEDURE !validate-data
+
+!***********************************************************************
+!  Procedure Name:  validate-emplid
+!  Called By:  process-main
+!  Description:  Validate employee ID
+!***********************************************************************
+begin-PROCEDURE validate-emplid
+
+   LET $valid_emplid = 'N'
+
+begin-SELECT
+
+P.EMPLID    &VALID_EMPLID
+
+   LET $emplid = &valid_emplid
+
+   LET $valid_emplid = 'Y'
+
+FROM PS_PERSON P
+WHERE EMPLID = $emplid
+UNION
+SELECT PDE.EMPLID
+  FROM PS_PERS_DATA_EFFDT PDE
+ WHERE PDE.ALTER_EMPLID = $emplid
+   AND PDE.EFFDT = (SELECT MAX(EFFDT)
+                      FROM PS_PERS_DATA_EFFDT
+                     WHERE EMPLID = PDE.EMPLID
+                       AND EFFDT <= SYSDATE)
+
+end-SELECT
+
+end-PROCEDURE !validate-emplid
+
+!***********************************************************************
+!   Procedure Name: get-pay-begin-dt
+!  Called By:  validate-data
+!  Description:  Select pay begin date for pay date from file.
+!***********************************************************************
+begin-PROCEDURE get-pay-begin-dt
+
+   LET $pay_begin_dt = ''
+
+begin-SELECT
+
+PC.PAY_BEGIN_DT
+
+   LET $pay_begin_dt = &pc.pay_begin_dt
+
+FROM PS_PAY_CALENDAR PC
+WHERE PC.CHECK_DT =  (SELECT MIN(CHECK_DT)
+                        FROM PS_PAY_CALENDAR
+                       WHERE CHECK_DT >= $pay_dt)
+  AND PAY_BEGIN_DT <= $pay_dt
+
+end-SELECT
+
+end-PROCEDURE !get-pay-begin-dt
+
+!***********************************************************************
+!   Process Name:  process-election
+!   Called By:  process-main
+!  Description:  Processes inbound transaction from file.
+!***********************************************************************
+begin-PROCEDURE process-election
+
+   LET #amount = $amount
+
+   IF #amount = 0
+      LET $coverage_elect = 'W'
+      let $benefit_plan   = ' '
+      DO process-end-savings
+      LET $msg = 'Saving plan end dated.'
+   ELSE
+      LET #amount = #amount / 100
+      LET $coverage_elect = 'E'
+      DO process-savings
+      LET $msg = 'New Savings election loaded.'
+   END-IF
+
+   SHOW 'Message for processed record: ' $msg
+
+end-PROCEDURE !process-election
+
+!***********************************************************************
+!   Process Name:  process-end-savings
+!  Called By:  process-election
+!  Description:  Locate existing savings planand end date it.
+!***********************************************************************
+begin-PROCEDURE process-end-savings
+
+   LET $savings_effdt = ''
+   LET $existing_savings_found = 'N'
+
+begin-SELECT
+
+SAV.EMPL_RCD
+SAV.BENEFIT_NBR
+SAV.EFFDT
+SAV.COVERAGE_ELECT
+
+   LET #empl_rcd = &sav.empl_rcd
+   LET #benefit_nbr = &sav.benefit_nbr
+   LET $savings_effdt = &sav.effdt
+
+   LET $existing_savings_found = 'Y'
+
+   IF $savings_effdt = $pay_begin_dt
+      DO end-savings-plan
+   END-IF
+
+FROM PS_SAVINGS_PLAN SAV
+WHERE SAV.EMPLID = $emplid
+  AND SAV.PLAN_TYPE = $plan_type
+  AND SAV.EFFDT = (SELECT MAX(EFFDT)
+                     FROM PS_SAVINGS_PLAN
+                    WHERE EMPLID = SAV.EMPLID
+                      AND EMPL_RCD = SAV.EMPL_RCD
+                      AND PLAN_TYPE = SAV.PLAN_TYPE
+                      AND BENEFIT_NBR = SAV.BENEFIT_NBR
+                      AND TRUNC(EFFDT) <= $pay_begin_dt)
+
+end-SELECT
+
+   IF $savings_effdt <> $pay_begin_dt
+     IF $existing_savings_found = 'N'
+        DO get-empl-rcd
+        DO insert-benefit-partic
+     END-IF
+      DO insert-savings-plan
+   END-IF
+
+end-PROCEDURE !process-end-savings
+
+!***********************************************************************
+!   Procedure Name:  end-date-savings-plan
+!  Called By:  process-end-savings
+!  Description:  End date Savings Plan
+!***********************************************************************
+begin-PROCEDURE end-savings-plan
+
+   SHOW 'Update Savings'
+
+begin-SQL on-error=end-date-savings-plan-error
+
+UPDATE PS_SAVINGS_PLAN
+   SET COVERAGE_ELECT = $coverage_elect
+! HCM-928 Change to blamk Benefit plan when waive or term.
+      ,BENEFIT_PLAN   = ' '
+! end of HCM-928
+ WHERE EMPLID = $emplid
+   AND EMPL_RCD = #empl_rcd
+   AND BENEFIT_NBR = #benefit_nbr
+   AND PLAN_TYPE = $plan_type
+   AND EFFDT = $savings_effdt
+
+end-SQL
+
+end-PROCEDURE !end-date-savings-plan
+
+!***********************************************************************
+!   Procedure Name: process-savings
+!  Called By:  process-election
+!  Description:  Insert new savings plan election, end date existing
+!      if it exists
+!***********************************************************************
+begin-PROCEDURE process-savings
+
+   LET $savings_exists = 'N'
+
+   LET #empl_rcd = 0
+   LET #benefit_nbr = 0
+
+   SHOW $emplid
+   SHOW 'Processing Savings'
+
+begin-SELECT
+
+S1.EMPL_RCD
+S1.BENEFIT_NBR
+S1.EFFDT
+
+   LET #empl_rcd = &s1.empl_rcd
+   LET #benefit_nbr = &s1.benefit_nbr
+   LET $savings_effdt = &s1.effdt
+
+   IF $pay_begin_dt = $savings_effdt
+      DO delete-savings-plan
+   END-IF
+
+   LET $savings_exists = 'Y'
+
+FROM PS_SAVINGS_PLAN S1
+WHERE S1.EMPLID = $emplid
+  AND S1.PLAN_TYPE = $plan_type
+  AND S1.EFFDT = (SELECT MAX(EFFDT)
+                     FROM PS_SAVINGS_PLAN
+                    WHERE EMPLID = S1.EMPLID
+                      AND PLAN_TYPE = S1.PLAN_TYPE
+                      AND EFFDT <= $pay_begin_dt)
+
+end-SELECT
+
+   IF $savings_exists = 'N'
+      DO get-empl-rcd
+      DO insert-benefit-partic
+   END-IF
+
+   DO insert-savings-plan
+
+end-PROCEDURE !process-savings
+
+!***********************************************************************
+!   Procedure Name:  get-empl-rcd
+!  Called By:  process-savings
+!  Description:  Select job data
+!***********************************************************************
+begin-PROCEDURE get-empl-rcd
+
+begin-SELECT
+
+POA.BENEFIT_RCD_NBR
+
+   LET #empl_rcd = &poa.benefit_rcd_nbr
+
+FROM PS_PRIMARY_JOBS PJ
+    ,PS_PER_ORG_ASGN POA
+WHERE PJ.EMPLID = $emplid
+  AND PJ.EMPLID = POA.EMPLID
+  AND PJ.EMPL_RCD = POA.EMPL_RCD
+  AND PJ.PRIMARY_JOB_IND = 'Y'
+  AND PJ.EFFDT = (SELECT MAX(EFFDT)
+                    FROM PS_PRIMARY_JOBS
+                   WHERE EMPLID = PJ.EMPLID
+                     AND PRIMARY_JOB_IND = 'Y'
+                     AND EFFDT <= SYSDATE)
+
+end-SELECT
+
+end-PROCEDURE !get-empl-rcd
+
+!***********************************************************************
+!   Procedure name:  delete-savings-plan
+!  Called By:  process-savings
+!  Description:  Deletes existing savings plan record so new record
+!       with same key values can be loaded
+!***********************************************************************
+begin-PROCEDURE delete-savings-plan
+
+   SHOW 'Deleting savings plan'
+
+begin-SQL on-error=delete-savings-plan-error
+
+DELETE FROM PS_SAVINGS_PLAN
+ WHERE EMPLID = $emplid
+   AND EMPL_RCD = #empl_rcd
+   AND BENEFIT_NBR= #benefit_nbr
+   AND EFFDT = $savings_effdt
+   AND PLAN_TYPE = $plan_type
+
+end-SQL
+
+end-PROCEDURE !delete-savings-plan
+
+!***********************************************************************
+! insert-benefit-partic
+!***********************************************************************
+begin-PROCEDURE insert-benefit-partic
+
+begin-SQL
+
+INSERT INTO PS_BENEFIT_PARTIC (
+ EMPLID
+,EMPL_RCD
+,COBRA_EVENT_ID
+,PLAN_TYPE
+,BENEFIT_NBR)
+SELECT $emplid
+      ,#empl_rcd
+      ,0
+      ,$plan_type
+      ,#benefit_nbr
+  FROM DUAL
+ WHERE NOT EXISTS (SELECT 'X'
+                     FROM PS_BENEFIT_PARTIC
+                    WHERE EMPLID = $emplid
+                      AND EMPL_RCD = #empl_rcd
+                      AND PLAN_TYPE = $plan_type)
+
+end-SQL
+
+end-PROCEDURE !insert-benefit-partic
+
+!***********************************************************************
+!   Procedure Name:  insert-savings-plan
+!  Called By:  process-savings
+!  Description:  Inserts new savings plan record
+!***********************************************************************
+begin-PROCEDURE insert-savings-plan
+
+   SHOW 'Insert savings plan'
+
+
+begin-SQL on-error=insert-savings-plan-error
+
+INSERT INTO PS_SAVINGS_PLAN (
+ EMPLID
+,EMPL_RCD
+,PLAN_TYPE
+,BENEFIT_NBR
+,EFFDT
+,DEDUCTION_END_DT
+,COVERAGE_BEGIN_DT
+,COVERAGE_END_DT
+,COVERAGE_ELECT
+,COVERAGE_ELECT_DT
+,BENEFIT_PLAN
+,SAVINGS_COVRG
+,FLAT_DED_AMT
+,PCT_GROSS
+,SAVINGS_COVRG_ATAX
+,FLAT_DED_AMT_ATAX
+,PCT_GROSS_ATAX
+,ANN_EX_CREDITS
+,PLAN_TYPE_RB
+,BENEFIT_PLAN_RB
+,DEDCD_RB
+,DED_CLASS_RB
+,PLAN_TYPE_RA
+,BENEFIT_PLAN_RA
+,DEDCD_RA
+,DED_CLASS_RA
+,GVT_INV_CHG_FLAG
+,GVT_STAT_CHG_FLAG)
+VALUES (
+ $emplid    !EMPLID
+,#empl_rcd    !EMPL_RCD
+,$plan_type    !PLAN_TYPE
+,#benefit_nbr    !BENEFIT_NBR
+,$pay_begin_dt    !EFFDT
+,''      !DEDUCTION_END_DT
+,$pay_begin_dt    !COVERAGE_BEGIN_DT
+,''      !COVERAGE_END_DT
+,$coverage_elect  !COVERAGE_ELECT
+,$pay_begin_dt    !COVERAGE_ELECT_DT
+,$benefit_plan    !BENEFIT_PLAN
+,'1'      !SAVINGS_COVRG
+,#amount    !FLAT_DED_AMT
+,0      !PCT_GROSS
+,'1'      !SAVINGS_COVRG_ATAX
+,0      !FLAT_DED_AMT_ATAX
+,0      !PCT_GROSS_ATAX
+,0      !ANN_EX_CREDITS
+,' '      !PLAN_TYPE_RB
+,' '      !BENEFIT_PLAN_RB
+,' '      !DEDCD_RB
+,' '      !DED_CLASS_RB
+,' '      !PLAN_TYPE_RA
+,' '      !BENEFIT_PLAN_RA
+,' '      !DEDCD_RA
+,' '      !DED_CLASS_RA
+,' '      !GVT_INV_CHG_FLAG
+,' ')      !GVT_STAT_CHG_FLAG
+
+end-SQL
+
+end-PROCEDURE !insert-savings-plan
+
+!***********************************************************************
+!   Procedure Name: open-input-file
+!       Called By:  process-main
+!       Description:  This procedure will attempt to open the
+!                       specified input file for reading.
+!***********************************************************************
+begin-PROCEDURE open-input-file
+
+   OPEN $filename AS #file_in FOR-READING RECORD=466:VARY STATUS=#file_status
+
+   IF #file_status = 0
+      SHOW ' '
+      SHOW $filename ' opened successfully for processing.'
+   else
+      SHOW 'Unable to open file ' $filename
+      SHOW 'RETURN-STATUS = ' #return-status
+      DO update-prcsrqst-no-success
+      STOP quiet
+   END-IF
+
+end-PROCEDURE !open-input-file
+
+!************************************************************************
+!   Procedure Name:  backup-file
+!  Called By:  process-main
+!  Description:  Moves file that was processed to backup directory.
+!************************************************************************
+begin-PROCEDURE backup-file
+
+   let #prevfile_status = rename($filename,$backup_filename)
+   if #prevfile_status <> 0
+      show ' '
+      show 'ERROR - unable to rename ' $filename ' to ' $backup_filename '!!'
+      show '   Program aborting ...........'
+      show ' '
+      show 'RETURN-STATUS = ' #return-status
+      stop
+   else
+      show ' '
+      show $filename ' successfully renamed to ' $backup_filename
+      show ' '
+   end-if
+
+end-PROCEDURE !backup-file
+
+!***********************************************************************
+!  Procedure Name: print-detail
+!  Called By:  process-main
+!  Description:  Print summary and error detail
+!***********************************************************************
+begin-PROCEDURE print-detail
+
+   let $print_ded_begin_dt = DATETOSTR($pay_begin_dt,'MM/DD/YYYY')
+   let $print_cov_begin_dt = DATETOSTR($new_effdt,'MM/DD/YYYY')
+
+   PRINT $emplid    (+1,1)
+   PRINT $first_name    (,12)
+   PRINT $last_name    (,28)
+   PRINT $print_ded_begin_dt  (,44)
+   PRINT $print_cov_begin_dt  (,56)
+   PRINT $chg_status    (,68)
+   PRINT #amount    (,80)
+
+   IF $error_exists = 'Y'
+      LET $result = 'Error' || $msg
+   ELSE
+      LET $result = $msg
+   END-IF
+
+   PRINT $result (,90)
+
+end-PROCEDURE !print-detail
+
+!***********************************************************************
+!  Procedure Name:  update-prcsrqst-no-success
+!  Called By:
+!  Description:  Updates the Process Run Status so that "No Success"
+!               is displayed in the Process Monitor.
+!***********************************************************************
+begin-PROCEDURE update-prcsrqst-no-success
+
+      LET #prcs_run_status = 10
+      DO Update-Prcs-Run-Status          ! prcsapi.sqc
+
+end-PROCEDURE   update-prcsrqst-no-success
+
+!******************************************************************************
+! end-date-savings-plan-error
+!******************************************************************************
+begin-PROCEDURE end-date-savings-plan-error
+
+   show ' '
+   show ' error in Procedure => ' 'END-DATE-SAVINGS-PLAN'
+   show 'Table 1 in error ==========> ' 'PS_SAVINGS_PLAN'
+   show  'UPDATE PS_SAVINGS_PLAN'
+   show '   SET COVERAGE_END_DT = ' $END_DT
+   show '      ,DEDUCTION_END_DT = ' $END_DT
+   show ' WHERE EMPLID = ' $EMPLID
+   show '   AND EMPL_RCD = ' #EMPL_RCD
+   show '   AND BENEFIT_NBR = ' #BENEFIT_NBR
+   show  '   AND PLAN_TYPE = 46'
+   show '   AND EFFDT = ' $SAVINGS_EFFDT
+   show ' '
+   show '******* PROGRAM TERMINATING UNSUCCESSFULLY *******'
+   show 'Sql Error     = ' $sql-error
+   show 'Sql Status    = ' #sql-status edit 9999999
+   show 'RETURN-STATUS = ' #return-status
+   DO update-prcsrqst-no-success
+   stop
+
+end-PROCEDURE !end-date-savings-plan-error
+
+!******************************************************************************
+! delete-savings-plan-error
+!******************************************************************************
+begin-PROCEDURE delete-savings-plan-error
+
+   show ' '
+   show 'DELETE error in Procedure => ' 'DELETE-SAVINGS-PLAN'
+   show 'Table 1 in error ==========> ' 'PS_SAVINGS_PLAN'
+   show  'DELETE FROM PS_SAVINGS_PLAN'
+   show ' WHERE EMPLID = ' $EMPLID
+   show '   AND EMPL_RCD = ' #EMPL_RCD
+   show '   AND BENEFIT_NBR= ' #BENEFIT_NBR
+   show '   AND EFFDT = ' $SAVINGS_EFFDT
+   show  '   AND PLAN_TYPE = 46'
+   show ' '
+   show '******* PROGRAM TERMINATING UNSUCCESSFULLY *******'
+   show 'Sql Error     = ' $sql-error
+   show 'Sql Status    = ' #sql-status edit 9999999
+   show 'RETURN-STATUS = ' #return-status
+   DO update-prcsrqst-no-success
+   stop
+
+end-PROCEDURE !delete-savings-plan-error
+
+!******************************************************************************
+! insert-savings-plan-error
+!******************************************************************************
+begin-PROCEDURE insert-savings-plan-error
+
+   show ' '
+   show 'INSERT error in Procedure => ' 'INSERT-SAVINGS-PLAN'
+   show 'Table 1 in error ==========> ' 'PS_SAVINGS_PLAN'
+   show  'INSERT INTO PS_SAVINGS_PLAN ('
+   show  ' EMPLID'
+   show  ',EMPL_RCD'
+   show  ',PLAN_TYPE'
+   show  ',BENEFIT_NBR'
+   show  ',EFFDT'
+   show  ',DEDUCTION_END_DT'
+   show  ',COVERAGE_BEGIN_DT'
+   show  ',COVERAGE_END_DT'
+   show  ',COVERAGE_ELECT'
+   show  ',COVERAGE_ELECT_DT'
+   show  ',BENEFIT_PLAN'
+   show  ',SAVINGS_COVRG'
+   show  ',FLAT_DED_AMT'
+   show  ',PCT_GROSS'
+   show  ',SAVINGS_COVRG_ATAX'
+   show  ',FLAT_DED_AMT_ATAX'
+   show  ',PCT_GROSS_ATAX'
+   show  ',ANN_EX_CREDITS'
+   show  ',PLAN_TYPE_RB'
+   show  ',BENEFIT_PLAN_RB'
+   show  ',DEDCD_RB'
+   show  ',DED_CLASS_RB'
+   show  ',PLAN_TYPE_RA'
+   show  ',BENEFIT_PLAN_RA'
+   show  ',DEDCD_RA'
+   show  ',DED_CLASS_RA'
+   show  ',GVT_INV_CHG_FLAG'
+   show  ',GVT_STAT_CHG_FLAG)'
+   show  'VALUES ('
+   show ' ' $EMPLID
+   show ',' #EMPL_RCD
+   show  ',46      '
+   show ',' #BENEFIT_NBR
+   show ',' $pay_begin_dt
+   show  ',      '
+   show ',' $NEW_EFFDT
+   show  ',      '
+   show  ',' $COVERAGE_ELECT
+   show ',' $NEW_EFFDT
+   show  ',TSA      '
+   show  ',1      '
+   show ',' #AMOUNT
+   show  ',0      '
+   show  ',1      '
+   show  ',0      '
+   show  ',0      '
+   show  ',0      '
+   show  ',       '
+   show  ',       '
+   show  ',       '
+   show  ',       '
+   show  ',       '
+   show  ',       '
+   show  ',       '
+   show  ',       '
+   show  ',       '
+   show  ', )      '
+   show ' '
+   show '******* PROGRAM TERMINATING UNSUCCESSFULLY *******'
+   show 'Sql Error     = ' $sql-error
+   show 'Sql Status    = ' #sql-status edit 9999999
+   show 'RETURN-STATUS = ' #return-status
+   DO update-prcsrqst-no-success
+   stop
+
+end-PROCEDURE !insert-savings-plan-error
+
+!******************************************************************************
+! terminate-program
+!******************************************************************************
+begin-PROCEDURE terminate-program
+
+  DO Get-Current-DateTime
+
+  SHOW $ReportID ' ' $ReportTitle
+  SHOW 'Completed at ' $AsOfToday ' ' $AsOfNow
+
+  MOVE 0 to #return-status
+  SHOW 'Return-Status = ' #return-status
+
+  COMMIT
+
+  DO Reset                               ! reset.sqc
+  DO Stdapi-Term                       ! stdapi.sqc
+
+end-PROCEDURE   terminate-program
+
+
+!******************************************************************************
+! Include SQCs
+!******************************************************************************
+#include 'stdapi.sqc'                    !Routines to update run status
+#Include 'reset.sqc'                     !Reset printer procedure
+#Include 'curdttim.sqc'                  !Get-Current-DateTime procedure
+#Include 'datetime.sqc'                  !Routines for date and time formatting
+#Include 'number.sqc'                    !Routines to format numbers
+#Include 'sqrtrans.sqc'
+#Include 'useprntr.sqc'
+#include 'hrsecty.sqc'                   !Get SQR Security parameters
+#include 'uaparm.sqc'       !Get UA Parameters
+!******************************* End of Program *******************************
