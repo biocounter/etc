@@ -74,7 +74,13 @@ normal  <ll>vV      Grep for the word under the cursor, match whole word, like
 normal  <ll>va      Like vv, but add to existing list
 normal  <ll>vA      Like vV, but add to existing list
 normal  <ll>vr      Perform a global search search on the word under the cursor
-normal  <ll>vo      Select the files to search in and set grep options
+normal  <ll>vo      Select the files to search in and set <leader> hm	HexManager: Call/Leave Hexmode (using xxd)
+normal  <ll>hd      HexDelete: delete hex character under cursor
+normal  <ll>hi      HexInsert: Insert Ascii character before cursor
+normal  <ll>hg      HexGoto: Goto hex offset.
+normal  <ll>hn      HexNext: Goto next hex offset.
+normal  <ll>hp      HexPrev: Goto previous hex offset.
+normal  <ll>hs      HexStatus: Show / Hide hexoffset infos in statuslin: and related ascii column grep options
 
 ================================================================================
 == COMMAND LINE
