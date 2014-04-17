@@ -29,69 +29,47 @@ set cpoptions=aABceFsmq
 "             ||+-- A backslash has no special meaning in mappings
 "             |+-- :write updates alternative file name
 "             +-- :read updates alternative file name
-filetype plugin indent on       " load filetype plugins/indent settings
-set autochdir                   " always switch to the current file directory
-set backspace=indent,eol,start  " make backspace a more flexible
-set nobackup                    " do not make backup files
-set nowb						" do not make a backup before overwriting a file
+filetype plugin indent on      " load filetype plugins/indent settings
+set autochdir                  " always switch to the current file directory
+set backspace=indent,eol,start " make backspace a more flexible
+set nobackup                   " do not make backup files
+set nowb                       " do not make a backup before overwriting a file
 set noswapfile
-set clipboard+=unnamed          " share windows clipboard
-"if (s:running_windows)
-"	set backupdir=~/vimfiles/backup " where to put backup files
-"	set directory=~/vimfiles/temp   " directory to place swap files in
-"else
-"    set backupdir=~/.vim/backup     " where to put backup files
-"	set directory=~/.vim/temp       " directory to place swap files in
-"endif
-set fileformats=unix,dos,mac " support all three, in this order
-set hidden                   " you can change buffers without saving
-                             " (XXX: #VIM/tpope warns the line below could break things)
-set iskeyword+=_,$,@,%,#     " none of these are word dividers
-set mouse=a                  " use mouse everywhere
-set noerrorbells             " don't make noise
-set showtabline=0			       " never show tabs
-set wildmenu                 " turn on command line completion wild style
-" set whichwrap=b,s,h,l,<,>,~,[,] " everything wraps
-"             | | | | | | | | |
-"             | | | | | | | | +-- "]" Insert and Replace
-"             | | | | | | | +-- "[" Insert and Replace
-"             | | | | | | +-- "~" Normal
-"             | | | | | +-- <Right> Normal and Visual
-"             | | | | +-- <Left> Normal and Visual
-"             | | | +-- "l" Normal and Visual (not recommended)
-"             | | +-- "h" Normal and Visual (not recommended)
-"             | +-- <Space> Normal and Visual
-"             +-- <BS> Normal and Visual
-
-" ------------------------------------------------------------------------------
-" Text Formatting/Layout
-" ------------------------------------------------------------------------------
-set completeopt=menuone                          " always show menu for completions
-"set foldenable                                   " Turn on folding
+set clipboard+=unnamed         " share windows clipboard
+	" if (s:running_windows)
+	" set backupdir=~/vimfiles/backup                           " where to put backup files
+	" set directory=~/vimfiles/temp                             " directory to place swap files in
+	" else
+	" set backupdir=~/.vim/backup                               " where to put backup files
+	" set directory=~/.vim/temp                                 " directory to place swap files in
+	" endif
+set fileformats=unix,dos,mac   " support all three, in this order
+set hidden                     " you can change buffers without saving
+		                       " (XXX: #VIM/tpope warns the line below could break things)
+set iskeyword+=_,$,@,%,#       " none of these are word dividers
+set mouse=a                    " use mouse everywhere
+set noerrorbells               " don't make noise
+set showtabline=0              " never show tabs
+set wildmenu                   " turn on command line completion wild style
 "set foldlevel=100                                " Don't autofold anything (but I can still fold manually)
+set completeopt=menuone                          " always show menu for completions
+set foldenable                                   " Turn on folding
 set foldmethod=indent                            " Fold on the indent (damn you python)
 set foldopen=block,hor,mark,percent,quickfix,tag " what movements open folds
 set foldtext=SimpleFoldText()                    " Custom fold text function (cleaner than default)
 set formatoptions=rq                             " Automatically insert comment leader on return, and let gq format comments
 set ignorecase                                   " ignore case when searching
+set noexpandtab					 				 " use real tabs instead of spaces
 set nolist                                       " do not show hidden characters
 set nowrap                                       " turn off line wrapping (affects how text is DISPLAYED on long lines)
 set shiftround                                   " when at 3 spaces, and I hit > ... go to 4, not 5
-set smartindent                                  " perform c-like indenting
-set wildmode=list:longest                        " turn on wild mode huge list
-set wildignore=*.dll,*.o,*.obj,*.bak,*.exe,*.pyc,*.jpg,*.gif,*.png " ignore these list file extensions
-set noexpandtab					 " use real tabs instead of spaces
-set tabstop=4
 set shiftwidth=4                                 " auto-indent amount when using cindent, >>, << and stuff like that
-set softtabstop=4                                " when hitting tab or backspace, how many spaces should a tab be (see expandtab)
-
-" ------------------------------------------------------------------------------
-" Find & Replace
-" ------------------------------------------------------------------------------
+set smartindent                                  " perform c-like indenting
+set tabstop=4
+set wildignore=*.dll,*.o,*.obj,*.bak,*.exe,*.pyc,*.jpg,*.gif,*.png " ignore these list file extensions
+set wildmode=list:longest                        " turn on wild mode huge list
 set ignorecase            " case insensitive search matching
-" * or # in visual mode searches for occurences of the current selection
-vnoremap <silent> * :call VisualSelection('f')<CR>
-vnoremap <silent> # :call VisualSelection('b')<CR>
+set nosmarttab									 " do not replace tabs with spaces 
 
 " ------------------------------------------------------------------------------
 " Envorinment Configuration
@@ -197,16 +175,6 @@ map <leader>bd :Bclose<cr>
 " Close all the buffers
 map <leader>ba :1,1000 bd!<cr>
 
-" Useful mappings for managing tabs
-map <leader>tn :tabnew<cr>
-map <leader>to :tabonly<cr>
-map <leader>tc :tabclose<cr>
-map <leader>tm :tabmove
-
-" Opens a new tab with the current buffer's path
-" Super useful when editing files in the same directory
-map <leader>te :tabedit <c-r>=expand("%:p:h")<cr>/
-
 " Switch CWD to the directory of the open buffer
 map <leader>cd :cd %:p:h<cr>:pwd<cr>
 
@@ -217,19 +185,17 @@ try
 catch
 endtry
 
+" switch between buffers with tab w/ Ctrl-N/P
+nnoremap <C-n> :bnext<CR>
+nnoremap <C-p> :bprevious<CR>
+
 " ------------------------------------------------------------------------------
 " Plugin Settings
 " ------------------------------------------------------------------------------
-" Easy Align Plugin
-vmap <Enter> <Plug>(EasyAlign)
-nmap <Leader>a <Plug>(EasyAlign)
 
 " TComment Map Settings
 "let g:tcommentMapLeaderOp1=
 "let g:tcommentMapLeaderOp2=
-autocmd BufReadPost * :DetectIndent
-let g:detectindent_preferred_expandtab=0    " if indent not detected use tabs
-let g:detectindent_preferred_indent=4	    " set default TS to 4
 
 " turn off delimitmate by type
 " au FileType mail let b:delimitMate_autoclose = 0
@@ -239,13 +205,10 @@ let g:detectindent_preferred_indent=4	    " set default TS to 4
 " ------------------------------------------------------------------------------
 " When you press gv you vimgrep after the selected text
 vnoremap <silent> gv :call VisualSelection('gv')<CR>
-
 " Open vimgrep and put the cursor in the right position
 map <leader>g :vimgrep // **/*.<left><left><left><left><left><left><left>
-
 " Vimgreps in the current file
 map <leader><space> :vimgrep // <C-R>%<C-A><right><right><right><right><right><right><right><right><right>
-
 " When you press <leader>r you can search and replace the selected text
 vnoremap <silent> <leader>r :call VisualSelection('replace')<CR>
 
@@ -328,34 +291,28 @@ endfunction
 " ------------------------------------------------------------------------------
 function! TwiddleCase(str)
   if a:str ==# toupper(a:str)
-    let result = tolower(a:str)
+	let result = tolower(a:str)
   elseif a:str ==# tolower(a:str)
-    let result = substitute(a:str,'\(\<\w\+\>\)', '\u\1', 'g')
+	let result = substitute(a:str,'\(\<\w\+\>\)', '\u\1', 'g')
   else
-    let result = toupper(a:str)
+	let result = toupper(a:str)
   endif
   return result
 endfunction
 vnoremap ~ y:call setreg('', TwiddleCase(@"), getregtype(''))<CR>gv""Pgv
 
 " ------------------------------------------------------------------------
-function! SimpleFoldText()
-" ------------------------------------------------------------------------------
-	return getline(v:foldstart).' '
-endfunction
-
-" ------------------------------------------------------------------------
 function! ListUniqueSort(list, ...)
 " ------------------------------------------------------------------------
   let dictionary = {}
   for i in a:list
-    let dictionary[string(i)] = i
+	let dictionary[string(i)] = i
   endfor
   let result = []
   if ( exists( 'a:1' ) )
-    let result = sort( values( dictionary ), a:1 )
+	let result = sort( values( dictionary ), a:1 )
   else
-    let result = sort( values( dictionary ) )
+	let result = sort( values( dictionary ) )
   endif
   return result
 endfunction
@@ -380,15 +337,6 @@ function! MyDiff()
 endfunction
 
 " ------------------------------------------------------------------------------
-func! DeleteTrailingWS()
-" ------------------------------------------------------------------------------
-  exe "normal mz"
-  %s/\s\+$//ge
-  exe "normal `z"
-endfunc
-autocmd! BufWrite *.* :call DeleteTrailingWS()
-
-" ------------------------------------------------------------------------------
 function! CygwinShell()
 " ------------------------------------------------------------------------------
 	set shell=\"C:\Progra~1\Cygwin64\bin\bash.exe\"
@@ -397,3 +345,14 @@ function! CygwinShell()
 	command! -complete=shellcmd -nargs=* -bang Shell call s:ExecuteInShell(<q-args>, '<bang>')
 "	cabbrev shell Shell
 endfunction
+
+" ------------------------------------------------------------------------------
+function! ToggleFoldLevel() 
+" ------------------------------------------------------------------------------
+	if (&foldlevel == 0)
+		set foldlevel=99
+	else
+		set foldlevel=0
+	endif
+endfunction
+nnoremap <leader>f :call ToggleFoldLevel()<cr>
