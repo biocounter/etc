@@ -425,6 +425,6 @@ function cdb() {
 export -f cdb
 
 function gvi() {
-	nohup /cygdrive/c/Progra~2/Vim/vim74/gvim.exe "$1" &
+	/cygdrive/c/Progra~2/Vim/vim74/gvim.exe "$1" &
 }
 export -f gvi
