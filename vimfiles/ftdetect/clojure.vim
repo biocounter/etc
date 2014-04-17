@@ -1,1 +1,1 @@
-au BufNewFile,BufRead *.clj set filetype=clojure
+autocmd BufNewFile,BufRead *.clj,*.cljs,*.edn setlocal filetype=clojure
