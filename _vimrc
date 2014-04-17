@@ -221,13 +221,16 @@ endtry
 " Plugin Settings
 " ------------------------------------------------------------------------------
 " Easy Align Plugin
-noremap <silent> ea :EasyAlign<CR>
+vmap <Enter> <Plug>(EasyAlign)
+nmap <Leader>a <Plug>(EasyAlign)
+
 " TComment Map Settings
 "let g:tcommentMapLeaderOp1=
 "let g:tcommentMapLeaderOp2=
 autocmd BufReadPost * :DetectIndent
 let g:detectindent_preferred_expandtab=0    " if indent not detected use tabs
 let g:detectindent_preferred_indent=4	    " set default TS to 4
+
 " turn off delimitmate by type
 " au FileType mail let b:delimitMate_autoclose = 0
 

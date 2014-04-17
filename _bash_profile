@@ -59,12 +59,12 @@ export EDITOR=vi				# use the VI editor for line edting
 
 function bashify {	# convert environment variable to cygwin format
 	if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
-	  local p
-	  for p ; do
+		local p
+		for p ; do
 		 if [ "${!p}" ] ; then
 			   eval 'export '$p'=$(cygpath -pu "$'$p'")'
 		 fi
-	  done
+		done
 	fi
 }
 export -f bashify
@@ -78,7 +78,7 @@ function addtopath { # add value to path if it does not exist
 		if [[ "${PATH}" != *:"${p}":* ]] ; then
 			export PATH=$PATH:$p
 		fi
-   fi
+	 fi
 }
 export -f addtopath
 
@@ -96,6 +96,7 @@ bashify GIT_HOME
 addtopath $GIT_HOME/bin
 bashify JAVA_HOME
 addtopath $JAVA_HOME/bin
+addtopath $SCALA_HOME/bin
 
 # configure python3 environment
 #alias python=python3
@@ -135,7 +136,7 @@ PS1="\n${cyan}[`date +%m/%d` \@][\u@\h][\w]${NC}\n\$ "
 
 # show today's agenda
 if [ -f /bin/google ] ; then
-   echo "Today's Agenda:"; google calendar today --fields title,when,where
+	 echo "Today's Agenda:"; google calendar today --fields title,when,where
 fi
 
 #-----------------------------------------------------------------------
@@ -225,20 +226,20 @@ function cuttail() { # cut last n lines in file, 10 by default
 }
 
 function lowercase() { # move filenames to lowercase
-   for file ; do
-	  filename=${file##*/}
-	  case "$filename" in
+	 for file ; do
+		filename=${file##*/}
+		case "$filename" in
 		 */*) dirname==${file%/*} ;;
 		 *) dirname=.;;
-	  esac
-	  nf=$(echo $filename | tr A-Z a-z)
-	  newname="${dirname}/${nf}"
-	  if [ "$nf" != "$filename" ]; then
+		esac
+		nf=$(echo $filename | tr A-Z a-z)
+		newname="${dirname}/${nf}"
+		if [ "$nf" != "$filename" ]; then
 		 mv "$file" "$newname"
 		 echo "lowercase: $file --> $newname"
-	  else
+		else
 		 echo "lowercase: $file not changed."
-	  fi
+		fi
 	done
 }
 export -f lowercase
@@ -254,7 +255,7 @@ function dateprefix { # add YYYYMM to files in %CD%
 	date_prefix=$(date + %Y%m)
 	for file in *.*
 	do
-	  mv $file		"$date_prefix ${file%.*}.${file##*.}"
+		mv $file		"$date_prefix ${file%.*}.${file##*.}"
 	done
 }
 
@@ -368,7 +369,7 @@ function repeat() { # repeat n times command
 	local i max
 	max=$1; shift;
 	for ((i=1; i <= max ; i++)); do		# --> C-like syntax
-	  eval "$@";
+		eval "$@";
 	done
 }
 export -f repeat
@@ -422,3 +423,8 @@ function cdb() {
 	esac
 }
 export -f cdb
+
+function gvi() {
+	nohup /cygdrive/c/Progra~2/Vim/vim74/gvim.exe "$1" &
+}
+export -f gvi

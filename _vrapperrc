@@ -1,13 +1,9 @@
-set autoindent			"automatically indent lines
-set clipboard=unnamed	"use system clipboard for y
-set cursorline			"show current line
-set globalregisters	"share buffers across editor panes
-set hlsearch			  "highlight searches
-set ignorecase			"ignore case while searching
-set noexpandtab			"don't expand spaces to tab
-set number          "turn on line numbering
-set smartindendt		"automatically indent lines
-set softtabstop=2		"# spaces for tab (if expandtab)
-set tabstop=4			  "default tabstop
-set textwidth=80		"set width of line for formatting
-set visualmouse			"using the mouse = visual mode
+set autoindent
+set cursorline		" highlight current line
+set gvimpath		"C:\Progra~2\Vim\vim74
+set hlsearch
+set ignorecase		" ignore case when searching
+set noexpandtab		" do not replace spaces with tabs 
+set nosmartcase		" ignore case when searching
+set number
+set tabstop=4
