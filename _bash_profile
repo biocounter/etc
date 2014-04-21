@@ -143,6 +143,11 @@ fi
 # Aliases
 #-----------------------------------------------------------------------
 alias cp='cp -i'					# -> Prevents accidentally clobbering files.
+if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+	alias clojure='java -cp $(cygpath -w ~/lib/java/clojure-1.6.0.jar) clojure.main'
+else
+	alias clojure='java -cp ~/lib/java/clojure-1.6.0.jar clojure.main'
+fi
 alias dnt='echo -e `date "+%A %B %d, %Y"`" "`date "+%I:%M %p"` > /dev/clipboard'
 alias dtm='printf "[%s %s] " `date "+%y%m%d"` `date "+%H:%M"` > /dev/clipboard'
 alias fn='{ alias && export -f; } | egrep "\(\)|alias" | sed "s/alias //ig" | cut -d= -f1 | sort'
