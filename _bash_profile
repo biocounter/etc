@@ -1,6 +1,17 @@
-#-----------------------------------
+#============================================================================
+#title          :.bash_profile.sh
+#description    :setup and customizations for bash shell
+#author         :Gary Furash
+#date           :20140422
+#version        :1      
+#usage          :./.bash_profile.sh
+#notes          :       
+#bash_version   :4.1.11(2)-release
+#============================================================================
+
+#-------------------------------------------------------------------------------
 # Source global definitions (if any)
-#-----------------------------------
+#-------------------------------------------------------------------------------
 if [ -f /etc/bashrc ]; then
 	. /etc/bashrc
 fi
@@ -8,9 +19,9 @@ if [ -f /etc/profile ]; then
 	. /etc/profile
 fi
 
-#---------------
+#-------------------------------------------------------------------------------
 # Some settings
-#---------------
+#-------------------------------------------------------------------------------
 
 ulimit -S -c 0				# Don't want any coredumps
 set -o notify
@@ -34,13 +45,13 @@ shopt -s cdable_vars
 shopt -s checkhash
 shopt -s checkwinsize
 shopt -s sourcepath
-shopt -s no_empty_cmd_completion		# bash>=2.04 only
+shopt -s no_empty_cmd_completion         #bash>=2.04 only
 shopt -s cmdhist
 shopt -s histappend histreedit histverify
-shopt -s extglob			# necessary for programmable completion
+shopt -s extglob                         #necessary for programmable completion
 
 if [[ ${BASH_VERSINFO[0]} == 4 ]]; then
-	shopt -s globstar										# enable '**' (recursive)
+shopt -s globstar                        #enable '**' (recursive)
 fi
 
 # use this section for variables that append
