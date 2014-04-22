@@ -192,18 +192,11 @@ nnoremap <C-p> :bprevious<CR>
 " ------------------------------------------------------------------------------
 " Plugin Settings
 " ------------------------------------------------------------------------------
-
 " TComment Map Settings
 "let g:tcommentMapLeaderOp1=
 "let g:tcommentMapLeaderOp2=
 
-" turn off delimitmate by type
-" au FileType mail let b:delimitMate_autoclose = 0
 
-" ------------------------------------------------------------------------------
-" Vim Grep Utility
-" ------------------------------------------------------------------------------
-" When you press gv you vimgrep after the selected text
 vnoremap <silent> gv :call VisualSelection('gv')<CR>
 " Open vimgrep and put the cursor in the right position
 map <leader>g :vimgrep // **/*.<left><left><left><left><left><left><left>
@@ -218,6 +211,7 @@ vnoremap <silent> <leader>r :call VisualSelection('replace')<CR>
 " TODO: create custom fold function for sqr
 autocmd FileType sqr setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 autocmd BufRead,BufNewFile *.sqr,*.sqc setlocal tabstop=2 shiftwidth=2 softtabstop=0 expandtab
+autocmd FileType xml exe ":silent %!xmllint --format --recover - 2>/dev/null"
 
 " ------------------------------------------------------------------------------
 " cusotm fold text function cleaner than the default
