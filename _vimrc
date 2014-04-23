@@ -13,12 +13,10 @@ set background=dark                                           " we plan to use a
 set fenc=utf-8                                                " UTF-8
 let g:skip_loading_mswin=1                                    " Just in case :)
 set fileformat=unix                                           " use UNIX file formats
-set history=9999                                              " big old history
 set timeoutlen=300                                            " super low delay (works for me)
 set formatoptions+=n                                          " Recognize numbered lists
 set formatlistpat=^\\s*\\(\\d\\\|[-*]\\)\\+[\\]:.)}\\t\ ]\\s* " and bullets, too
 set viminfo+=!                                                " Store upper-case registers in viminfo
-set nomore                                                    " Short nomore
 set cpoptions=aABceFsmq
 "             |||||||||
 "             ||||||||+-- When joining lines, leave the cursor between joined lines
@@ -30,46 +28,29 @@ set cpoptions=aABceFsmq
 "             |+-- :write updates alternative file name
 "             +-- :read updates alternative file name
 filetype plugin indent on      " load filetype plugins/indent settings
-set autochdir                  " always switch to the current file directory
-set backspace=indent,eol,start " make backspace a more flexible
-set nobackup                   " do not make backup files
-set nowb                       " do not make a backup before overwriting a file
-set noswapfile
-set clipboard+=unnamed         " share windows clipboard
-	" if (s:running_windows)
-	" set backupdir=~/vimfiles/backup                           " where to put backup files
-	" set directory=~/vimfiles/temp                             " directory to place swap files in
-	" else
-	" set backupdir=~/.vim/backup                               " where to put backup files
-	" set directory=~/.vim/temp                                 " directory to place swap files in
-	" endif
-set fileformats=unix,dos,mac   " support all three, in this order
-set hidden                     " you can change buffers without saving
-		                       " (XXX: #VIM/tpope warns the line below could break things)
-set iskeyword+=_,$,@,%,#       " none of these are word dividers
-set mouse=a                    " use mouse everywhere
-set noerrorbells               " don't make noise
-set showtabline=0              " never show tabs
-set wildmenu                   " turn on command line completion wild style
-"set foldlevel=100                                " Don't autofold anything (but I can still fold manually)
-set completeopt=menuone                          " always show menu for completions
-set foldenable                                   " Turn on folding
-set foldmethod=indent                            " Fold on the indent (damn you python)
-set foldopen=block,hor,mark,percent,quickfix,tag " what movements open folds
-set foldtext=SimpleFoldText()                    " Custom fold text function (cleaner than default)
-set formatoptions=rq                             " Automatically insert comment leader on return, and let gq format comments
-set ignorecase                                   " ignore case when searching
-set noexpandtab					 				 " use real tabs instead of spaces
-set nolist                                       " do not show hidden characters
-set nowrap                                       " turn off line wrapping (affects how text is DISPLAYED on long lines)
-set shiftround                                   " when at 3 spaces, and I hit > ... go to 4, not 5
-set shiftwidth=4                                 " auto-indent amount when using cindent, >>, << and stuff like that
-set smartindent                                  " perform c-like indenting
-set tabstop=4
+set autochdir                                                      " always switch to the current file directory
+set backspace=indent,eol,start                                     " make backspace a more flexible
+set nowb nobackup noswapfile                                       " turn off backups
+set clipboard+=unnamed                                             " share windows clipboard
+set fileformats=unix,dos,mac                                       " support all three, in this order
+set hidden                                                         " you can change buffers without saving
+set iskeyword+=_,$,@,%,#                                           " none of these are word dividers
+set mouse=a                                                        " use mouse everywhere
+set noerrorbells                                                   " don't make noise
+set showtabline=0                                                  " never show tabs
+set wildmenu                                                       " turn on command line completion wild style
+set completeopt=menuone                                            " always show menu for completions
+set foldenable foldmethod=indent                                   " Turn on folding at indents
+set foldopen=block,hor,mark,percent,quickfix,tag                   " what movements open folds
+set foldtext=SimpleFoldText()                                      " Custom fold text function (cleaner than default)
+set formatoptions=rq                                               " Automatically insert comment leader on return, and let gq format comments
+set ignorecase incsearch hlsearch                                  " search: ignore case, higlight matches
+set nolist                                                         " do not show hidden characters
+set nowrap shiftround shiftwidth=4                                 " configure (no) line wrapping
+set smartindent                                                    " perform c-like indenting
+set tabstop=4 nosmarttab noexpandtab                               " use real tab characters
 set wildignore=*.dll,*.o,*.obj,*.bak,*.exe,*.pyc,*.jpg,*.gif,*.png " ignore these list file extensions
-set wildmode=list:longest                        " turn on wild mode huge list
-set ignorecase            " case insensitive search matching
-set nosmarttab									 " do not replace tabs with spaces 
+set wildmode=list:longest                                          " turn on wild mode huge list
 
 " ------------------------------------------------------------------------------
 " Envorinment Configuration
@@ -93,18 +74,14 @@ set diffopt+=iwhite   " diff ignores whitespace
 " ------------------------------------------------------------------------------
 colorscheme torte
 set cursorline
-set guifont=Courier_New:h10:cANSI " My favorite font
 set laststatus=2                  " always show the status line
 set lazyredraw                    " do not redraw while running macros
 set linespace=0                   " don't insert any extra pixel lines betweens rows
 set matchtime=5                   " how many tenths of a second to blink matching brackets for
 set mousehide                     " hide the mouse cursor when typing
-set nohlsearch                    " do not highlight searched for phrases
-set noincsearch                   " BUT do highlight as you type you search phrase
 set nostartofline                 " leave my cursor where it was
 set novisualbell                  " don't blink
-set number                        " turn on line numbers
-set numberwidth=5                 " We are good up to 99999 lines
+set number numberwidth=5          " turn on line numbers
 set report=0                      " tell us when anything is changed via :...
 set ruler                         " Always show current positions along the bottom
 set scrolloff=10                  " Keep 10 lines (top/bottom) for scope
@@ -114,7 +91,7 @@ set showmatch                     " show matching brackets
 set sidescrolloff=10              " Keep 5 lines at the size
 set showtabline=0
 syntax on                         " syntax highlighting on
-"set statusline=%F%m%r%h%w[%L][%{&ff}]%y[%p%%][%04l,%04v]
+set statusline=%F%m%r%h%w[%L][%{&ff}]%y[%p%%][%04l,%04v]
 "              | | | | |  |   |      |  |     |    |
 "              | | | | |  |   |      |  |     |    + current column
 "              | | | | |  |   |      |  |     +-- current line
@@ -189,6 +166,11 @@ endtry
 nnoremap <C-n> :bnext<CR>
 nnoremap <C-p> :bprevious<CR>
 
+" Replace word under cursor globally
+nnoremap <Leader>a :%s/\<<C-r><C-w>\>/
+" Replace word under cursor in line
+nnoremap <Leader>s :s/\<<C-r><C-w>\>/
+
 " ------------------------------------------------------------------------------
 " Plugin Settings
 " ------------------------------------------------------------------------------
@@ -196,6 +178,8 @@ nnoremap <C-p> :bprevious<CR>
 "let g:tcommentMapLeaderOp1=
 "let g:tcommentMapLeaderOp2=
 
+" ctags
+set tags=tags;/
 
 vnoremap <silent> gv :call VisualSelection('gv')<CR>
 " Open vimgrep and put the cursor in the right position
@@ -212,6 +196,25 @@ vnoremap <silent> <leader>r :call VisualSelection('replace')<CR>
 autocmd FileType sqr setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 autocmd BufRead,BufNewFile *.sqr,*.sqc setlocal tabstop=2 shiftwidth=2 softtabstop=0 expandtab
 autocmd FileType xml exe ":silent %!xmllint --format --recover - 2>/dev/null"
+
+" ------------------------------------------------------------------------------
+" scala
+" ------------------------------------------------------------------------------
+" TODO: create custom fold function for sqr
+let g:scala_sort_across_groups=1
+au BufEnter *.scala setl formatprg=java\ -jar\ /Users/stefanb/Exec/scalariform.jar\ -f\ -q\ +alignParameters\ +alignSingleLineCaseStatements\ +doubleIndentClassDeclaration\ +preserveDanglingCloseParenthesis\ +rewriteArrowSymbols\ +preserveSpaceBeforeArguments\ --stdin\ --stdout
+nmap <leader>m :SortScalaImports<CR>gggqG<C-o><C-o><leader><w>
+
+" ------------------------------------------------------------------------------
+" highlight unwanted(trailing) whitespace
+" ------------------------------------------------------------------------------
+" http://vim.wikia.com/wiki/Highlight_unwanted_spaces
+:highlight ExtraWhitespace ctermbg=red guibg=red
+:autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
+autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+autocmd InsertLeave * match ExtraWhitespace /\s\+$/
+autocmd BufWinLeave * call clearmatches()
 
 " ------------------------------------------------------------------------------
 " cusotm fold text function cleaner than the default
