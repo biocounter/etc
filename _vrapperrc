@@ -1,9 +1,12 @@
 set autoindent
-set cursorline		" highlight current line
-set gvimpath		"C:\Progra~2\Vim\vim74
+set contentassistmode " ctl-n/p to navigate content asst
+set cursorline        " highlight current line
+set gvimpath          " C:\Progra~2\Vim\vim74
 set hlsearch
-set ignorecase		" ignore case when searching
-set noexpandtab		" do not replace spaces with tabs 
-set nosmartcase		" ignore case when searching
+set ignorecase        " ignore case when searching
+set incsearch         " show search mactches incrementally
+set noexpandtab       " do not replace spaces with tabs
+set nosmartcase       " ignore case when searching
 set number
+set scrolloff=5       " move screen when near top/bottom
 set tabstop=4

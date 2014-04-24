@@ -133,12 +133,12 @@ CYAN='\e[1;36m'
 NC='\e[0m'								# No Color
 
 # Looks best on a black background.....
-echo -e "${CYAN}This is BASH ${RED}${BASH_VERSION%.*}${CYAN}${NC}"
-date
-function _exit() { # function to run upon exit of shell
-	echo -e "${RED}Hasta la vista, baby${NC}"
-}
-trap _exit EXIT
+#echo -e "${CYAN}This is BASH ${RED}${BASH_VERSION%.*}${CYAN}${NC}"
+#date
+#function _exit() { # function to run upon exit of shell
+#	echo -e "${RED}Hasta la vista, baby${NC}"
+#}
+#trap _exit EXIT
 
 PS1="\n${cyan}[`date +%m/%d` \@][\u@\h][\w]${NC}\n\$ "
 
@@ -170,6 +170,7 @@ alias r='fc -s' # execute last command
 alias rm='rm -i'					# -> Prevents accidentally clobbering files.
 alias rn='/usr/local/bin/rename '								# call Perl rename script
 alias vi='vim'								# cygwin installs a minimal vi
+alias scala='rlwrap scala'
 
 #if [[ ${BASH_VERSINFO[0]} == 4 ]]; then
 #		alias l='ls -A -B --color --group-directories-first -F --ignore="desktop.ini" --ignore="NTUSER*" --ignore="ntuser*"'
@@ -185,7 +186,7 @@ fi
 # run on startup
 #------------------------------------------------------------------------------------
 # delete temporary files
-nohup find $TEMP -type f -mtime +5 -exec rm {} \; > /tmp/${RANDOM}.out 2>&1&
+#nohup find $TEMP -type f -mtime +5 -exec rm {} \; > /tmp/${RANDOM}.out 2>&1&
 
 fitterm () {																 # Truncate oversized lines on input. Mostly for display use. Example: grep foo log | fitterm
 	cut -c 1-$( tput cols ) ;
@@ -193,9 +194,9 @@ fitterm () {																 # Truncate oversized lines on input. Mostly for dis
 export -f fitterm
 
 # show today's Google calendar agenda
-if [ -f /bin/google ] ; then
-	 echo "Today's Agenda:"; google calendar today --fields title,when,where
-fi
+#if [ -f /bin/google ] ; then
+#	 echo "Today's Agenda:"; google calendar today --fields title,when,where
+#fi
 
 #------------------------------------------------------------------------------------
 # functions 
@@ -430,8 +431,3 @@ function cdb() {
 	esac
 }
 export -f cdb
-
-function gvi() {
-	/cygdrive/c/Progra~2/Vim/vim74/gvim.exe "$1" &
-}
-export -f gvi

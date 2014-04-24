@@ -9,7 +9,6 @@ let s:colorful_term = (&term =~ "xterm") || (&term =~ "screen")
 " ------------------------------------------------------------------------
 set nocompatible                                              " explicitly get out of vi-compatible mode
 set noexrc                                                    " don't use local version of .(g)vimrc, .exrc
-set background=dark                                           " we plan to use a dark background
 set fenc=utf-8                                                " UTF-8
 let g:skip_loading_mswin=1                                    " Just in case :)
 set fileformat=unix                                           " use UNIX file formats
@@ -74,6 +73,7 @@ set diffopt+=iwhite   " diff ignores whitespace
 " ------------------------------------------------------------------------------
 colorscheme torte
 set cursorline
+set background=dark                                           " we plan to use a dark background
 set laststatus=2                  " always show the status line
 set lazyredraw                    " do not redraw while running macros
 set linespace=0                   " don't insert any extra pixel lines betweens rows
@@ -334,14 +334,20 @@ function! MyDiff()
 endfunction
 
 " ------------------------------------------------------------------------------
-function! CygwinShell()
+"function! CygwinShell()
 " ------------------------------------------------------------------------------
-	set shell=\"C:\Progra~1\Cygwin64\bin\bash.exe\"
-	set shellcmdflag=--login\ -c
-	set shellxquote=\"
-	command! -complete=shellcmd -nargs=* -bang Shell call s:ExecuteInShell(<q-args>, '<bang>')
+if has("gui_running")  
+	if has("gui_win32")
+"		set shell=\"%CYGWIN_HOME%\bin\bash.exe\"
+		" this fails if there are any spaces in the path 
+		set shell=%CYGWIN_HOME%\bin\bash.exe
+		set shellcmdflag=--login\ -c
+		set shellxquote=\"
+		command! -complete=shellcmd -nargs=* -bang Shell call s:ExecuteInShell(<q-args>, '<bang>')
+	endif
+endif
 "	cabbrev shell Shell
-endfunction
+"endfunction
 
 " ------------------------------------------------------------------------------
 function! ToggleFoldLevel() 
