@@ -44,29 +44,47 @@ set foldopen=block,hor,mark,percent,quickfix,tag                   " what moveme
 set foldtext=SimpleFoldText()                                      " Custom fold text function (cleaner than default)
 set formatoptions=rq                                               " Automatically insert comment leader on return, and let gq format comments
 set ignorecase incsearch hlsearch                                  " search: ignore case, higlight matches
+if maparg('<C-L>', 'n') ==# ''
+  nnoremap <silent> <C-L> :nohlsearch<CR><C-L>
+endif
 set nolist                                                         " do not show hidden characters
 set nowrap shiftround shiftwidth=4                                 " configure (no) line wrapping
 set smartindent                                                    " perform c-like indenting
 set tabstop=4 nosmarttab noexpandtab                               " use real tab characters
 set wildignore=*.dll,*.o,*.obj,*.bak,*.exe,*.pyc,*.jpg,*.gif,*.png " ignore these list file extensions
 set wildmode=list:longest                                          " turn on wild mode huge list
+set display+=lastline 											   " show last line of text
+if &encoding ==# 'latin1' && has('gui_running')
+  set encoding=utf-8
+endif
+if &listchars ==# 'eol:$'
+  set listchars=tab:>\ ,trail:-,extends:>,precedes:<,nbsp:+
+endif
 
 " ------------------------------------------------------------------------------
 " Envorinment Configuration
 " ------------------------------------------------------------------------------
-if (s:running_windows)
-	set shell=\"C:\Windows\SysWow64\cmd.exe\"
-	set shellcmdflag=/c
-	set shellxquote=("
-	let $TMP="c:/tmp"
+" if (s:running_windows)
+" 	set shell=\"C:\Windows\SysWow64\cmd.exe\"
+" 	set shellcmdflag=/c
+" 	set shellxquote=("
+" 	let $TMP="c:/tmp"
+"	set diffexpr=MyDiff()
+" endif
+if has("gui_running")  
+	if has("gui_win32")
+		" this fails if there are any spaces in the path 
+		set shell=%CYGWIN_HOME%\bin\bash.exe
+		set shellcmdflag=--login\ -c
+		set shellxquote=\"
+		command! -complete=shellcmd -nargs=* -bang Shell call s:ExecuteInShell(<q-args>, '<bang>')
+"	cabbrev shell Shell
+	endif
 endif
 set directory=.,$TMP,$TEMP
 set diffopt+=vertical " diff files side by side
 set diffopt+=icase    " diff ignores case
 set diffopt+=iwhite   " diff ignores whitespace
-"if (s:running_windows)
-"	set diffexpr=MyDiff()
-"endif
 
 " ------------------------------------------------------------------------------
 " Vim UI
@@ -91,7 +109,8 @@ set showmatch                     " show matching brackets
 set sidescrolloff=10              " Keep 5 lines at the size
 set showtabline=0
 syntax on                         " syntax highlighting on
-set statusline=%F%m%r%h%w[%L][%{&ff}]%y[%p%%][%04l,%04v]
+set statusline=%F%m%r%h%w[%L][%{&ff}]%y[%p%%][%04l,%04v][%{fugitive#statusline()}]
+" set statusline=%F%m%r%h%w[%L][%{&ff}]%y[%p%%][%04l,%04v]
 "              | | | | |  |   |      |  |     |    |
 "              | | | | |  |   |      |  |     |    + current column
 "              | | | | |  |   |      |  |     +-- current line
@@ -101,7 +120,7 @@ set statusline=%F%m%r%h%w[%L][%{&ff}]%y[%p%%][%04l,%04v]
 "              | | | | |  +-- number of lines
 "              | | | | +-- preview flag in square brackets
 "              | | | +-- help flag in square brackets
-"              | | +-- readonly flag in square brackets
+"              | | +-- readonly flag in square bracketskkk
 "              | +-- rodified flag in square brackets
 "              +-- full path to file in the buffer
 "   		   ||+- show toolbar
@@ -117,6 +136,11 @@ if has("terminfo")
 else
 	let &t_Sf="\ESC[3%dm"
 	let &t_Sb="\ESC[4%dm"
+endif
+
+" Allow color schemes to do bright colors without forcing bold.
+if &t_Co == 8 && $TERM !~# '^linux'
+  set t_Co=16
 endif
 
 " Odds n Ends
@@ -174,13 +198,10 @@ nnoremap <Leader>s :s/\<<C-r><C-w>\>/
 " ------------------------------------------------------------------------------
 " Plugin Settings
 " ------------------------------------------------------------------------------
-" TComment Map Settings
-"let g:tcommentMapLeaderOp1=
-"let g:tcommentMapLeaderOp2=
-
 " ctags
 set tags=tags;/
 
+" vimgrep
 vnoremap <silent> gv :call VisualSelection('gv')<CR>
 " Open vimgrep and put the cursor in the right position
 map <leader>g :vimgrep // **/*.<left><left><left><left><left><left><left>
@@ -189,13 +210,22 @@ map <leader><space> :vimgrep // <C-R>%<C-A><right><right><right><right><right><r
 " When you press <leader>r you can search and replace the selected text
 vnoremap <silent> <leader>r :call VisualSelection('replace')<CR>
 
+" gist.vim
+let g:github_user = 'GaryFurash'
+let g:github_token = '56d288b02d32162efec1fe0918e5274c83acbe70'
+
 " ------------------------------------------------------------------------------
 " Autocommands (run on ... for filetype ...)
 " ------------------------------------------------------------------------------
 " TODO: create custom fold function for sqr
 autocmd FileType sqr setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 autocmd BufRead,BufNewFile *.sqr,*.sqc setlocal tabstop=2 shiftwidth=2 softtabstop=0 expandtab
-autocmd FileType xml exe ":silent %!xmllint --format --recover - 2>/dev/null"
+" use empty(s:running_windows) if string instead of number
+if (s:running_windows)
+	autocmd FileType xml,xsl,html exe ":silent %!xml fo -t"
+else
+	autocmd FileType xml,xsl,html exe ":silent %!xmllint XMLLINT_INDENT='\t' --format --recover - 2>/dev/null"
+endif
 
 " ------------------------------------------------------------------------------
 " scala
@@ -333,21 +363,6 @@ function! MyDiff()
 	endif
 endfunction
 
-" ------------------------------------------------------------------------------
-"function! CygwinShell()
-" ------------------------------------------------------------------------------
-if has("gui_running")  
-	if has("gui_win32")
-"		set shell=\"%CYGWIN_HOME%\bin\bash.exe\"
-		" this fails if there are any spaces in the path 
-		set shell=%CYGWIN_HOME%\bin\bash.exe
-		set shellcmdflag=--login\ -c
-		set shellxquote=\"
-		command! -complete=shellcmd -nargs=* -bang Shell call s:ExecuteInShell(<q-args>, '<bang>')
-	endif
-endif
-"	cabbrev shell Shell
-"endfunction
 
 " ------------------------------------------------------------------------------
 function! ToggleFoldLevel() 
