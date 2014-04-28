@@ -71,9 +71,9 @@ endif
 " 	let $TMP="c:/tmp"
 "	set diffexpr=MyDiff()
 " endif
-if has("gui_running")  
+if has("gui_running")
 	if has("gui_win32")
-		" this fails if there are any spaces in the path 
+		" this fails if there are any spaces in the path
 		set shell=%CYGWIN_HOME%\bin\bash.exe
 		set shellcmdflag=--login\ -c
 		set shellxquote=\"
@@ -239,12 +239,22 @@ nmap <leader>m :SortScalaImports<CR>gggqG<C-o><C-o><leader><w>
 " highlight unwanted(trailing) whitespace
 " ------------------------------------------------------------------------------
 " http://vim.wikia.com/wiki/Highlight_unwanted_spaces
-:highlight ExtraWhitespace ctermbg=red guibg=red
-:autocmd ColorScheme * highlight ExtraWhitespace ctermbg=red guibg=red
-autocmd BufWinEnter * match ExtraWhitespace /\s\+$/
+highlight ExtraWhitespace ctermbg=red guibg=red
+autocmd ColorScheme * highlight ExtraWhitespace guibg=red
+autocmd BufEnter * match ExtraWhitespace /\s\+$/
 autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
-autocmd InsertLeave * match ExtraWhitespace /\s\+$/
-autocmd BufWinLeave * call clearmatches()
+autocmd InsertLeave * match ExtraWhiteSpace /\s\+$/
+autocmd BufWritePre txt,sqr,sql,xml,vim :call <SID>StripWhite()
+autocmd BufRead,BufWritePre txt,sqr,sql,xml,vim :call TrimWhiteSpace()
+
+" ------------------------------------------------------------------------------
+" strip trailing whitespace on a file
+" ------------------------------------------------------------------------------
+function! TrimWhiteSpace()
+    "%s/\s\+$//e
+    %s/[ \t]\+$//ge
+    %s!^\( \+\)\t!\=StrRepeat("\t", 1 + strlen(submatch(1)) / 8)!ge
+endfunction
 
 " ------------------------------------------------------------------------------
 " cusotm fold text function cleaner than the default
@@ -363,9 +373,8 @@ function! MyDiff()
 	endif
 endfunction
 
-
 " ------------------------------------------------------------------------------
-function! ToggleFoldLevel() 
+function! ToggleFoldLevel()
 " ------------------------------------------------------------------------------
 	if (&foldlevel == 0)
 		set foldlevel=99
