@@ -108,6 +108,7 @@ addtopath $GIT_HOME/bin
 bashify JAVA_HOME
 addtopath $JAVA_HOME/bin
 addtopath $SCALA_HOME/bin
+addtopath ~/.local/perl/bin
 
 # configure python3 environment
 #alias python=python3

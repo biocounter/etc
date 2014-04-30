@@ -57,6 +57,11 @@
 :TCommentInline	tcomment.txt	/*:TCommentInline*
 :TCommentMaybeInline	tcomment.txt	/*:TCommentMaybeInline*
 :TCommentRight	tcomment.txt	/*:TCommentRight*
+:Transpose	transpose.txt	/*:Transpose*
+:TransposeCSV	transpose.txt	/*:TransposeCSV*
+:TransposeInteractive	transpose.txt	/*:TransposeInteractive*
+:TransposeTab	transpose.txt	/*:TransposeTab*
+:TransposeWords	transpose.txt	/*:TransposeWords*
 Align-copyright	Align.txt	/*Align-copyright*
 EasyGrep	easygrep.txt	/*EasyGrep*
 EasyGrep.txt	easygrep.txt	/*EasyGrep.txt*
@@ -103,6 +108,9 @@ EasyGrep_Performance	easygrep.txt	/*EasyGrep_Performance*
 Gist.vim	gist-vim.txt	/*Gist.vim*
 MatchError	matchit.txt	/*MatchError*
 [%	matchit.txt	/*[%*
+\\	commentary.txt	/*\\\\*
+\\\	commentary.txt	/*\\\\\\*
+\\u	commentary.txt	/*\\\\u*
 ]%	matchit.txt	/*]%*
 align	Align.txt	/*align*
 align-align	Align.txt	/*align-align*
@@ -225,6 +233,7 @@ clojure-about	clojure.txt	/*clojure-about*
 clojure-indent	clojure.txt	/*clojure-indent*
 clojure-introduction	clojure.txt	/*clojure-introduction*
 clojure.txt	clojure.txt	/*clojure.txt*
+commentary.txt	commentary.txt	/*commentary.txt*
 cs	surround.txt	/*cs*
 delimitMate	delimitMate.txt	/*delimitMate*
 delimitMate#JumpAny()	delimitMate.txt	/*delimitMate#JumpAny()*
@@ -433,6 +442,9 @@ g:tcommentOptions	tcomment.txt	/*g:tcommentOptions*
 g:tcommentSyntaxMap	tcomment.txt	/*g:tcommentSyntaxMap*
 g:tcommentTextObjectInlineComment	tcomment.txt	/*g:tcommentTextObjectInlineComment*
 g:tcomment_types	tcomment.txt	/*g:tcomment_types*
+gc	commentary.txt	/*gc*
+gcc	commentary.txt	/*gcc*
+gcu	commentary.txt	/*gcu*
 gist-vim-install	gist-vim.txt	/*gist-vim-install*
 gist-vim-license	gist-vim.txt	/*gist-vim-license*
 gist-vim-requirements	gist-vim.txt	/*gist-vim-requirements*
@@ -527,11 +539,16 @@ tcomment#TextObjectInlineComment()	tcomment.txt	/*tcomment#TextObjectInlineComme
 tcomment-maps	tcomment.txt	/*tcomment-maps*
 tcomment-operator	tcomment.txt	/*tcomment-operator*
 tcomment.txt	tcomment.txt	/*tcomment.txt*
+transpose	transpose.txt	/*transpose*
+transpose-tutorial	transpose.txt	/*transpose-tutorial*
+transpose.txt	transpose.txt	/*transpose.txt*
 vS	surround.txt	/*vS*
 v_[%	matchit.txt	/*v_[%*
+v_\\	commentary.txt	/*v_\\\\*
 v_]%	matchit.txt	/*v_]%*
 v_a%	matchit.txt	/*v_a%*
 v_g%	matchit.txt	/*v_g%*
+v_gc	commentary.txt	/*v_gc*
 vgS	surround.txt	/*vgS*
 yS	surround.txt	/*yS*
 ySS	surround.txt	/*ySS*
