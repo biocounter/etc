@@ -5,13 +5,13 @@
 
 (function(contentPath, options, path) {
     "use strict";
-    var
-    global = (function() {
+    var global = (function() {
         return this || eval.call(null, 'this');
     }()),
         load = global.load,
         read = global.read,
-        print = global.print,
+        hop = Object.prototype.hasOwnProperty,
+        print = null,
         hasCache = null,
 
         objectPrototypeToString = Object.prototype.toString,
@@ -21,9 +21,6 @@
         },
         isUndefined = function(it) {
             return typeof it === 'undefined';
-        },
-        isObject = function(it) {
-            return objectPrototypeToString.call(it) === '[object Object]';
         },
 
         has = function(name) {
@@ -40,27 +37,48 @@
         return now && has(name);
     };
 
-    has.add('host-node', isObject(global.process) && /node(\.exe||js)?$/.test(global.process.execPath));
+    has.add('host-node', global.process && /node(\.exe||js)?$/.test(global.process.execPath));
     has.add('host-v8', isFunction(global.load) && isFunction(global.read));
 
+    if (has('host-v8')) {
+        print = global.write;
+        global.window = global;
+        // get rootPtah
+        // Need for html-beautify
+        // because it require loading js-beautify and css-beautify
+        global.rootPtah = path.replace(/[\w-.]+.js$/,'');
+    }
+
     if (has('host-node')) {
-      (function () {
-        var fs = require('fs'),
-            vm = require('vm');
+        (function() {
+            var fs = require('fs');
 
-        load = function(path) {
+            load = function(path) {
                 var context = {},
-                data = read(path);
+                    property;
 
-            vm.runInNewContext(data, context, path);
-            global.js_beautify = context.js_beautify;
-        };
+                // if path not absolute
+                // check for path beginning with / for unix systems
+                // or with a second character of : for Windows C:\
+                // style paths
+                if (path.charAt(0) !== '/' && path.charAt(1) !== ':') {
+                    path = global.process.cwd() + '/' + path; // make relative path
+                }
 
-        print = global.console.log;
-        read = function (path) {
-          return fs.readFileSync(path, 'utf-8');
-        };
-      }());
+                context = require(path);
+
+                for (property in context) {
+                    if (hop.call(context, property)) {
+                        global[property] = context[property];
+                    }
+                }
+            };
+
+            print = process.stdout.write.bind(process.stdout);
+            read = function(path) {
+                return fs.readFileSync(path, 'utf-8');
+            };
+        }());
     }
 
     // execute jsbeautify
@@ -69,11 +87,26 @@
             indent_size: 4,
             indent_char: ' '
         },
-        content = read(contentPath);
+            content = read(contentPath);
         options = (options && JSON.parse(options)) || defOps;
 
         load(path);
-        print(global.js_beautify(content, options));
+
+        global.beautify = global.js_beautify || global.html_beautify || global.css_beautify;
+
+        // XXX
+        if (has('host-v8') && global.html_beautify) {
+            load(global.rootPtah+'beautify.js');
+            load(global.rootPtah+'beautify-css.js');
+        }
+
+        //FIXME(maksimrv): Hm.... Why?! only for html :|
+        if (global.html_beautify) {
+            print(global.beautify(content, options).replace(/\n$/g, ''));
+            return;
+        }
+
+        print(global.beautify(content, options));
 
     }(contentPath, options, path));
 }).apply(this, (typeof process === 'object' && process.argv.splice(3)) || arguments);
