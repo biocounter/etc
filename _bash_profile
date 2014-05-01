@@ -102,7 +102,7 @@ addtopath /bin
 addtopath /usr/sbin
 addtopath /usr/local/bin
 addtopath /usr/bin
-addtopath ~/bin
+addtopath ~/.local/bin
 bashify GIT_HOME
 addtopath $GIT_HOME/bin
 bashify JAVA_HOME
@@ -113,7 +113,7 @@ addtopath ~/.local/perl/bin
 # configure python3 environment
 #alias python=python3
 #export PYTHONHOME=/usr/lib/python3.2:/usr/lib/python3.2/plat-cygwin:/usr/lib/python3.2/lib-tk:/usr/lib/python3.2/lib-dynload:/usr/lib/python3.2/site-packages
-export PERL5LIB=~/.local/perl/bin
+export PERL5LIB=~/.local/perl/lib
 
 # include any windows-specific environment variables
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then

@@ -214,6 +214,9 @@ vnoremap <silent> <leader>r :call VisualSelection('replace')<CR>
 let g:github_user = 'GaryFurash'
 let g:github_token = '56d288b02d32162efec1fe0918e5274c83acbe70'
 
+" jsbeautify
+let g:jsbeautify = {"indent_size": 4, "indent_char":, "\t"}
+
 " ------------------------------------------------------------------------------
 " Autocommands (run on ... for filetype ...)
 " ------------------------------------------------------------------------------
@@ -226,6 +229,8 @@ if (s:running_windows)
 else
 	autocmd FileType xml,xsl,html exe ":silent %!xmllint XMLLINT_INDENT='\t' --format --recover - 2>/dev/null"
 endif
+autocmd BufWrite,BufRead *.js exe ":call JsBeautify()<cr>"
+autocmd FileType javascript set dictionary+=$HOME/.vim/dict/node.dict
 
 " ------------------------------------------------------------------------------
 " scala
