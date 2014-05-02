@@ -107,7 +107,9 @@ bashify GIT_HOME
 addtopath $GIT_HOME/bin
 bashify JAVA_HOME
 addtopath $JAVA_HOME/bin
+bashify $SCALA_HOME
 addtopath $SCALA_HOME/bin
+bashify NODE_HOME
 addtopath ~/.local/perl/bin
 
 # configure python3 environment
