@@ -115,7 +115,7 @@ addtopath ~/.local/perl/bin
 # configure python3 environment
 #alias python=python3
 #export PYTHONHOME=/usr/lib/python3.2:/usr/lib/python3.2/plat-cygwin:/usr/lib/python3.2/lib-tk:/usr/lib/python3.2/lib-dynload:/usr/lib/python3.2/site-packages
-export PERL5LIB=~/.local/perl/lib
+export PERL5LIB=~/.local/perl/lib/perl5:$PERL5LIB
 
 # include any windows-specific environment variables
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
@@ -164,17 +164,17 @@ alias j='jobs -l'
 alias jjs='rlwrap $JAVA_HOME/bin/jjs'
 alias l='ls --color=tty -A -B -F --ignore="desktop.ini" --ignore="NTUSER*" --ignore="ntuser*" --ignore=".*"'
 alias ld='du -hs * | grep -e "^[0-9].*G\s" -e "^[0-9].*M\s" | sort -n -k 2,2 -s'
-alias markdown='perl /usr/local/bin/markdown.pl '				# call Perl markdown
-alias mkdir='mkdir -p'																		# Prevents accidentally clobbering files.
-alias more='less' # more is less
-alias mv='mv -i'																				# Prevents accidentally clobbering files.
-alias mydiff='diff -ywEa --suppress-common-lines --minimal' # personal zip preferences
-alias nospace="perl /usr/local/bin/rename 's/ /_' *"				# underscore all files in dir
-alias r='fc -s' # execute last command
-alias rm='rm -i'					# -> Prevents accidentally clobbering files.
-alias rn='/usr/local/bin/rename '								# call Perl rename script
-alias vi='vim'								# cygwin installs a minimal vi
+alias markdown='perl /usr/local/bin/markdown.pl '                                                            # call Perl markdown
+alias mkdir='mkdir -p'                                                                                       # Prevents accidentally clobbering files.
+alias more='less'                                                                                            # more is less
+alias mv='mv -i'                                                                                             # Prevents accidentally clobbering files.
+alias mydiff='diff -ywEa --suppress-common-lines --minimal'                                                  # personal zip preferences
+alias nospace="perl /usr/local/bin/rename 's/ /_' *"                                                         # underscore all files in dir
+alias r='fc -s'                                                                                              # execute last command
+alias rm='rm -i'                                                                                             # -> Prevents accidentally clobbering files.
+alias rn='perl ~/.local/perl/bin/rename '                                                                    # call Perl rename script
 alias scala='rlwrap scala'
+alias vi='vim'                                                                                               # cygwin installs a minimal vi
 
 #if [[ ${BASH_VERSINFO[0]} == 4 ]]; then
 #		alias l='ls -A -B --color --group-directories-first -F --ignore="desktop.ini" --ignore="NTUSER*" --ignore="ntuser*"'
