@@ -34,7 +34,6 @@ set clipboard+=unnamed                                             " share windo
 set fileformats=unix,dos,mac                                       " support all three, in this order
 set hidden                                                         " you can change buffers without saving
 set iskeyword+=_,$,@,%,#                                           " none of these are word dividers
-set mouse=a                                                        " use mouse everywhere
 set noerrorbells                                                   " don't make noise
 set showtabline=0                                                  " never show tabs
 set wildmenu                                                       " turn on command line completion wild style
@@ -53,12 +52,8 @@ set smartindent                                                    " perform c-l
 set tabstop=4 nosmarttab noexpandtab                               " use real tab characters
 set wildignore=*.dll,*.o,*.obj,*.bak,*.exe,*.pyc,*.jpg,*.gif,*.png " ignore these list file extensions
 set wildmode=list:longest                                          " turn on wild mode huge list
-set display+=lastline 											   " show last line of text
 if &encoding ==# 'latin1' && has('gui_running')
   set encoding=utf-8
-endif
-if &listchars ==# 'eol:$'
-  set listchars=tab:>\ ,trail:-,extends:>,precedes:<,nbsp:+
 endif
 
 " ------------------------------------------------------------------------------
@@ -90,25 +85,30 @@ set diffopt+=iwhite   " diff ignores whitespace
 " Vim UI
 " ------------------------------------------------------------------------------
 colorscheme torte
+set background=dark      " we plan to use a dark background
 set cursorline
-set background=dark                                           " we plan to use a dark background
-set laststatus=2                  " always show the status line
-set lazyredraw                    " do not redraw while running macros
-set linespace=0                   " don't insert any extra pixel lines betweens rows
-set matchtime=5                   " how many tenths of a second to blink matching brackets for
-set mousehide                     " hide the mouse cursor when typing
-set nostartofline                 " leave my cursor where it was
-set novisualbell                  " don't blink
-set number numberwidth=5          " turn on line numbers
-set report=0                      " tell us when anything is changed via :...
-set ruler                         " Always show current positions along the bottom
-set scrolloff=10                  " Keep 10 lines (top/bottom) for scope
-set shortmess=aOstT               " shortens messages to avoid 'press a key' prompt
-set showcmd                       " show the command being typed
-set showmatch                     " show matching brackets
-set sidescrolloff=10              " Keep 5 lines at the size
+set display+=lastline    " show last line of text
+set laststatus=2         " always show the status line
+set lazyredraw           " do not redraw while running macros
+set linespace=0          " don't insert any extra pixel lines betweens rows
+set matchtime=5          " how many tenths of a second to blink matching brackets for
+set mouse=a              " use mouse everywhere
+set mousehide            " hide the mouse cursor when typing
+set nostartofline        " leave my cursor where it was
+set novisualbell         " don't blink
+set number numberwidth=5 " turn on line numbers
+set report=0             " tell us when anything is changed via :...
+set ruler                " Always show current positions along the bottom
+set scrolloff=10         " Keep 10 lines (top/bottom) for scope
+set shortmess=aOstT      " shortens messages to avoid 'press a key' prompt
+set showcmd              " show the command being typed
+set showmatch            " show matching brackets
 set showtabline=0
-syntax on                         " syntax highlighting on
+set sidescrolloff=10     " Keep 5 lines at the size
+syntax on                " syntax highlighting on
+if &listchars ==# 'eol:$'
+  set listchars=tab:>\ ,trail:-,extends:>,precedes:<,nbsp:+
+endif
 set statusline=%F%m%r%h%w[%L][%{&ff}]%y[%p%%][%04l,%04v][%{fugitive#statusline()}]
 " set statusline=%F%m%r%h%w[%L][%{&ff}]%y[%p%%][%04l,%04v]
 "              | | | | |  |   |      |  |     |    |
@@ -147,7 +147,7 @@ endif
 set ttymouse=xterm2 " makes it work in everything
 
 " run on startup
-":helptags ~/vimfiles/doc
+:helptags ~/.local/etc/vimfiles/doc
 
 " ------------------------------------------------------------------------------
 " Mappings
@@ -249,6 +249,7 @@ autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
 autocmd InsertLeave * match ExtraWhiteSpace /\s\+$/
 autocmd BufWritePre txt,sqr,sql,xml,vim :call <SID>StripWhite()
 autocmd BufRead,BufWritePre txt,sqr,sql,xml,vim :call TrimWhiteSpace()
+autocmd BufRead,BufNewFile *.dms set filetype=sql
 
 " ------------------------------------------------------------------------------
 " strip trailing whitespace on a file
