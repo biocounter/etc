@@ -103,14 +103,10 @@ addtopath /usr/sbin
 addtopath /usr/local/bin
 addtopath /usr/bin
 addtopath ~/.local/bin
-bashify GIT_HOME
-addtopath $GIT_HOME/bin
-bashify JAVA_HOME
-addtopath $JAVA_HOME/bin
-bashify $SCALA_HOME
-addtopath $SCALA_HOME/bin
-bashify NODE_HOME
 addtopath ~/.local/perl/bin
+bashify GIT_HOME; addtopath $GIT_HOME/bin
+bashify JAVA_HOME; addtopath $JAVA_HOME/bin
+bashify SCALA_HOME; addtopath $SCALA_HOME/bin
 
 # configure python3 environment
 #alias python=python3
@@ -190,7 +186,8 @@ fi
 # run on startup
 #------------------------------------------------------------------------------------
 # delete temporary files
-#nohup find $TEMP -type f -mtime +5 -exec rm {} \; > /tmp/${RANDOM}.out 2>&1&
+find $TEMP -type f -mtime +7 -delete
+find /tmp -type f -mtime +7 -delete
 
 fitterm () {																 # Truncate oversized lines on input. Mostly for display use. Example: grep foo log | fitterm
 	cut -c 1-$( tput cols ) ;
