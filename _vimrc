@@ -138,6 +138,11 @@ else
 	let &t_Sb="\ESC[4%dm"
 endif
 
+" setup the cursor in terminal mode
+if &term =~ '^xterm'
+  let &t_EI .= "\<Esc>[1 q"
+endif
+
 " Allow color schemes to do bright colors without forcing bold.
 if &t_Co == 8 && $TERM !~# '^linux'
   set t_Co=16
