@@ -151,9 +151,6 @@ endif
 " Odds n Ends
 set ttymouse=xterm2 " makes it work in everything
 
-" run on startup
-:helptags ~/.local/etc/vimfiles/doc
-
 " ------------------------------------------------------------------------------
 " Mappings
 " ------------------------------------------------------------------------------
