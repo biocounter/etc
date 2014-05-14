@@ -87,7 +87,7 @@ function addtopath { # add value to path if it does not exist
 			p=`cygpath -pu $p`
 		fi
 		if [[ "${PATH}" != *:"${p}":* ]] ; then
-			export PATH=$PATH:$p
+			export PATH=$p:$PATH
 		fi
 	 fi
 }
