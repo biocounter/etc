@@ -99,7 +99,6 @@ if [ -f ~/.setenv ]; then
 	. ~/.setenv
 fi
 
-echo $PATH
 bashify GIT_HOME JAVA_HOME PYTHON_HOME
 addtopath $PYTHON_HOME $JAVA_HOME/bin $GIT_HOME/bin ~/.local/perl/bin ~/.local/bin /usr/bin \
 	/usr/local/bin /usr/sbin /bin 
