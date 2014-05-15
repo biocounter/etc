@@ -200,9 +200,7 @@ nnoremap <Leader>s :s/\<<C-r><C-w>\>/
 " ------------------------------------------------------------------------------
 " Plugin Settings
 " ------------------------------------------------------------------------------
-" ctags
-set tags=tags;/
-
+"
 " vimgrep
 vnoremap <silent> gv :call VisualSelection('gv')<CR>
 " Open vimgrep and put the cursor in the right position
@@ -215,10 +213,6 @@ vnoremap <silent> <leader>r :call VisualSelection('replace')<CR>
 " gist.vim
 let g:github_user = 'GaryFurash'
 let g:github_token = '56d288b02d32162efec1fe0918e5274c83acbe70'
-
-" easytag
-let g:easytags_auto_update = 1
-let g:easytags_auto_highlight = 1
 
 " ------------------------------------------------------------------------------
 " Autocommands (run on ... for filetype ...)

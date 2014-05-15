@@ -86,8 +86,9 @@ function addtopath { # add value to path if it does not exist
 		if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
 			p=`cygpath -pu $p`
 		fi
+		# the last path value of path trumps
 		if [[ "${PATH}" != *:"${p}":* ]] ; then
-			export PATH=$p:$PATH
+			export PATH=$PATH:$p
 		fi
 	 fi
 }
@@ -98,15 +99,10 @@ if [ -f ~/.setenv ]; then
 	. ~/.setenv
 fi
 
-addtopath /bin
-addtopath /usr/sbin
-addtopath /usr/local/bin
-addtopath /usr/bin
-addtopath ~/.local/bin
-addtopath ~/.local/perl/bin
-bashify GIT_HOME; addtopath $GIT_HOME/bin
-bashify JAVA_HOME; addtopath $JAVA_HOME/bin
-bashify SCALA_HOME; addtopath $SCALA_HOME/bin
+echo $PATH
+bashify GIT_HOME JAVA_HOME PYTHON_HOME
+addtopath $PYTHON_HOME $JAVA_HOME/bin $GIT_HOME/bin ~/.local/perl/bin ~/.local/bin /usr/bin \
+	/usr/local/bin /usr/sbin /bin 
 
 # configure python3 environment
 #alias python=python3
@@ -115,8 +111,7 @@ export PERL5LIB=~/.local/perl/lib/perl5:$PERL5LIB
 
 # include any windows-specific environment variables
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
-	addtopath /cygdrive/c/Windows/SysWOW64
-	addtopath /cygdrive/c/Windows/System32
+	addtopath /cygdrive/c/Windows/SysWOW64 /cygdrive/c/Windows/System32
 	export TEMP=~/AppData/Local/Temp
 	export TMP=~/AppData/Local/Temp
 fi
