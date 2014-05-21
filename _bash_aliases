@@ -1,0 +1,43 @@
+alias cp='cp -i'					# -> Prevents accidentally clobbering files.
+alias df='df -h'
+alias dir='ls --color=auto --format=vertical'
+alias dnt='echo -e `date "+%A %B %d, %Y"`" "`date "+%I:%M %p"` > /dev/clipboard'
+alias dtm='printf "[%s %s] " `date "+%y%m%d"` `date "+%H:%M"` > /dev/clipboard'
+alias du='du -h'
+alias egrep='egrep --color=auto'              # show differences in colour
+alias explorer='cyg-wrapper.sh "explorer" --slashed-opt'
+alias fgrep='fgrep --color=auto'              # show differences in colour
+alias fn='{ alias && export -f; } | egrep "\(\)|alias" | sed "s/alias //ig" | cut -d= -f1 | sort'
+alias gitlog='git log --pretty=format:"[%h] %ae, %ar: %s" --stat'
+alias grep='grep --color'                     # show differences in colour
+alias gtypist='gtypist -wi'
+alias gvim='cyg-wrapper.sh "$USBDRV/PortableApps/gVimPortable/gvimPortable.exe" --fork=2 --binary-opt=--cmd,"set shellslash",--cmd,"set shell=bash",--cmd,"set ff=unix"'
+alias h='history'
+alias j='jobs -l'
+alias jjs='rlwrap $JAVA_HOME/bin/jjs'
+alias l='ls --color=tty -A -B -F --ignore="desktop.ini" --ignore="NTUSER*" --ignore="ntuser*" --ignore=".*"'
+alias l='ls -CF'                              #
+alias la='ls -A'                              # all but . and ..
+alias ld='du -hs * | grep -e "^[0-9].*G\s" -e "^[0-9].*M\s" | sort -n -k 2,2 -s'
+alias less='less -r'                          # raw control characters
+alias ll='ls -l'                              # long list
+alias ls='ls -hF --color=auto'                 # classify files in colour
+alias markdown='perl /usr/local/bin/markdown.pl '                                                            # call Perl markdown
+alias md='cyg-wrapper.sh "$USBDRV/PortableApps/MarkdownWinPortable/MarkdownWin.exe" --fork=2'
+alias mkdir='mkdir -p'                                                                                       # Prevents accidentally clobbering files.
+alias more='less'                                                                                            # more is less
+alias mv='mv -i'                                                                                             # Prevents accidentally clobbering files.
+alias mydiff='diff -ywEa --suppress-common-lines --minimal'                                                  # personal zip preferences
+alias newterm='mintty /bin/env CHERE_INVOKING=1 /bin/bash -l &'
+alias nospace="perl /usr/local/bin/rename 's/ /_' *"                                                         # underscore all files in dir
+alias r='fc -s'                                                                                              # execute last command
+alias rm='rm -i'
+alias rn='perl ~/.local/perl/bin/rename '                                                                    # call Perl rename script
+alias scala='rlwrap scala'
+alias st='cyg-wrapper.sh "$USBDRV/PortableApps/SublimeTextPortable/sublime_text.exe" --fork=2'
+alias startxwin='run /usr/bin/bash.exe -l -c "/usr/bin/startxwin -- -nolock -unixkill"'
+alias sumatra='startSumatra.sh'
+alias units='rlwrap units'
+alias vdir='ls --color=auto --format=long'
+alias vi='vim'                                                                                               # cygwin installs a minimal vi
+alias whence='type -a'                        # where, of a sort
