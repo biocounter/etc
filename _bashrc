@@ -189,7 +189,7 @@ alias ld='du -hs * | grep -e "^[0-9].*G\s" -e "^[0-9].*M\s" | sort -n -k 2,2 -s'
 alias less='less -r'                          # raw control characters
 alias ll='ls -l'                              # long list
 alias ls='ls -hF --color=auto'                 # classify files in colour
-alias markdown='perl /usr/local/bin/markdown.pl '                                                            # call Perl markdown
+alias markdown='python3 -m markdown  '
 alias mkdir='mkdir -p'                                                                                       # Prevents accidentally clobbering files.
 alias more='less'                                                                                            # more is less
 alias mv='mv -i'                                                                                             # Prevents accidentally clobbering files.
