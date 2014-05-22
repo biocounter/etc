@@ -94,49 +94,50 @@ function bashify {	# convert environment variable to cygwin format
 export -f bashify
 
 function addtopath { # add value to path if it does not exist
-	if [ -z "$RANPROFILE" ]; then
-		export RANPROFILE=true
-		local p=$1
-		if [ -d "$p" ]; then
-			if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
-				p=`cygpath -pu $p`
-			fi
-			# the last path value of path trumps
-			if [[ "${PATH}" != *:"${p}":* ]] ; then
-				export PATH=$PATH:$p
-			fi
-		 fi
+	local p=$1
+	if [ -d "$p" ]; then
+		if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+			p=`cygpath -pu $p`
+		fi
+		# the last path value of path trumps
+		if [[ "${PATH}" != *:"${p}":* ]] ; then
+			export PATH=$PATH:$p
+		fi
 	fi
 }
 export -f addtopath
 
-#include any local environment variables
-if [ -f ~/.setenv ]; then
-	. ~/.setenv
-	if [[ $JAVA_HOME ]]; then
-		addtopath $JAVA_HOME/bin 
+if [ -z "$RANPROFILE" ]; then
+	export RANPROFILE=true
+	#include any local environment variables
+	if [ -f ~/.setenv ]; then
+		. ~/.setenv
+		if [[ $JAVA_HOME ]]; then
+			addtopath $JAVA_HOME/bin 
+		fi
+		if [[ $SCALA_HOME ]]; then
+			addtopath $SCALA_BIN/bin 
+		fi
 	fi
-	if [[ $SCALA_HOME ]]; then
-		addtopath $SCALA_BIN/bin 
+
+	# add user's local binaries and scripts
+	if [ -d ~/usr/bin ]; then
+		addtopath ~/usr/bin
+	fi
+
+	# include any windows-specific environment variables
+	if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+		addtopath /cygdrive/c/Windows/SysWOW64 /cygdrive/c/Windows/System32
 	fi
 fi
 
-# add user's local binaries and scripts
-if [ -d ~/usr/bin ]; then
-	addtopath ~/usr/bin
+if [ -d ~/perl5 ]; then 
+	PERL_MB_OPT="--install_base \"~/perl5\""; export PERL_MB_OPT;
+	PERL_MM_OPT="INSTALL_BASE=~/perl5"; export PERL_MM_OPT;
 fi
 
-# include any windows-specific environment variables
-if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
-	addtopath /cygdrive/c/Windows/SysWOW64 /cygdrive/c/Windows/System32
-	export TEMP=~/AppData/Local/Temp
-	export TMP=~/AppData/Local/Temp
-fi
-
-#PERL_MB_OPT="--install_base \"/home/furashg/perl5\""; export PERL_MB_OPT;
-PERL_MB_OPT="--install_base \"~/perl5\""; export PERL_MB_OPT;
-#PERL_MM_OPT="INSTALL_BASE=/home/furashg/perl5"; export PERL_MM_OPT;
-PERL_MM_OPT="INSTALL_BASE=~/perl5"; export PERL_MM_OPT;
+# remove duplicate entries from PATH
+export PATH=`awk -F: '{for (i=1;i<=NF;i++) { if ( !x[$i]++ ) printf("%s:",$i); }}' <<< $PATH`
 
 #-----------------------------------------------------------------------
 # define terminal colors, prompts, and display
@@ -219,6 +220,9 @@ fi
 if [ "$WINDIR" != "" ]; then
 	alias gvim='cyg-wrapper.sh "$USBDRV/PortableApps/gVimPortable/gvimPortable.exe" --fork=2 --binary-opt=--cmd,"set shellslash",--cmd,"set shell=bash",--cmd,"set ff=unix"'
 fi
+
+# remove duplicate entries from the path
+#export PATH=`echo $PATH | tr ':' '\n' | sort | uniq | tr '\n' ':'`
 
 #------------------------------------------------------------------------------------
 # run on startup
