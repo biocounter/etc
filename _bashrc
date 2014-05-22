@@ -1,0 +1,528 @@
+#============================================================================
+#title          :~/.bashrc
+#description    :excuted by bash(1) for interactive shells for interactive 
+#				 shells the latest version is always at 
+#				 /etc/defaults/etc/skel/.bashrc (do not modify)
+#author         :Gary Furash
+#date           :20140422
+#version        :1      
+#usage          :~/.bashrc
+#notes          :       
+#bash_version   :4.1.11(2)-release
+#============================================================================
+
+# If not running interactively, don't do anything
+[[ "$-" != *i* ]] && return
+
+#-------------------------------------------------------------------------------
+# Source global definitions (if any)
+#-------------------------------------------------------------------------------
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
+if [ -f /etc/profile ]; then
+	. /etc/profile
+fi
+
+#-------------------------------------------------------------------------------
+# System Settings
+#-------------------------------------------------------------------------------
+export LC_ALL='C'			# sort ignores problem characters
+set -o ignoreeof			# don't use ^D to exit
+set -o noclobber
+set -o notify				# don't wait for job termination notification
+set -o vi					# use VI for editing
+set nocompatible
+set nodosfilewarnings		# turn off dos file warnings
+shopt -s cdable_vars
+shopt -s cdspell 			# When changing directory small typos can be ignored by bash
+shopt -s checkhash
+shopt -s checkwinsize
+shopt -s extglob            #necessary for programmable completion
+shopt -s nocaseglob 		# Use case-insensitive filename globbing
+shopt -s no_empty_cmd_completion         #bash>=2.04 only
+shopt -s sourcepath
+ulimit -S -c 0				# Don't want any coredumps
+
+if [[ ${BASH_VERSINFO[0]} == 4 ]]; then
+	shopt -s globstar                        #enable '**' (recursive)
+fi
+
+#-------------------------------------------------------------------------------
+# Bash History Configuration
+#-------------------------------------------------------------------------------
+shopt -s cmdhist
+shopt -s histappend histreedit histverify
+
+# Any completions you add in ~/.bash_completion are sourced last.
+[[ -f /etc/bash_completion ]] && . /etc/bash_completion
+
+# Don't put duplicate lines in the history.
+export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
+ 
+# Ignore some controlling instructions
+export HISTIGNORE=$'[ \t]*:&:[fb]g:exit'
+export HISTIGNORE=$'[ \t]*:&:[fb]g:exit:ls' # Ignore the ls command as well
+ 
+# Whenever displaying the prompt, write the previous line to disk
+# export PROMPT_COMMAND="history -a"
+
+#-------------------------------------------------------------------------------
+# Environment Variables
+#
+# use this section for variables that append:
+# if [ -z "$RANPROFILE" ]; then
+#		export RANPROFILE=true
+# fi
+#-------------------------------------------------------------------------------
+
+export TIMEFORMAT=$'\nreal %3R	user %3U	sys %3S	pcpu %P\n'
+export HISTIGNORE="&:bg:fg:ll:h"
+export HOSTFILE=$HOME/.hosts	# Put a list of remote hosts in ~/.hosts
+export EDITOR=vi				# use the VI editor for line editing
+
+function bashify {	# convert environment variable to cygwin format
+	if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+		local p
+		for p ; do
+		 if [ "${!p}" ] ; then
+			   eval 'export '$p'=$(cygpath -pu "$'$p'")'
+		 fi
+		done
+	fi
+}
+export -f bashify
+
+function addtopath { # add value to path if it does not exist
+	if [ -z "$RANPROFILE" ]; then
+		export RANPROFILE=true
+		local p=$1
+		if [ -d "$p" ]; then
+			if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+				p=`cygpath -pu $p`
+			fi
+			# the last path value of path trumps
+			if [[ "${PATH}" != *:"${p}":* ]] ; then
+				export PATH=$PATH:$p
+			fi
+		 fi
+	fi
+}
+export -f addtopath
+
+#include any local environment variables
+if [ -f ~/.setenv ]; then
+	. ~/.setenv
+	if [[ $JAVA_HOME ]]; then
+		addtopath $JAVA_HOME/bin 
+	fi
+	if [[ $SCALA_HOME ]]; then
+		addtopath $SCALA_BIN/bin 
+	fi
+fi
+
+# add user's local binaries and scripts
+if [ -d ~/usr/bin ]; then
+	addtopath ~/usr/bin
+fi
+
+# include any windows-specific environment variables
+if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+	addtopath /cygdrive/c/Windows/SysWOW64 /cygdrive/c/Windows/System32
+	export TEMP=~/AppData/Local/Temp
+	export TMP=~/AppData/Local/Temp
+fi
+
+#PERL_MB_OPT="--install_base \"/home/furashg/perl5\""; export PERL_MB_OPT;
+PERL_MB_OPT="--install_base \"~/perl5\""; export PERL_MB_OPT;
+#PERL_MM_OPT="INSTALL_BASE=/home/furashg/perl5"; export PERL_MM_OPT;
+PERL_MM_OPT="INSTALL_BASE=~/perl5"; export PERL_MM_OPT;
+
+#-----------------------------------------------------------------------
+# define terminal colors, prompts, and display
+#-----------------------------------------------------------------------
+red='\e[0;31m'
+RED='\e[1;31m'
+blue='\e[0;34m'
+BLUE='\e[1;34m'
+cyan='\e[0;36m'
+CYAN='\e[1;36m'
+NC='\e[0m'								# No Color
+
+# Looks best on a black background.....
+#echo -e "${CYAN}This is BASH ${RED}${BASH_VERSION%.*}${CYAN}${NC}"
+#date
+#function _exit() { # function to run upon exit of shell
+#	echo -e "${RED}Hasta la vista, baby${NC}"
+#}
+#trap _exit EXIT
+
+PS1="\n${cyan}[`date +%m/%d` \@][\u@\h][\w]${NC}\n\$ "
+
+# Set up syntax highlighting for 'less' (requires source-highlight package)
+# See http://www.gnu.org/software/src-highlite/source-highlight.html
+export LESSOPEN="| /usr/bin/src-hilite-lesspipe.sh %s"
+export LESS=' -R '
+
+#-----------------------------------------------------------------------
+# aliases
+#-----------------------------------------------------------------------
+alias cp='cp -i'					# -> Prevents accidentally clobbering files.
+alias df='df -h'
+alias dir='ls --color=auto --format=vertical'
+alias dnt='echo -e `date "+%A %B %d, %Y"`" "`date "+%I:%M %p"` > /dev/clipboard'
+alias dtm='printf "[%s %s] " `date "+%y%m%d"` `date "+%H:%M"` > /dev/clipboard'
+alias du='du -h'
+alias egrep='egrep --color=auto'              # show differences in colour
+alias explorer='cyg-wrapper.sh "explorer" --slashed-opt'
+alias fgrep='fgrep --color=auto'              # show differences in colour
+alias fn='{ alias && export -f; } | egrep "\(\)|alias" | sed "s/alias //ig" | cut -d= -f1 | sort'
+alias gitlog='git log --pretty=format:"[%h] %ae, %ar: %s" --stat'
+alias grep='grep --color'                     # show differences in colour
+alias gtypist='gtypist -wi'
+alias h='history'
+alias j='jobs -l'
+alias jjs='rlwrap $JAVA_HOME/bin/jjs'
+alias la='ls -A'                              # all but . and ..
+alias ld='du -hs * | grep -e "^[0-9].*G\s" -e "^[0-9].*M\s" | sort -n -k 2,2 -s'
+alias less='less -r'                          # raw control characters
+alias ll='ls -l'                              # long list
+alias ls='ls -hF --color=auto'                 # classify files in colour
+alias markdown='perl /usr/local/bin/markdown.pl '                                                            # call Perl markdown
+alias mkdir='mkdir -p'                                                                                       # Prevents accidentally clobbering files.
+alias more='less'                                                                                            # more is less
+alias mv='mv -i'                                                                                             # Prevents accidentally clobbering files.
+alias mydiff='diff -ywEa --suppress-common-lines --minimal'                                                  # personal zip preferences
+alias newterm='mintty /bin/env CHERE_INVOKING=1 /bin/bash -l &'
+alias nospace="perl /usr/local/bin/rename 's/ /_' *"                                                         # underscore all files in dir
+alias r='fc -s'                                                                                              # execute last command
+alias rm='rm -i'
+alias perl-rename='perl ~/perl5/bin/rename '                                                                    # call Perl rename script
+alias scala='rlwrap scala'
+alias startxwin='run /usr/bin/bash.exe -l -c "/usr/bin/startxwin -- -nolock -unixkill"'
+alias sumatra='startSumatra.sh'
+alias vdir='ls --color=auto --format=long'
+alias vi='vim'                                                                                               # cygwin installs a minimal vi
+alias whence='type -a'                        # where, of a sort
+
+if [[ ${BASH_VERSINFO[5]} == *cygwin* ]] || [[ ${BASH_VERSINFO[0]} == 4 ]]; then
+	alias l='ls -A -B --color=tty --group-directories-first -F --ignore="desktop.ini" --ignore="NTUSER*" --ignore="ntuser*"'
+fi
+
+if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+	alias dow='date "+%A" > /dev/clipboard'
+	alias fdt='date "+%B %d, %Y" > /dev/clipboard'
+	alias tts='date "+%I:%M %p" > /dev/clipboard'
+	alias md='cyg-wrapper.sh "$USBDRV/PortableApps/MarkdownWinPortable/MarkdownWin.exe" --fork=2'
+fi
+
+if [ "$WINDIR" != "" ]; then
+	alias gvim='cyg-wrapper.sh "$USBDRV/PortableApps/gVimPortable/gvimPortable.exe" --fork=2 --binary-opt=--cmd,"set shellslash",--cmd,"set shell=bash",--cmd,"set ff=unix"'
+fi
+
+#------------------------------------------------------------------------------------
+# run on startup
+#------------------------------------------------------------------------------------
+
+# Mount the portable Documents folder, if it isn't already
+if [[ ${BASH_VERSINFO[5]} == *cygwin* ]] && [ ! -d Documents ]; then
+	mount -f $(cygpath -m $USBDRVPATH)Documents ~/Documents;
+fi
+
+#------------------------------------------------------------------------------------
+# functions 
+#------------------------------------------------------------------------------------
+# Truncate oversized lines on input. Mostly for display use. Example: grep foo log | fitterm
+fitterm () { cut -c 1-$( tput cols ) ; }
+export -f fitterm
+
+# This function defines a 'cd' replacement function capable of keeping, 
+# displaying and accessing history of visited directories, up to 10 entries.
+# To use it, uncomment it, source this file and try 'cd --'.
+# acd_func 1.0.5, 10-nov-2004
+# Petar Marinov, http:/geocities.com/h2428, this is public domain
+cd_func () {
+  local x2 the_new_dir adir index
+  local -i cnt
+
+  if [[ $1 ==  "--" ]]; then
+    dirs -v
+    return 0
+  fi
+
+  the_new_dir=$1
+  [[ -z $1 ]] && the_new_dir=$HOME
+
+  if [[ ${the_new_dir:0:1} == '-' ]]; then
+    #
+    # Extract dir N from dirs
+    index=${the_new_dir:1}
+    [[ -z $index ]] && index=1
+    adir=$(dirs +$index)
+    [[ -z $adir ]] && return 1
+    the_new_dir=$adir
+  fi
+
+  #
+  # '~' has to be substituted by ${HOME}
+  [[ ${the_new_dir:0:1} == '~' ]] && the_new_dir="${HOME}${the_new_dir:1}"
+
+  #
+  # Now change to the new dir and add to the top of the stack
+  pushd "${the_new_dir}" > /dev/null
+  [[ $? -ne 0 ]] && return 1
+  the_new_dir=$(pwd)
+
+  #
+  # Trim down everything beyond 11th entry
+  popd -n +11 2>/dev/null 1>/dev/null
+
+  #
+  # Remove any other occurence of this dir, skipping the top of the stack
+  for ((cnt=1; cnt <= 10; cnt++)); do
+    x2=$(dirs +${cnt} 2>/dev/null)
+    [[ $? -ne 0 ]] && return 0
+    [[ ${x2:0:1} == '~' ]] && x2="${HOME}${x2:1}"
+    if [[ "${x2}" == "${the_new_dir}" ]]; then
+      popd -n +$cnt 2>/dev/null 1>/dev/null
+      cnt=cnt-1
+    fi
+  done
+
+  return 0
+}
+export -f cd_func
+alias cd=cd_func
+
+function ll(){ ls -l "$@"| egrep "^d" ; ls -lXB "$@" 2>&-| egrep -v "^d|total "; }
+export -f ll
+
+# Find a file with a pattern in name:
+function ff() { find . -type f -iname '*'$*'*' -ls ; }
+export -f ff
+
+# Find a file with pattern $1 in name and Execute $2 on it:
+function fe() { find . -type f -iname '*'$1'*' -exec "${2:-file}" {} \;		; }
+export -f fe
+
+function fstr() { # find pattern in a set of filesand highlight them
+	OPTIND=1
+	local case=""
+	local usage="fstr: find string in files.  Usage: fstr [-i] \"pattern\" [\"filename pattern\"] "
+	while getopts :it opt; do
+		case "$opt" in
+			i) case="-i " ;;
+			*) echo "$usage"; return;;
+		esac
+	done
+	shift $(( $OPTIND - 1 ))
+	if [ "$#" -lt 1 ]; then
+		echo "$usage"
+		return;
+	fi
+	local SMSO=$(tput smso)
+	local RMSO=$(tput rmso)
+	find . -type f -name "${2:-*}" -print0 | xargs -0 grep -sn ${case} "$1" 2>&- | \
+	sed "s/$1/${SMSO}\0${RMSO}/gI" | more
+}
+export -f fstr
+
+function cuttail() { # cut last n lines in file, 10 by default
+	nlines=${2:-10}
+	sed -n -e :a -e "1,${nlines}!{P;N;D;};N;ba" $1
+}
+
+function lowercase() { # move filenames to lowercase
+	 for file ; do
+		filename=${file##*/}
+		case "$filename" in
+		 */*) dirname==${file%/*} ;;
+		 *) dirname=.;;
+		esac
+		nf=$(echo $filename | tr A-Z a-z)
+		newname="${dirname}/${nf}"
+		if [ "$nf" != "$filename" ]; then
+		 mv "$file" "$newname"
+		 echo "lowercase: $file --> $newname"
+		else
+		 echo "lowercase: $file not changed."
+		fi
+	done
+}
+export -f lowercase
+
+function ccd {	# clear the screen, change directory, list contents
+	clear
+	cd "$1"
+	l
+}
+export -f ccd
+
+function dateprefix { # add YYYYMM to files in %CD%
+	date_prefix=$(date + %Y%m)
+	for file in *.*
+	do
+		mv $file		"$date_prefix ${file%.*}.${file##*.}"
+	done
+}
+export -f dateprefix
+
+function extract () {
+	if [ ! -f "$1" ] ; then
+		echo "'$1' is not a valid file!"
+		return 1
+	fi
+
+	# Assoc. array of commands for extracting archives
+	declare -A xcmd
+	xcmd=(
+		[.tar.bz2]="tar xvjf"
+		[.tar.gz]="tar xvzf"
+		[.bz2]="bunzip2"
+		[.rar]="unrar x"
+		[.gz]="gunzip"
+		[.tar]="tar xvf"
+		[.zip]="unzip"
+		[.Z]="uncompress"
+		[.7z]="7z x"
+	)
+	# extension aliases
+	xcmd[.tbz2]="${xcmd[.tar.bz2]}"
+	xcmd[.tgz]="${xcmd[.tar.gz]}"
+
+	# See which extension the given file uses
+	fext=""
+	for i in ${!xcmd[@]}; do
+		if [ $(grep -o ".\{${#i}\}$" <<< $1) == "$i" ]; then
+			fext="$i"
+			break
+		fi
+	done
+
+	# Die if we couldn't discover what archive type it is
+	if [ -z "$fext" ]; then
+		echo "don't know how to extract '$1'..."
+		return 1
+	fi
+
+	# Extract & cd if we can
+	fbase=$(basename "$1" "$fext")
+	if ${xcmd[$fext]} "$1" && [ -d "$fbase" ]; then
+		cd "$fbase"
+	fi
+}
+export -f extract
+
+function uppercase()		# move filenames to uppercase
+{
+	for file ; do
+	filename=${file##*/}
+	case "$filename" in
+	*/*) dirname==${file%/*} ;;
+	*) dirname=.;;
+	esac
+	nf=$(echo $filename | tr a-z A-Z)
+	newname="${dirname}/${nf}"
+	if [ "$nf" != "$filename" ]; then
+		mv "$file" "$newname"
+		echo "uppercase: $file --> $newname"
+	else
+		echo "uppercase: $file not changed."
+	fi
+	done
+}
+export -f uppercase
+
+function swap() {				 # swap 2 filenames around
+	local TMPFILE=tmp.$$
+	mv "$1" $TMPFILE
+	mv "$2" "$1"
+	mv $TMPFILE "$2"
+}
+export -f swap
+
+bak () { # save a copy of a file with a file stamp
+	filename="$(basename "$1")"
+	extension="${filename##*.}"
+	filename="${filename%.*}"
+	filetime=$(date -r "$1" +%Y%m%d$H%M%S)
+	cp "$1" ${filename}_${filetime}.${extension}
+}
+export -f bak
+
+function my_ps() { ps $@ -u $USER -o pid,%cpu,%mem,bsdtime,command ; }
+export -f my_ps
+function pp() { my_ps f | awk '!/awk/ && $0~var' var=${1:-".*"} ; }
+export -f pp
+
+function ii() { # get current host related info
+	echo -e "\nYou are logged on ${RED}$HOST"
+	echo -e "\nAdditionnal information:$NC " ; uname -a
+	echo -e "\n${RED}Users logged on:$NC " ; w -h
+	echo -e "\n${RED}Current date :$NC " ; date
+	echo -e "\n${RED}Memory stats :$NC " ; free
+	my_ip 2>&- ;
+	echo -e "\n${RED}Local IP Address :$NC" ; echo ${MY_IP:-"Not connected"}
+	echo -e "\n${RED}ISP Address :$NC" ; echo ${MY_ISP:-"Not connected"}
+	echo
+}
+export -f ii
+
+function repeat() { # repeat n times command
+	local i max
+	max=$1; shift;
+	for ((i=1; i <= max ; i++)); do		# --> C-like syntax
+		eval "$@";
+	done
+}
+export -f repeat
+
+function ask() {
+	echo -n "$@" '[y/n] ' ; read ans
+	case "$ans" in
+	y*|Y*) return 0 ;;
+	*) return 1 ;;
+	esac
+}
+export -f ask
+
+function cdb() {
+	USAGE="Usage: cdb [-c|-g|-d|-l] [bookmark]" ;
+	if		[ ! -e ~/.cd_bookmarks ] ; then
+	mkdir ~/.cd_bookmarks
+	fi
+
+	case $1 in
+		# create bookmark
+		-c) shift
+			if [ ! -f ~/.cd_bookmarks/$1 ] ; then
+				echo "cd `pwd`" > ~/.cd_bookmarks/"$1" ;
+			else
+				echo "Try again! Looks like there is already a bookmark '$1'"
+			fi
+			;;
+		# goto bookmark
+		-g) shift
+			if [ -f ~/.cd_bookmarks/$1 ] ; then
+				source ~/.cd_bookmarks/"$1"
+			else
+				echo "Mmm...looks like your bookmark has spontaneously combusted. What I mean to say is that your bookmark does not exist." ;
+			fi
+			;;
+		# delete bookmark
+		-d) shift
+			if [ -f ~/.cd_bookmarks/$1 ] ; then
+				rm -rf ~/.cd_bookmarks/"$1" ;
+			else
+				echo "Oops, forgot to specify the bookmark" ;
+			fi
+			;;
+		# list bookmarks
+		-l) shift
+			ls -l ~/.cd_bookmarks/ ;
+			;;
+		*) echo "$USAGE" ;
+			;;
+	esac
+}
+export -f cdb
