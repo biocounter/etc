@@ -84,7 +84,7 @@ set diffopt+=iwhite   " diff ignores whitespace
 " ------------------------------------------------------------------------------
 " Vim UI
 " ------------------------------------------------------------------------------
-colorscheme torte
+colorscheme jellybeans 
 set background=dark      " we plan to use a dark background
 set cursorline
 set display+=lastline    " show last line of text
@@ -247,7 +247,6 @@ autocmd ColorScheme * highlight ExtraWhitespace guibg=red
 autocmd BufEnter * match ExtraWhitespace /\s\+$/
 autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
 autocmd InsertLeave * match ExtraWhiteSpace /\s\+$/
-autocmd BufWritePre txt,sqr,sql,xml,vim :call <SID>StripWhite()
 autocmd BufRead,BufWritePre txt,sqr,sql,xml,vim :call TrimWhiteSpace()
 autocmd BufRead,BufNewFile *.dms set filetype=sql
 
