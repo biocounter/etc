@@ -124,7 +124,7 @@ if [ -z "$RANPROFILE" ]; then
 	if [ -d ~/usr/bin ]; then
 		addtopath ~/usr/bin
 	fi
-
+	
 	# include any windows-specific environment variables
 	if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
 		addtopath /cygdrive/c/Windows/SysWOW64 /cygdrive/c/Windows/System32

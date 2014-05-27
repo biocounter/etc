@@ -84,7 +84,7 @@ set diffopt+=iwhite   " diff ignores whitespace
 " ------------------------------------------------------------------------------
 " Vim UI
 " ------------------------------------------------------------------------------
-colorscheme jellybeans 
+colorscheme solarized
 set background=dark      " we plan to use a dark background
 set cursorline
 set display+=lastline    " show last line of text
@@ -225,7 +225,7 @@ if (s:running_windows)
 	autocmd FileType xml,xsl,html exe ":silent %!xml fo -t"
 else
 	autocmd FileType xml,xsl,html exe ":silent %!xmllint XMLLINT_INDENT='\t' --format --recover - 2>/dev/null"
-endif 
+endif
 autocmd FileType javascript noremap <buffer>  <c-f> :call JsBeautify()<cr>
 autocmd FileType html noremap <buffer> <c-f> :call HtmlBeautify()<cr>
 autocmd FileType css noremap <buffer> <c-f> :call CSSBeautify()<cr>
