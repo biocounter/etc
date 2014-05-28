@@ -259,7 +259,7 @@ set_prompt () {
     # Print the working directory and prompt marker in blue, and reset
     # the text color to the default.
     #PS1+="$Blue\\w \\\$$Reset "
-    PS1+="$Blue[\!][`date +%m/%d` \@][\w]${NC}\n\$ "
+    PS1+="$Blue[`date +%m/%d` \@][\w]${NC}\n\$ "
 }
 PROMPT_COMMAND='set_prompt'
 
