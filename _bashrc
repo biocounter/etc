@@ -1,13 +1,13 @@
 #============================================================================
 #title          :~/.bashrc
-#description    :excuted by bash(1) for interactive shells for interactive 
-#				 shells the latest version is always at 
+#description    :excuted by bash(1) for interactive shells for interactive
+#				 shells the latest version is always at
 #				 /etc/defaults/etc/skel/.bashrc (do not modify)
 #author         :Gary Furash
 #date           :20140422
-#version        :1      
+#version        :1
 #usage          :~/.bashrc
-#notes          :       
+#notes          :
 #bash_version   :4.1.11(2)-release
 #============================================================================
 
@@ -59,11 +59,11 @@ shopt -s histappend histreedit histverify
 
 # Don't put duplicate lines in the history.
 export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
- 
+
 # Ignore some controlling instructions
 export HISTIGNORE=$'[ \t]*:&:[fb]g:exit'
 export HISTIGNORE=$'[ \t]*:&:[fb]g:exit:ls' # Ignore the ls command as well
- 
+
 # Whenever displaying the prompt, write the previous line to disk
 # export PROMPT_COMMAND="history -a"
 
@@ -113,10 +113,10 @@ if [ -z "$RANPROFILE" ]; then
 	if [ -f ~/.setenv ]; then
 		. ~/.setenv
 		if [[ $JAVA_HOME ]]; then
-			addtopath $JAVA_HOME/bin 
+			addtopath $JAVA_HOME/bin
 		fi
 		if [[ $SCALA_HOME ]]; then
-			addtopath $SCALA_BIN/bin 
+			addtopath $SCALA_BIN/bin
 		fi
 	fi
 
@@ -124,14 +124,14 @@ if [ -z "$RANPROFILE" ]; then
 	if [ -d ~/usr/bin ]; then
 		addtopath ~/usr/bin
 	fi
-	
+
 	# include any windows-specific environment variables
 	if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
 		addtopath /cygdrive/c/Windows/SysWOW64 /cygdrive/c/Windows/System32
 	fi
 fi
 
-if [ -d ~/perl5 ]; then 
+if [ -d ~/perl5 ]; then
 	PERL_MB_OPT="--install_base \"~/perl5\""; export PERL_MB_OPT;
 	PERL_MM_OPT="INSTALL_BASE=~/perl5"; export PERL_MM_OPT;
 fi
@@ -142,28 +142,126 @@ export PATH=`awk -F: '{for (i=1;i<=NF;i++) { if ( !x[$i]++ ) printf("%s:",$i); }
 #-----------------------------------------------------------------------
 # define terminal colors, prompts, and display
 #-----------------------------------------------------------------------
-red='\e[0;31m'
-RED='\e[1;31m'
-blue='\e[0;34m'
-BLUE='\e[1;34m'
-cyan='\e[0;36m'
-CYAN='\e[1;36m'
-NC='\e[0m'								# No Color
+# Reset
+NC='\e[0m'              # Text Reset
 
-# Looks best on a black background.....
-#echo -e "${CYAN}This is BASH ${RED}${BASH_VERSION%.*}${CYAN}${NC}"
-#date
+# Regular Colors
+BLACk='\e[0;30m'        # Black
+RED='\e[0;31m'          # Red
+GREEN='\e[0;32m'        # Green
+YELLOW='\e[0;33m'       # Yellow
+BLUE='\e[0;34m'         # Blue
+PURPle='\e[0;35m'       # Purple
+CYAN='\e[0;36m'         # Cyan
+WHITE='\e[0;37m'        # White
+
+# Bold
+BBLACK='\e[1;30m'      # Black
+BRED='\e[1;31m'        # Red
+BGREEN='\e[1;32m'      # Green
+BYELLOW='\e[1;33m'     # Yellow
+BBLUE='\e[1;34m'       # Blue
+BPURPLE='\e[1;35m'     # Purple
+BCYAN='\e[1;36m'       # Cyan
+BWHITE='\e[1;37m'      # White
+
+# UNDERLINE
+UBLACK='\e[4;30m'      # Black
+URED='\e[4;31m'        # Red
+UGREEN='\e[4;32m'      # Green
+UYELLOW='\e[4;33m'     # Yellow
+UBLUE='\e[4;34m'       # Blue
+UPURPLE='\e[4;35m'     # Purple
+UCYAN='\e[4;36m'       # Cyan
+UWHITE='\e[4;37m'      # White
+
+# BACKGROUND
+ON_BLACK='\e[40m'      # Black
+ON_RED='\e[41m'        # Red
+ON_GREEN='\e[42m'      # Green
+ON_YELLOW='\e[43m'     # Yellow
+ON_BLUE='\e[44m'       # Blue
+ON_PURPLE='\e[45m'     # Purple
+ON_CYAN='\e[46m'       # Cyan
+ON_WHITE='\e[47m'      # White
+
+# HIGH INTENSITY
+IBLACK='\e[0;90m'      # Black
+IRED='\e[0;91m'        # Red
+IGREEN='\e[0;92m'      # Green
+IYELLOW='\e[0;93m'     # Yellow
+IBLUE='\e[0;94m'       # Blue
+IPURPLE='\e[0;95m'     # Purple
+ICYAN='\e[0;96m'       # Cyan
+IWHITE='\e[0;97m'      # White
+
+# BOLD HIGH INTENsity
+BIBLACK='\e[1;90m'     # Black
+BIRED='\e[1;91m'       # Red
+BIGREEN='\e[1;92m'     # Green
+BIYELLOW='\e[1;93m'    # Yellow
+BIBLUE='\e[1;94m'      # Blue
+BIPURPLE='\e[1;95m'    # Purple
+BICYAN='\e[1;96m'      # Cyan
+BIWHITE='\e[1;97m'     # White
+
+ # HIGH INTENSITY backgrounds
+ON_IBLACK='\e[0;100m'  # Black
+ON_IRED='\e[0;101m'    # Red
+ON_IGREEN='\e[0;102m'  # Green
+ON_IYELLOW='\e[0;103m' # Yellow
+ON_IBLUE='\e[0;104m'   # Blue
+ON_IPURPLE='\e[0;105m' # Purple
+ON_ICYAN='\e[0;106m'   # Cyan
+ON_IWHITE='\e[0;107m'  # White
+
+# run on startup
+clear
+echo -e "${CYAN}This is BASH ${RED}${BASH_VERSION%.*}${CYAN}${NC}"
+date
 #function _exit() { # function to run upon exit of shell
 #	echo -e "${RED}Hasta la vista, baby${NC}"
 #}
 #trap _exit EXIT
 
-PS1="\n${cyan}[`date +%m/%d` \@][\u@\h][\w]${NC}\n\$ "
-
 # Set up syntax highlighting for 'less' (requires source-highlight package)
 # See http://www.gnu.org/software/src-highlite/source-highlight.html
 export LESSOPEN="| /usr/bin/src-hilite-lesspipe.sh %s"
 export LESS=' -R '
+
+set_prompt () {
+    Last_Command=$? # Must come first!
+    Blue='\[\e[01;34m\]'
+    White='\[\e[01;37m\]'
+    Red='\[\e[01;31m\]'
+    Green='\[\e[01;32m\]'
+    Reset='\[\e[00m\]'
+    FancyX='\342\234\227'
+    Checkmark='\342\234\223'
+
+    # Add a bright white exit status for the last command
+    PS1="\n$White\$? "
+
+    # If it was successful, print a green check mark. Otherwise, print
+    # a red X.
+    if [[ $Last_Command == 0 ]]; then
+        PS1+="$Green$Checkmark "
+    else
+        PS1+="$Red$FancyX "
+    fi
+    # If root, just print the host in red. Otherwise, print the current user
+    # and host in green.
+    if [[ $EUID == 0 ]]; then
+        PS1+="$Red[\\h]"
+    else
+        PS1+="$Green[\\h]"
+    fi
+    # Print the working directory and prompt marker in blue, and reset
+    # the text color to the default.
+    #PS1+="$Blue\\w \\\$$Reset "
+    PS1+="$Blue[\!][`date +%m/%d` \@][\w]${NC}\n\$ "
+}
+PROMPT_COMMAND='set_prompt'
 
 #-----------------------------------------------------------------------
 # aliases
@@ -234,13 +332,13 @@ if [[ ${BASH_VERSINFO[5]} == *cygwin* ]] && [ ! -d Documents ]; then
 fi
 
 #------------------------------------------------------------------------------------
-# functions 
+# functions
 #------------------------------------------------------------------------------------
 # Truncate oversized lines on input. Mostly for display use. Example: grep foo log | fitterm
 fitterm () { cut -c 1-$( tput cols ) ; }
 export -f fitterm
 
-# This function defines a 'cd' replacement function capable of keeping, 
+# This function defines a 'cd' replacement function capable of keeping,
 # displaying and accessing history of visited directories, up to 10 entries.
 # To use it, uncomment it, source this file and try 'cd --'.
 # acd_func 1.0.5, 10-nov-2004
