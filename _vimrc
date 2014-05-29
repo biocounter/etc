@@ -84,7 +84,7 @@ set diffopt+=iwhite   " diff ignores whitespace
 " ------------------------------------------------------------------------------
 " Vim UI
 " ------------------------------------------------------------------------------
-colorscheme wombat
+colorscheme leo
 set background=dark      " we plan to use a dark background
 set cursorline
 set display+=lastline    " show last line of text
@@ -213,6 +213,9 @@ vnoremap <silent> <leader>r :call VisualSelection('replace')<CR>
 " gist.vim
 let g:github_user = 'GaryFurash'
 let g:github_token = '56d288b02d32162efec1fe0918e5274c83acbe70'
+
+" bufline configuration
+let g:bufline_autoscroll = 1
 
 " ------------------------------------------------------------------------------
 " Autocommands (run on ... for filetype ...)
