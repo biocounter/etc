@@ -232,6 +232,16 @@ date
 export LESSOPEN="| /usr/bin/src-hilite-lesspipe.sh %s"
 export LESS=' -R '
 
+# display git repository status on prompt
+if which git >/dev/null; then
+	GIT_ENABLED='Y'
+	source ~/usr/bin/git-prompt.sh
+	export GIT_PS1_SHOWDIRTYSTATE='Y'       # show staged (*) and unstaged (+)
+	export GIT_PS1_SHOWSTASHSTATE='Y'       # show stashed ($)
+	export GIT_PS1_SHOWUNTRACKEDFILES='Y'   # show untracked (%)
+	export GIT_PS1_=SHOWUPSTREAM="auto"     # show behind (<), ahead (>), diverged (=), none (=)
+fi
+
 set_prompt () {
     Last_Command=$? # Must come first!
     Blue='\[\e[01;34m\]'
@@ -262,7 +272,15 @@ set_prompt () {
     # Print the working directory and prompt marker in blue, and reset
     # the text color to the default.
     #PS1+="$Blue\\w \\\$$Reset "
-    PS1+="$Blue[`date +%m/%d` \@][\w]${NC}\n\$ "
+	if [ "$GIT_ENABLED" == "Y" ] && [[ $(find `pwd` -maxdepth 1 -type d -iname ".git") ]]; then
+		GIT_STATE=`__git_ps1 "[%s]"`
+		if [ "$GIT_STATE" != "[master]" ]; then
+			GIT_STATE="${Red}"$GIT_STATE"${Reset}"
+		fi
+		PS1+="$Blue[`date +%m/%d`][\w]${GIT_STATE}${Reset}\n[\A] \$ "
+	else
+		PS1+="$Blue[`date +%m/%d`][\w]${Reset}\n[\A] \$ "
+	fi
 }
 PROMPT_COMMAND='set_prompt'
 
