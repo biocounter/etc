@@ -94,8 +94,7 @@ endif
 
 " console-gui different
 hi Normal				cterm=none		ctermfg=255		ctermbg=232 guifg=#ffffff	guibg=#121212
-"hi CursorLine		cterm=none		ctermbg=16		guibg=#050505
-hi CursorLine		cterm=none		ctermbg=16		guibg=#323300
+hi CursorLine		cterm=none		ctermbg=16		guibg=#050505
 hi SpecialKey		cterm=none		ctermfg=245		ctermbg=233		guifg=#8a8a8a	guibg=#090909
 hi Folded				cterm=none		ctermfg=110		ctermbg=233		guifg=#87afd7	guibg=#000000
 
@@ -147,7 +146,7 @@ if v:version >= 700
 	hi SpellCap			cterm=none    ctermfg=16		ctermbg=196
 	hi SpellLocal		cterm=none    ctermfg=16		ctermbg=196
 	hi SpellRare		cterm=none    ctermfg=16		ctermbg=196
-
+	
 	" No need for GUI colors
 	"hi TabLine			cterm=none	ctermfg=252		ctermbg=17
 	"hi TabLineSel		cterm=none	ctermfg=255		ctermbg=21
