@@ -319,7 +319,7 @@ alias newterm='mintty /bin/env CHERE_INVOKING=1 /bin/bash -l &'
 alias nospace="perl /usr/local/bin/rename 's/ /_' *"                                                         # underscore all files in dir
 alias r='fc -s'                                                                                              # execute last command
 alias rm='rm -i'
-alias perl-rename='perl ~/perl5/bin/rename '                                                                    # call Perl rename script
+alias rn='perl /usr/local/bin/rename'
 alias scala='rlwrap scala'
 alias startxwin='run /usr/bin/bash.exe -l -c "/usr/bin/startxwin -- -nolock -unixkill"'
 alias sumatra='startSumatra.sh'
