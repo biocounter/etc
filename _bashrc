@@ -335,7 +335,7 @@ fi
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
 	alias dow='date "+%A" > /dev/clipboard'
 	alias fdt='date "+%B %d, %Y" > /dev/clipboard'
-	alias tts='date "[+%I:%M %p] " > /dev/clipboard'
+	alias tts='echo [`date "+%I:%M %p"`] > /dev/clipboard'
 	alias md='cyg-wrapper.sh "$USBDRV/PortableApps/MarkdownWinPortable/MarkdownWin.exe" --fork=2'
 fi
 
