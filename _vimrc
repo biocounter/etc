@@ -84,7 +84,7 @@ set diffopt+=iwhite   " diff ignores whitespace
 " ------------------------------------------------------------------------------
 " Vim UI
 " ------------------------------------------------------------------------------
-colorscheme blacksea
+colorscheme brookstream
 set background=dark      " we plan to use a dark background
 set cursorline
 set display+=lastline    " show last line of text
