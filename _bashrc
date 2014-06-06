@@ -122,8 +122,8 @@ if [ -z "$RANPROFILE" ]; then
 	fi
 
 	# add user's local binaries and scripts
-	if [ -d ~/usr/bin ]; then
-		addtopath ~/usr/bin
+	if [ -d ~/bin ]; then
+		addtopath ~/bin
 	fi
 
 	# include any windows-specific environment variables
@@ -237,7 +237,7 @@ export LESS=' -R '
 # display git repository status on prompt
 if which git >/dev/null; then
 	GIT_ENABLED='Y'
-	source ~/usr/bin/git-prompt.sh
+	source ~/bin/git-prompt.sh
 	export GIT_PS1_SHOWDIRTYSTATE='Y'       # show staged (*) and unstaged (+)
 	export GIT_PS1_SHOWSTASHSTATE='Y'       # show stashed ($)
 	export GIT_PS1_SHOWUNTRACKEDFILES='Y'   # show untracked (%)
