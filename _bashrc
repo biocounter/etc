@@ -277,20 +277,12 @@ set_prompt () {
     # Print the working directory and prompt marker in blue, and reset
     # the text color to the default.
     #PS1+="$Blue\\w \\\$$Reset "
-	if [ "$GIT_ENABLED" == "Y" ]; then
-		CWD=`pwd`
-		if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
-			WD=$(cygpath -u '${WD}')
+	if [ "$GIT_ENABLED" == "Y" ] && [[ $(find "`pwd`" -maxdepth 1 -type d -iname ".git") ]]; then
+		GIT_STATE=`__git_ps1 "[%s]"`
+		if [ "$GIT_STATE" != "[master]" ]; then
+			GIT_STATE="${Red}"$GIT_STATE"${Reset}"
 		fi
-		if  [[ $(find `pwd` -maxdepth 1 -type d -iname ".git") ]]; then
-			GIT_STATE=`__git_ps1 "[%s]"`
-			if [ "$GIT_STATE" != "[master]" ]; then
-				GIT_STATE="${Red}"$GIT_STATE"${Reset}"
-			fi
-			PS1+="$Blue[`date +%m/%d`][\w]${GIT_STATE}${Reset}\n[\A] \$ "
-		else
-			PS1+="$Blue[`date +%m/%d`][\w]${Reset}\n[\A] \$ "
-		fi
+		PS1+="$Blue[`date +%m/%d`][\w]${GIT_STATE}${Reset}\n[\A] \$ "
 	else
 		PS1+="$Blue[`date +%m/%d`][\w]${Reset}\n[\A] \$ "
 	fi
