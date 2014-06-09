@@ -331,6 +331,7 @@ alias sumatra='startSumatra.sh'
 alias vdir='ls --color=auto --format=long'
 alias vi='vim'                                                                                               # cygwin installs a minimal vi
 alias whence='type -a'                        # where, of a sort
+alias xml='xmlstarlet'
 
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]] || [[ ${BASH_VERSINFO[0]} == 4 ]]; then
 	alias l='ls -A -B --color=tty --group-directories-first -F --ignore="desktop.ini" --ignore="NTUSER*" --ignore="ntuser*"'
