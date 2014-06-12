@@ -110,6 +110,11 @@ export -f addtopath
 
 if [ -z "$RANPROFILE" ]; then
 	export RANPROFILE=true
+
+	if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+		export PATH="/usr/local/bin:/usr/bin:/bin:/sbin"
+	fi
+
 	#include any local environment variables
 	if [ -f ~/.setenv ]; then
 		. ~/.setenv
@@ -140,6 +145,16 @@ if [ -d ~/perl5 ]; then
 	PERL_MM_OPT="INSTALL_BASE=~/perl5"; export PERL_MM_OPT;
 	addtopath ~/perl5/bin
 fi
+
+# setup python
+if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+	export OCI_HOME=$USBDRV/Apps/Oracle/instantclient_12_1
+else
+	export OCI_HOME=~/usr/lib/instantclient_12_1
+fi
+addtopath $OCI_HOME
+export PYTHONPATH=''
+export PYTHONHOME=''
 
 # remove duplicate entries from PATH
 export PATH=`awk -F: '{for (i=1;i<=NF;i++) { if ( !x[$i]++ ) printf("%s:",$i); }}' <<< $PATH`
