@@ -4864,29 +4864,3 @@ RSPRD =
     )
   )
 #UAZRSPRD Entries - END
-
-#Temp Names for KCPRDA and KCPRDB databases used for Research by Mike Simpson
-#These will be deleted once they are no longer needed
-KCPRDA =
-  (DESCRIPTION =
-    (ADDRESS_LIST =
-      (ADDRESS = (PROTOCOL = TCP)(HOST = uaz-ep-d25-vip.mosaic.arizona.edu)(PORT = 1521))
-      (LOAD_BALANCE = yes)
-    )
-    (CONNECT_DATA =
-      (SERVER = DEDICATED)
-      (SERVICE_NAME = KCPRDA.mosaic.arizona.edu)
-    )
-  )
-
-KCPRDB =
-  (DESCRIPTION =
-    (ADDRESS_LIST =
-      (ADDRESS = (PROTOCOL = TCP)(HOST = uaz-ep-d25-vip.mosaic.arizona.edu)(PORT = 1521))
-      (LOAD_BALANCE = yes)
-    )
-    (CONNECT_DATA =
-      (SERVER = DEDICATED)
-      (SERVICE_NAME = KCPRDB.mosaic.arizona.edu)
-    )
-  )

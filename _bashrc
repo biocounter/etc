@@ -153,7 +153,7 @@ else
 	export OCI_HOME=~/usr/lib/instantclient_12_1
 fi
 addtopath $OCI_HOME
-export PYTHONPATH=''
+export PYTHONPATH='/lib/python3.2'
 export PYTHONHOME=''
 
 # remove duplicate entries from PATH
