@@ -1,4 +1,0 @@
-vimfiles
-========
-
-my vimfiles directory
