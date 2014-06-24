@@ -308,6 +308,7 @@ PROMPT_COMMAND='set_prompt'
 #-----------------------------------------------------------------------
 # aliases
 #-----------------------------------------------------------------------
+alias clp="printf '%s [%s %s %s] %s\n' '--' `date '+%m/%d %I:%m %p'`  '------------------------------------------------------------------------------------' > /dev/clipboard"
 alias cp='cp -i'					# -> Prevents accidentally clobbering files.
 alias df='df -h'
 alias dir='ls --color --format=vertical'
@@ -337,6 +338,7 @@ alias mydiff='diff -ywEa --suppress-common-lines --minimal'                     
 alias newterm='mintty /bin/env CHERE_INVOKING=1 /bin/bash -l &'
 alias nospace="perl /usr/local/bin/rename 's/ /_' *"                                                         # underscore all files in dir
 alias npp='cyg-wrapper.sh "$USBDRV/PortableApps/Notepad++Portable/Notepad++Portable.exe" --fork=2'			 # run notepad++ in a separate shell
+alias pdfbox='java -jar "$(cygpath -w ~/usr/bin/pdfbox-app-1.8.5.jar)" '
 alias r='fc -s'                                                                                              # execute last command
 alias rm='rm -i'
 alias rn='perl /usr/local/bin/rename'
