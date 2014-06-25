@@ -148,13 +148,13 @@ fi
 
 # setup python
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
-	export OCI_HOME=$USBDRV/Apps/Oracle/instantclient_12_1
+	export OCI_HOME=$USBDRV/PortableApps/Oracle/instantclient_12_1
 else
 	export OCI_HOME=~/usr/lib/instantclient_12_1
 fi
 addtopath $OCI_HOME
-export PYTHONPATH='/lib/python3.2'
-export PYTHONHOME=''
+unset PYTHONPATH
+unset PYTHONHOME
 
 # remove duplicate entries from PATH
 export PATH=`awk -F: '{for (i=1;i<=NF;i++) { if ( !x[$i]++ ) printf("%s:",$i); }}' <<< $PATH`
@@ -350,8 +350,6 @@ alias xml='xmlstarlet'
 
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]] || [[ ${BASH_VERSINFO[0]} == 4 ]]; then
 	alias l='ls -A -B --color=tty --group-directories-first -F --ignore="desktop.ini" --ignore="NTUSER*" --ignore="ntuser*"'
-	alias pdfbox='java -jar "$(cygpath -w ~/usr/bin/pdfbox-app-1.8.5.jar)" '
-	alias npp='cyg-wrapper.sh "$USBDRV/PortableApps/Notepad++Portable/Notepad++Portable.exe" --fork=2'			 # run notepad++ in a separate shell
 fi
 
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
@@ -359,6 +357,10 @@ if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
 	alias fdt='date "+%B %d, %Y" > /dev/clipboard'
 	alias tts='echo [`date "+%I:%M %p"`] > /dev/clipboard'
 	alias md='cyg-wrapper.sh "$USBDRV/PortableApps/MarkdownWinPortable/MarkdownWin.exe" --fork=2'
+	alias pdfbox='java -jar "$(cygpath -w ~/usr/bin/pdfbox-app-1.8.5.jar)" '
+	alias npp='cyg-wrapper.sh "$USBDRV/PortableApps/Notepad++Portable/Notepad++Portable.exe" --fork=2'			 # run notepad++ in a separate shell
+else
+	alias pdfbox='java -jar ~/usr/bin/pdfbox-app-1.8.5.jar '
 fi
 
 if [ "$WINDIR" != "" ]; then
