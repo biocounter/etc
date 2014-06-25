@@ -84,7 +84,6 @@ set diffopt+=iwhite   " diff ignores whitespace
 " ------------------------------------------------------------------------------
 " Vim UI
 " ------------------------------------------------------------------------------
-colorscheme brookstream
 set background=dark      " we plan to use a dark background
 set cursorline
 set display+=lastline    " show last line of text
@@ -196,26 +195,6 @@ nnoremap <C-p> :bprevious<CR>
 nnoremap <Leader>a :%s/\<<C-r><C-w>\>/
 " Replace word under cursor in line
 nnoremap <Leader>s :s/\<<C-r><C-w>\>/
-
-" ------------------------------------------------------------------------------
-" Plugin Settings
-" ------------------------------------------------------------------------------
-"
-" vimgrep
-vnoremap <silent> gv :call VisualSelection('gv')<CR>
-" Open vimgrep and put the cursor in the right position
-map <leader>g :vimgrep // **/*.<left><left><left><left><left><left><left>
-" Vimgreps in the current file
-map <leader><space> :vimgrep // <C-R>%<C-A><right><right><right><right><right><right><right><right><right>
-" When you press <leader>r you can search and replace the selected text
-vnoremap <silent> <leader>r :call VisualSelection('replace')<CR>
-
-" gist.vim
-let g:github_user = 'GaryFurash'
-let g:github_token = '56d288b02d32162efec1fe0918e5274c83acbe70'
-
-" bufline configuration
-let g:bufline_autoscroll = 1
 
 " ------------------------------------------------------------------------------
 " Autocommands (run on ... for filetype ...)
