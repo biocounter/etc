@@ -213,6 +213,14 @@ autocmd FileType html noremap <buffer> <c-f> :call HtmlBeautify()<cr>
 autocmd FileType css noremap <buffer> <c-f> :call CSSBeautify()<cr>
 
 " ------------------------------------------------------------------------------
+" Plugin Settings 
+" ------------------------------------------------------------------------------
+let g:miniBufExplMapWindowNavVim = 1
+let g:miniBufExplMapWindowNavArrows = 1
+let g:miniBufExplMapCTabSwitchBufs = 1
+let g:miniBufExplModSelTarget = 1
+
+" ------------------------------------------------------------------------------
 " scala
 " ------------------------------------------------------------------------------
 " TODO: create custom fold function for sqr
