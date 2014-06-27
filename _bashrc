@@ -120,6 +120,7 @@ if [ -z "$RANPROFILE" ]; then
 		. ~/.setenv
 		if [[ $JAVA_HOME ]]; then
 			addtopath $JAVA_HOME/bin
+			export CLASSPATH=~/usr/lib/java/*
 		fi
 		if [[ $SCALA_HOME ]]; then
 			addtopath $SCALA_BIN/bin

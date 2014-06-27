@@ -84,7 +84,8 @@ set diffopt+=iwhite   " diff ignores whitespace
 " ------------------------------------------------------------------------------
 " Vim UI
 " ------------------------------------------------------------------------------
-set background=dark      " we plan to use a dark background
+colorscheme lucius
+LuciusBlack
 set cursorline
 set display+=lastline    " show last line of text
 set laststatus=2         " always show the status line
@@ -139,7 +140,10 @@ endif
 
 " setup the cursor in terminal mode
 if &term =~ '^xterm'
-  let &t_EI .= "\<Esc>[1 q"
+	let &t_ti.="\e[1 q"
+	let &t_SI.="\e[5 q"
+	let &t_EI.="\e[1 q"
+	let &t_te.="\e[0 q"
 endif
 
 " Allow color schemes to do bright colors without forcing bold.
