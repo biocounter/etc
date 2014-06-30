@@ -1,7 +1,7 @@
 " ============================================================================
 " Name:     Lucius vim color scheme
 " Author:   Jonathan Filip <jfilip1024@gmail.com>
-" Version:  8.1.2
+" Version:  8.1.4
 " ----------------------------------------------------------------------------
 "
 " Light and dark color scheme for GUI and 256 color terminal.
@@ -88,6 +88,12 @@
 " Setting this will cause the color scheme to use underlined fonts for some
 " items.
 "
+" g:lucius_no_term_bg (default: 0)
+"
+" Setting this will cause the color scheme to not set a background color in
+" the terminal (useful for transparency or terminals with different background
+" colors).
+"
 " ============================================================================
 
 
@@ -130,6 +136,12 @@ if exists("g:lucius_use_underline")
     let s:use_underline = g:lucius_use_underline
 else
     let s:use_underline = 1
+endif
+
+if exists("g:lucius_no_term_bg")
+    let s:no_term_bg = g:lucius_no_term_bg
+else
+    let s:no_term_bg = 0
 endif
 
 
@@ -243,7 +255,7 @@ let s:normal_items = [
 
 let s:bold_items = [
             \ "DiffText", "FoldColumn", "Folded", "StatusLine", "TabLineSel",
-            \ "Title",
+            \ "Title", "CursorLineNr",
             \ ]
 
 let s:underline_items = [
@@ -492,15 +504,15 @@ hi TabLine      guifg=bg
 hi TabLineSel   guifg=fg
 hi WildMenu     guifg=fg
 if s:style == "light"
-    hi ColorColumn                  guibg=#d7d7af
-    hi CursorLineNr guifg=#9e9e9e   guibg=#dadada
+    hi ColorColumn                  guibg=#e4e4e4
+    hi CursorLineNr guifg=#626262   guibg=#dadada
     hi FoldColumn                   guibg=#bcbcbc
     hi Folded                       guibg=#bcbcbc
     hi LineNr       guifg=#9e9e9e   guibg=#dadada
     hi PmenuSel                     guibg=#afd7ff
     hi SignColumn                   guibg=#d0d0d0
-    hi StatusLineNC guifg=#e4e4e4
-    hi TabLineFill  guifg=#b2b2b2
+    hi StatusLineNC guifg=#dadada
+    hi TabLineFill  guifg=#dadada
     hi VertSplit    guifg=#e4e4e4
     hi WildMenu                     guibg=#afd7ff
     if s:contrast == "low"
@@ -531,15 +543,15 @@ if s:style == "light"
         hi VertSplit                    guibg=#808080
     endif
 else
-    hi ColorColumn                  guibg=#87875f
-    hi CursorLineNr guifg=#626262   guibg=#444444
+    hi ColorColumn                  guibg=#3a3a3a
+    hi CursorLineNr guifg=#9e9e9e   guibg=#444444
     hi FoldColumn                   guibg=#4e4e4e
     hi Folded                       guibg=#4e4e4e
     hi LineNr       guifg=#626262   guibg=#444444
     hi PmenuSel                     guibg=#005f87
     hi SignColumn                   guibg=#4e4e4e
-    hi StatusLineNC guifg=#444444
-    hi TabLineFill  guifg=#444444
+    hi StatusLineNC guifg=#4e4e4e
+    hi TabLineFill  guifg=#4e4e4e
     hi VertSplit    guifg=#626262
     hi WildMenu                     guibg=#005f87
     if s:contrast == "low"
@@ -626,10 +638,10 @@ if s:style == "light"
     hi SpellLocal   guisp=#d7af00
     hi SpellRare    guisp=#5faf00
 else
-    hi SpellBad     guisp=#d70000
-    hi SpellCap     guisp=#00afd7
-    hi SpellLocal   guisp=#d7af00
-    hi SpellRare    guisp=#5faf00
+    hi SpellBad     guisp=#ff5f5f
+    hi SpellCap     guisp=#5fafd7
+    hi SpellLocal   guisp=#d7af5f
+    hi SpellRare    guisp=#5faf5f
 endif
 
 
@@ -676,6 +688,10 @@ endfor
 for s:item in s:undercurl_items
     call s:AddSpCterm(s:item)
 endfor
+
+if s:no_term_bg == 1
+    hi Normal ctermbg=NONE
+endif
 
 
 " ============================================================================
