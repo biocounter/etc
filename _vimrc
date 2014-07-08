@@ -66,16 +66,16 @@ endif
 " 	let $TMP="c:/tmp"
 "	set diffexpr=MyDiff()
 " endif
-if has("gui_running")
-	if has("gui_win32")
-		" this fails if there are any spaces in the path
-		set shell=%CYGWIN_HOME%\bin\bash.exe
-		set shellcmdflag=--login\ -c
-		set shellxquote=\"
-		command! -complete=shellcmd -nargs=* -bang Shell call s:ExecuteInShell(<q-args>, '<bang>')
-"	cabbrev shell Shell
-	endif
-endif
+"if has("gui_running")
+"	if has("gui_win32")
+"		" this fails if there are any spaces in the path
+"		set shell=%CYGWIN_HOME%\bin\bash.exe
+"		set shellcmdflag=--login\ -c
+"		set shellxquote=\"
+"		command! -complete=shellcmd -nargs=* -bang Shell call s:ExecuteInShell(<q-args>, '<bang>')
+""	cabbrev shell Shell
+"	endif
+"endif
 set directory=.,$TMP,$TEMP
 set diffopt+=vertical " diff files side by side
 set diffopt+=icase    " diff ignores case
@@ -217,7 +217,7 @@ autocmd FileType html noremap <buffer> <c-f> :call HtmlBeautify()<cr>
 autocmd FileType css noremap <buffer> <c-f> :call CSSBeautify()<cr>
 
 " ------------------------------------------------------------------------------
-" Plugin Settings 
+" Plugin Settings
 " ------------------------------------------------------------------------------
 let g:miniBufExplMapWindowNavVim = 1
 let g:miniBufExplMapWindowNavArrows = 1
@@ -241,7 +241,7 @@ autocmd ColorScheme * highlight ExtraWhitespace guibg=red
 autocmd BufEnter * match ExtraWhitespace /\s\+$/
 autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
 autocmd InsertLeave * match ExtraWhiteSpace /\s\+$/
-autocmd BufRead,BufWritePre txt,sqr,sql,xml,vim :call TrimWhiteSpace()
+autocmd BufRead,BufWritePre * :call TrimWhiteSpace()
 autocmd BufRead,BufNewFile *.dms set filetype=sql
 
 " ------------------------------------------------------------------------------
