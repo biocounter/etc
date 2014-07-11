@@ -346,6 +346,7 @@ alias startxwin='run /usr/bin/bash.exe -l -c "/usr/bin/startxwin -- -nolock -uni
 alias sumatra='startSumatra.sh'
 alias vdir='ls --color=auto --format=long'
 alias vi='vim'                                                                                               # cygwin installs a minimal vi
+alias wde='cyg-wrapper.sh "$USBDRV/PortableApps/WdePortable/wde.exe" --fork=2'
 alias whence='type -a'                        # where, of a sort
 alias xml='xmlstarlet'
 
