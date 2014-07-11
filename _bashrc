@@ -154,8 +154,7 @@ else
 	export OCI_HOME=~/usr/lib/instantclient_12_1
 fi
 addtopath $OCI_HOME
-unset PYTHONPATH
-unset PYTHONHOME
+export PYTHONSTARTUP=~/.pystartup
 
 # remove duplicate entries from PATH
 export PATH=`awk -F: '{for (i=1;i<=NF;i++) { if ( !x[$i]++ ) printf("%s:",$i); }}' <<< $PATH`

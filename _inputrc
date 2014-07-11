@@ -5,7 +5,18 @@ set meta-flag on
 set input-meta on
 set convert-meta off
 set output-meta on
+
+# use vi style editing
 set editing-mode vi
+
+# edit using a single line
+set horizontal-scroll-mode On
+
+# rebind some keys
+Meta-h: backward-kill-word
+"\C-u": universal-argument
+"\C-x\C-r": re-read-init-file
+
 "\e0d": backward-word
 "\e0c": forward-word
 "\e[h": beginning-of-line
@@ -19,4 +30,5 @@ set editing-mode vi
 "\e[1~": beginning-of-line
 "\e[3~": delete-char
 "\e[4~": end-of-line
+
 DEL: backward-delete-char
