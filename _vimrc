@@ -84,8 +84,7 @@ set diffopt+=iwhite   " diff ignores whitespace
 " ------------------------------------------------------------------------------
 " Vim UI
 " ------------------------------------------------------------------------------
-colorscheme lucius
-LuciusBlack
+colorscheme zenburn
 set cursorline
 set display+=lastline    " show last line of text
 set laststatus=2         " always show the status line
@@ -241,7 +240,7 @@ autocmd ColorScheme * highlight ExtraWhitespace guibg=red
 autocmd BufEnter * match ExtraWhitespace /\s\+$/
 autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
 autocmd InsertLeave * match ExtraWhiteSpace /\s\+$/
-autocmd BufRead,BufWritePre * :call TrimWhiteSpace()
+autocmd BufRead,BufWritePre *.* :call TrimWhiteSpace()
 autocmd BufRead,BufNewFile *.dms set filetype=sql
 
 " ------------------------------------------------------------------------------
