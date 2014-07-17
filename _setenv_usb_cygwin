@@ -1,4 +1,6 @@
-export JAVA_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/Java/jdk-7u60
+#export JAVA_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/Java/jdk-7u60
+# java 8 is required for jjs command
+export JAVA_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/Java/jdk1.8.0_05
 export NLS_LANG=AMERICAN_AMERICA.UTF8
 export OCI_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/Oracle/instantclient_12_1
 export ORACLE_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/Oracle
