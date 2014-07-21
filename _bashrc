@@ -15,11 +15,12 @@
 [[ "$-" != *i* ]] && return
 
 #-------------------------------------------------------------------------------
-# Source global definitions (if any)
+# source global definitions (if any)
 #-------------------------------------------------------------------------------
 if [ -f /etc/bashrc ]; then
 	. /etc/bashrc
 fi
+
 if [ -f /etc/profile ]; then
 	. /etc/profile
 fi
@@ -27,25 +28,30 @@ fi
 #-------------------------------------------------------------------------------
 # System Settings
 #-------------------------------------------------------------------------------
-export LC_ALL='C'			# sort ignores problem characters
-set -o ignoreeof			# don't use ^D to exit
+export EDITOR=vi				# use the VI editor for line editing
+export HISTIGNORE="&:bg:fg:ll:h"
+export HOSTFILE=$HOME/.hosts	# Put a list of remote hosts in ~/.hosts
+export LC_ALL='C'                # sort ignores problem characters
+export TERM=xterm-256color 		# render in 256 colors
+export TIMEFORMAT=$'\nreal %3R	user %3U	sys %3S	pcpu %P\n'
+set -o ignoreeof                 # don't use ^D to exit
 set -o noclobber
-set -o notify				# don't wait for job termination notification
-set -o vi					# use VI for editing
+set -o notify                    # don't wait for job termination notification
+set -o vi                        # use VI for editing
 set nocompatible
-set nodosfilewarnings		# turn off dos file warnings
+set nodosfilewarnings            # turn off dos file warnings
 shopt -s cdable_vars
-shopt -s cdspell 			# When changing directory small typos can be ignored by bash
+shopt -s cdspell                 # When changing directory small typos can be ignoRED by bash
 shopt -s checkhash
 shopt -s checkwinsize
-shopt -s extglob            #necessary for programmable completion
-shopt -s nocaseglob 		# Use case-insensitive filename globbing
-shopt -s no_empty_cmd_completion         #bash>=2.04 only
+shopt -s extglob                 # necessary for programmable completion
+shopt -s no_empty_cmd_completion # bash>=2.04 only
+shopt -s nocaseglob              # Use case-insensitive filename globbing
 shopt -s sourcepath
-ulimit -S -c 0				# Don't want any coredumps
+ulimit -S -c 0                   # Don't want any coREDumps
 
 if [[ ${BASH_VERSINFO[0]} == 4 ]]; then
-	shopt -s globstar                        #enable '**' (recursive)
+	shopt -s globstar                        #enable '**/*' (recursive)
 fi
 
 #-------------------------------------------------------------------------------
@@ -58,29 +64,51 @@ shopt -s histappend histreedit histverify
 [[ -f /etc/bash_completion ]] && . /etc/bash_completion
 
 # Don't put duplicate lines in the history.
-export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoredups
+export HISTCONTROL=$HISTCONTROL${HISTCONTROL+,}ignoREDups
 
 # Ignore some controlling instructions
 export HISTIGNORE=$'[ \t]*:&:[fb]g:exit'
 export HISTIGNORE=$'[ \t]*:&:[fb]g:exit:ls' # Ignore the ls command as well
 
 # Whenever displaying the prompt, write the previous line to disk
-# export PROMPT_COMMAND="history -a"
+export PROMPT_COMMAND="history -a"
 
-#-------------------------------------------------------------------------------
-# Environment Variables
-#
-# use this section for variables that append:
-# if [ -z "$RANPROFILE" ]; then
-#		export RANPROFILE=true
-# fi
-#-------------------------------------------------------------------------------
+#----------------------------------------------------------------------------
+# functions
+#----------------------------------------------------------------------------
 
-export TIMEFORMAT=$'\nreal %3R	user %3U	sys %3S	pcpu %P\n'
-export HISTIGNORE="&:bg:fg:ll:h"
-export HOSTFILE=$HOME/.hosts	# Put a list of remote hosts in ~/.hosts
-export EDITOR=vi				# use the VI editor for line editing
-export TERM=xterm-256color 		# render in 256 colors
+#----------------------------------------------------------------------------
+# Functions to help us manage paths.  Second argument is the name of the
+# path variable to be modified (default: PATH)
+#----------------------------------------------------------------------------
+pathremove () {
+        local IFS=':'
+        local NEWPATH
+        local DIR
+        local PATHVARIABLE=${2:-PATH}
+        for DIR in ${!PATHVARIABLE} ; do
+                if [ "$DIR" != "$1" ] ; then
+                  NEWPATH=${NEWPATH:+$NEWPATH:}$DIR
+                fi
+        done
+        export $PATHVARIABLE="$NEWPATH"
+}
+export -f pathremove
+
+pathprepend () {
+        pathremove $1 $2
+        local PATHVARIABLE=${2:-PATH}
+        export $PATHVARIABLE="$1${!PATHVARIABLE:+:${!PATHVARIABLE}}"
+}
+export -f pathprepend
+
+pathappend () {
+	pathremove $1 $2
+	local PATHVARIABLE=${2:-PATH}
+	#TODO incorporate ADDTOPATH CYGPATH
+	export $PATHVARIABLE="${!PATHVARIABLE:+${!PATHVARIABLE}:}$1"
+}
+export -f pathappend
 
 function bashify {	# convert environment variable to cygwin format
 	if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
@@ -108,217 +136,6 @@ function addtopath { # add value to path if it does not exist
 }
 export -f addtopath
 
-if [ -z "$RANPROFILE" ]; then
-	export RANPROFILE=true
-
-	if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
-		export PATH="/usr/local/bin:/usr/bin:/bin:/sbin"
-	fi
-
-	#include any local environment variables
-	if [ -f ~/.setenv ]; then
-		. ~/.setenv
-		if [[ $JAVA_HOME ]]; then
-			addtopath $JAVA_HOME/bin
-			export CLASSPATH=~/usr/lib/java/*
-		fi
-		if [[ $SCALA_HOME ]]; then
-			addtopath $SCALA_HOME/bin
-		fi
-	fi
-
-	# add user's local binaries and scripts
-	if [ -d ~/usr/bin ]; then
-		addtopath ~/usr/bin
-	fi
-	if [ -d ~/usr/script ]; then
-		addtopath ~/usr/script
-	fi
-
-	# include any windows-specific environment variables
-	if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
-		addtopath /cygdrive/c/Windows/SysWOW64 /cygdrive/c/Windows/System32
-	fi
-fi
-
-if [ -d ~/perl5 ]; then
-	PERL_MB_OPT="--install_base \"~/perl5\""; export PERL_MB_OPT;
-	PERL_MM_OPT="INSTALL_BASE=~/perl5"; export PERL_MM_OPT;
-	addtopath ~/perl5/bin
-fi
-
-# setup python
-if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
-	export OCI_HOME=$USBDRV/PortableApps/Oracle/instantclient_12_1
-else
-	export OCI_HOME=~/usr/lib/instantclient_12_1
-fi
-addtopath $OCI_HOME
-export PYTHONSTARTUP=~/.pystartup
-
-# remove duplicate entries from PATH
-export PATH=`awk -F: '{for (i=1;i<=NF;i++) { if ( !x[$i]++ ) printf("%s:",$i); }}' <<< $PATH`
-
-#-----------------------------------------------------------------------
-# define terminal colors, prompts, and display
-#-----------------------------------------------------------------------
-# Reset
-NC='\e[0m'              # Text Reset
-
-# Regular Colors
-BLACk='\e[0;30m'        # Black
-RED='\e[0;31m'          # Red
-GREEN='\e[0;32m'        # Green
-YELLOW='\e[0;33m'       # Yellow
-BLUE='\e[0;34m'         # Blue
-PURPle='\e[0;35m'       # Purple
-CYAN='\e[0;36m'         # Cyan
-WHITE='\e[0;37m'        # White
-
-# Bold
-BBLACK='\e[1;30m'      # Black
-BRED='\e[1;31m'        # Red
-BGREEN='\e[1;32m'      # Green
-BYELLOW='\e[1;33m'     # Yellow
-BBLUE='\e[1;34m'       # Blue
-BPURPLE='\e[1;35m'     # Purple
-BCYAN='\e[1;36m'       # Cyan
-BWHITE='\e[1;37m'      # White
-
-# UNDERLINE
-UBLACK='\e[4;30m'      # Black
-URED='\e[4;31m'        # Red
-UGREEN='\e[4;32m'      # Green
-UYELLOW='\e[4;33m'     # Yellow
-UBLUE='\e[4;34m'       # Blue
-UPURPLE='\e[4;35m'     # Purple
-UCYAN='\e[4;36m'       # Cyan
-UWHITE='\e[4;37m'      # White
-
-# BACKGROUND
-ON_BLACK='\e[40m'      # Black
-ON_RED='\e[41m'        # Red
-ON_GREEN='\e[42m'      # Green
-ON_YELLOW='\e[43m'     # Yellow
-ON_BLUE='\e[44m'       # Blue
-ON_PURPLE='\e[45m'     # Purple
-ON_CYAN='\e[46m'       # Cyan
-ON_WHITE='\e[47m'      # White
-
-# HIGH INTENSITY
-IBLACK='\e[0;90m'      # Black
-IRED='\e[0;91m'        # Red
-IGREEN='\e[0;92m'      # Green
-IYELLOW='\e[0;93m'     # Yellow
-IBLUE='\e[0;94m'       # Blue
-IPURPLE='\e[0;95m'     # Purple
-ICYAN='\e[0;96m'       # Cyan
-IWHITE='\e[0;97m'      # White
-
-# BOLD HIGH INTENsity
-BIBLACK='\e[1;90m'     # Black
-BIRED='\e[1;91m'       # Red
-BIGREEN='\e[1;92m'     # Green
-BIYELLOW='\e[1;93m'    # Yellow
-BIBLUE='\e[1;94m'      # Blue
-BIPURPLE='\e[1;95m'    # Purple
-BICYAN='\e[1;96m'      # Cyan
-BIWHITE='\e[1;97m'     # White
-
- # HIGH INTENSITY backgrounds
-ON_IBLACK='\e[0;100m'  # Black
-ON_IRED='\e[0;101m'    # Red
-ON_IGREEN='\e[0;102m'  # Green
-ON_IYELLOW='\e[0;103m' # Yellow
-ON_IBLUE='\e[0;104m'   # Blue
-ON_IPURPLE='\e[0;105m' # Purple
-ON_ICYAN='\e[0;106m'   # Cyan
-ON_IWHITE='\e[0;107m'  # White
-
-# run on startup
-clear
-if [[ -f ~/.dircolors ]]; then
-	eval `dircolors -b ~/.dircolors`
-fi
-echo -e "${CYAN}This is BASH ${RED}${BASH_VERSION%.*}${CYAN}${NC}"
-date
-#function _exit() { # function to run upon exit of shell
-#	echo -e "${RED}Hasta la vista, baby${NC}"
-#}
-#trap _exit EXIT
-
-# Set up syntax highlighting for 'less' (requires source-highlight package)
-# See http://www.gnu.org/software/src-highlite/source-highlight.html
-export LESSOPEN="| /usr/bin/src-hilite-lesspipe.sh %s"
-export LESS=' -R '
-
-# display git repository status on prompt
-if which git >/dev/null; then
-	GIT_ENABLED='Y'
-	source ~/usr/script/git-prompt.sh
-	export GIT_PS1_SHOWDIRTYSTATE='Y'       # show staged (*) and unstaged (+)
-	export GIT_PS1_SHOWSTASHSTATE='Y'       # show stashed ($)
-	export GIT_PS1_SHOWUNTRACKEDFILES='Y'   # show untracked (%)
-	export GIT_PS1_=SHOWUPSTREAM="auto"     # show behind (<), ahead (>), diverged (=), none (=)
-fi
-
-set_prompt () {
-    Last_Command=$? # Must come first!
-    Blue='\[\e[01;34m\]'
-    White='\[\e[01;37m\]'
-    Red='\[\e[01;31m\]'
-    Green='\[\e[01;32m\]'
-    Reset='\[\e[00m\]'
-    FancyX='\342\234\227'
-    Checkmark='\342\234\223'
-
-    # Add a bright white exit status for the last command
-    PS1="\n$White\$? "
-
-    # If it was successful, print a green check mark. Otherwise, print
-    # a red X.
-    if [[ $Last_Command == 0 ]]; then
-        PS1+="$Green$Checkmark "
-    else
-        PS1+="$Red$FancyX "
-    fi
-    # If root, just print the host in red. Otherwise, print the current user
-    # and host in green.
-    if [[ $EUID == 0 ]]; then
-        PS1+="$Red[\\h]"
-    else
-        PS1+="$Green[\\h]"
-    fi
-    # Print the working directory and prompt marker in blue, and reset
-    # the text color to the default.
-    #PS1+="$Blue\\w \\\$$Reset "
-	if [ "$GIT_ENABLED" == "Y" ] && [[ $(find "`pwd`" -maxdepth 1 -type d -iname ".git") ]]; then
-		GIT_STATE=`__git_ps1 "[%s]"`
-		if [ "$GIT_STATE" != "[master]" ]; then
-			GIT_STATE="${Red}"$GIT_STATE"${Reset}"
-		fi
-		PS1+="$Blue[`date +%m/%d`][\w]${GIT_STATE}${Reset}\n[\A] \$ "
-	else
-		PS1+="$Blue[`date +%m/%d`][\w]${Reset}\n[\A] \$ "
-	fi
-}
-export -f set_prompt
-PROMPT_COMMAND='set_prompt'
-# remove duplicate entries from the path
-#export PATH=`echo $PATH | tr ':' '\n' | sort | uniq | tr '\n' ':'`
-
-#------------------------------------------------------------------------------------
-# run on startup
-#------------------------------------------------------------------------------------
-
-# Mount the portable Documents folder, if it isn't already
-if [[ ${BASH_VERSINFO[5]} == *cygwin* ]] && [ ! -d Documents ]; then
-	mount -f $(cygpath -m $USBDRVPATH)Documents ~/Documents;
-fi
-
-#------------------------------------------------------------------------------------
-# functions
-#------------------------------------------------------------------------------------
 # Truncate oversized lines on input. Mostly for display use. Example: grep foo log | fitterm
 fitterm () { cut -c 1-$( tput cols ) ; }
 export -f fitterm
@@ -613,3 +430,198 @@ function cdb() {
 	esac
 }
 export -f cdb
+
+#-------------------------------------------------------------------------------
+# Environment Variables
+#-------------------------------------------------------------------------------
+if [ -z "$RANPROFILE" ]; then
+	export RANPROFILE=true
+
+	if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+		export PATH="/usr/local/bin:/usr/bin:/bin:/sbin"
+		addtopath /cygdrive/c/Windows/SysWOW64 /cygdrive/c/Windows/System32
+	fi
+
+	#include any local environment variables
+	export LOCAL_SETENV=~/.bash_${HOSTNANE}
+	if [ -f $LOCAL_SETENV ]; then
+		source ${LOCAL_SETENV}
+	fi
+
+	if [[ $JAVA_HOME ]]; then
+		addtopath $JAVA_HOME/bin
+		export CLASSPATH=~/usr/lib/java/*
+	fi
+
+	if [[ $SCALA_HOME ]]; then
+		addtopath $SCALA_HOME/bin
+	fi
+
+	# add user's local binaries and scripts
+	if [ -d ~/bin ]; then
+		addtopath ~/bin
+	fi
+fi
+
+if [ -d ~/perl5 ]; then
+	PERL_MB_OPT="--install_base \"~/perl5\""; export PERL_MB_OPT;
+	PERL_MM_OPT="INSTALL_BASE=~/perl5"; export PERL_MM_OPT;
+	addtopath ~/perl5/bin
+fi
+
+# setup python
+if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+	export OCI_HOME=$USBDRV/PortableApps/Oracle/instantclient_12_1
+else
+	export OCI_HOME=~/usr/lib/instantclient_12_1
+fi
+addtopath $OCI_HOME
+export PYTHONSTARTUP=~/.pystartup
+
+# remove duplicate entries from PATH
+export PATH=`awk -F: '{for (i=1;i<=NF;i++) { if ( !x[$i]++ ) printf("%s:",$i); }}' <<< $PATH`
+
+#-------------------------------------------------------------------------------
+# aliases
+#-------------------------------------------------------------------------------
+alias df='df -h'
+alias dir='ls --color --format=vertical'
+alias du='du -h'
+alias egrep='egrep --color=auto'                                                                  # show differences in colour
+alias explorer='cyg-wrapper.sh "explorer" --slashed-opt'
+alias fgrep='fgrep --color=auto'                                                                  # show differences in colour
+alias fn='{ alias && export -f; } | egrep "\(\)|alias" | sed "s/alias //ig" | cut -d= -f1 | sort'
+alias gitlog='git log --pretty=format:"[%h] %ae, %ar: %s" --stat'
+alias grep='grep --color'                                                                         # show differences in colour
+alias gtypist='gtypist -wi'
+alias h='history'
+alias j='jobs -l'
+alias jjs='rlwrap $JAVA_HOME/bin/jjs'
+alias la='ls -A'                                                                                  # all but . and ..
+alias ld='du -hs * | grep -e "^[0-9].*G\s" -e "^[0-9].*M\s" | sort -n -k 2,2 -s'
+alias less='less -r'                                                                              # raw control characters
+alias ll='ls -l'                                                                                  # long list
+alias ls='ls -hF --color'                                                                         # classify files in colour
+alias markdown='python3 -m markdown  '
+alias mkdir='mkdir -p'                                                                            # Prevents accidentally clobbering files.
+alias more='less'                                                                                 # more is less
+alias mv='mv -i'                                                                                  # Prevents accidentally clobbering files.
+alias mydiff='diff -ywEa --suppress-common-lines --minimal'                                       # personal zip preferences
+alias nospace="perl /usr/local/bin/rename 's/ /_' *"                                              # underscore all files in dir
+alias pdfbox='java -jar ~/usr/bin/pdfbox-app-1.8.5.jar '
+alias r='fc -s'                                                                                   # execute last command
+alias rm='rm -i'
+alias renamne='perl /usr/local/bin/rename'
+alias scala='rlwrap scala'
+alias startxwin='run /usr/bin/bash.exe -l -c "/usr/bin/startxwin -- -nolock -unixkill"'
+alias vdir='ls --color=auto --format=long'
+alias vi='vim'                                                                                    # cygwin installs a minimal vi
+alias whence='type -a'                                                                            # where, of a sort
+alias xml='xmlstarlet'
+
+if [[ ${BASH_VERSINFO[5]} == *cygwin* ]] || [[ ${BASH_VERSINFO[0]} == 4 ]]; then
+	alias l='ls -A -B --color=tty --group-directories-first -F --ignore="desktop.ini" --ignore="NTUSER*" --ignore="ntuser*"'
+fi
+
+if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+	alias clp="printf '%s [%s %s %s] %s\n' '--' `date '+%m/%d %I:%m %p'`  '------------------------------------------------------------------------------------' > /dev/clipboard"
+	alias dnt='echo -e `date "+%A %B %d, %Y"`" "`date "+%I:%M %p"` > /dev/clipboard'
+	alias dow='date "+%A" > /dev/clipboard'
+	alias dtm='printf "[%s %s] " `date "+%y%m%d"` `date "+%H:%M"` > /dev/clipboard'
+	alias fdt='date "+%B %d, %Y" > /dev/clipboard'
+	alias md='cyg-wrapper.sh "$USBDRV/PortableApps/MarkdownWinPortable/MarkdownWin.exe" --fork=2'
+	alias newterm='mintty /bin/env CHERE_INVOKING=1 /bin/bash -l &'
+	alias npp='cyg-wrapper.sh "$USBDRV/PortableApps/Notepad++Portable/Notepad++Portable.exe" --fork=2'			 # run notepad++ in a separate shell
+	alias pdfbox='java -jar "$(cygpath -w ~/usr/bin/pdfbox-app-1.8.5.jar)" '
+	alias sumatra='startSumatra.sh'
+	alias tts='echo [`date "+%I:%M %p"`] > /dev/clipboard'
+
+	# for cygwin PortableApps
+	if [ "$USBDRV" != "" ]; then
+		alias gvim='cyg-wrapper.sh "$USBDRV/PortableApps/gVimPortable/gvimPortable.exe" --fork=2 --binary-opt=--cmd,"set shellslash",--cmd,"set shell=bash",--cmd,"set ff=unix"'
+		alias wde='cyg-wrapper.sh "$USBDRV/PortableApps/WdePortable/wde.exe" --fork=2'
+	fi
+fi
+
+#------------------------------------------------------------------------------
+# setup colors and prompt
+#------------------------------------------------------------------------------
+if [ -f ~/.dircolors ]; then
+	eval `dircolors ~/.dircolors`
+fi
+
+# Regular Colors
+BLACk='\e[0;30m'        # Black
+RED='\e[0;31m'          # RED
+GREEN='\e[0;32m'        # GREEN
+YELLOW='\e[0;33m'       # Yellow
+BLUE='\e[0;34m'         # BLUE
+PURPle='\e[0;35m'       # Purple
+CYAN='\e[0;36m'         # Cyan
+WHITE='\e[0;37m'        # WHITE
+NC='\e[0m'              # Text RESET
+RESET='\e[0m'              # Text RESET
+FANCYX='\342\234\227'
+CHECKMARK='\342\234\223'
+
+
+# run on startup
+if [[ -f ~/.dircolors ]]; then
+	eval `dircolors -b ~/.dircolors`
+fi
+echo -e "${CYAN}This is BASH ${RED}${BASH_VERSION%.*}${CYAN}${NC}"
+date
+
+# Set up syntax highlighting for 'less' (requires source-highlight package)
+# See http://www.gnu.org/software/src-highlite/source-highlight.html
+export LESSOPEN="| /usr/bin/src-hilite-lesspipe.sh %s"
+export LESS=' -R '
+
+# display git repository status on prompt
+if which git >/dev/null; then
+	GIT_ENABLED='Y'
+	source ~/bin/git-prompt.sh
+	export GIT_PS1_SHOWDIRTYSTATE='Y'       # show staged (*) and unstaged (+)
+	export GIT_PS1_SHOWSTASHSTATE='Y'       # show stashed ($)
+	export GIT_PS1_SHOWUNTRACKEDFILES='Y'   # show untracked (%)
+	export GIT_PS1_=SHOWUPSTREAM="auto"     # show behind (<), ahead (>), diverged (=), none (=)
+fi
+
+set_prompt () {
+    Last_Command=$? # Must come first!
+
+    # Add a bright WHITE exit status for the last command
+    PS1="\n$WHITE\$? "
+
+    # If it was successful, print a GREEN check mark. Otherwise, print
+    # a RED X.
+    if [[ $Last_Command == 0 ]]; then
+        PS1+="$GREEN$CHECKMARK "
+    else
+        PS1+="$RED$FANCYX "
+    fi
+    # If root, just print the host in RED. Otherwise, print the current user
+    # and host in GREEN.
+    if [[ $EUID == 0 ]]; then
+        PS1+="$RED[\\h]"
+    else
+        PS1+="$GREEN[\\h]"
+    fi
+    # Print the working directory and prompt marker in BLUE, and RESET
+    # the text color to the default.
+    #PS1+="$BLUE\\w \\\$$RESET "
+	if [ "$GIT_ENABLED" == "Y" ] && [[ $(find "`pwd`" -maxdepth 1 -type d -iname ".git") ]]; then
+		GIT_STATE=`__git_ps1 "[%s]"`
+		if [ "$GIT_STATE" != "[master]" ]; then
+			GIT_STATE="${RED}"$GIT_STATE"${RESET}"
+		fi
+		PS1+="$BLUE[`date +%m/%d`][\w]${GIT_STATE}${RESET}\n[\A] \$ "
+	else
+		PS1+="$BLUE[`date +%m/%d`][\w]${RESET}\n[\A] \$ "
+	fi
+}
+export -f set_prompt
+PROMPT_COMMAND='set_prompt'
+# remove duplicate entries from the path
+#export PATH=`echo $PATH | tr ':' '\n' | sort | uniq | tr '\n' ':'`
+

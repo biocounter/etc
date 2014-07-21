@@ -8,4 +8,13 @@ export LD_LIBRARY_PATH=$(cygpath -u $USBDRVPATH)/PortableApps/Oracle
 export PERL_HOME=~/perl5/bin
 export SCALA_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/scala
 export SQLPATH=$OCI_HOME
-export USR_BIN=~/usr/bin
+export USR_BIN=~/bin
+
+#------------------------------------------------------------------------------------
+# run on startup
+#------------------------------------------------------------------------------------
+
+# Mount the portable Documents folder, if it isn't already
+if [[ ${BASH_VERSINFO[5]} == *cygwin* ]] && [ ! -d Documents ]; then
+	mount -f $(cygpath -m $USBDRVPATH)Documents ~/Documents;
+fi

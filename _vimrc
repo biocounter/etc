@@ -1,3 +1,14 @@
+"============================================================================
+"title          :_vimrc
+"description    :vim configuration file
+"author         :Gary Furash
+"date           :20140722
+"version        :1
+"usage          :place this (or alias this) in your home directory as .vimrc
+"notes          :
+"bash_version   :4.1.11(2)-release
+"============================================================================
+
 " ------------------------------------------------------------------------
 " Startup
 " ------------------------------------------------------------------------
@@ -108,21 +119,7 @@ syntax on                " syntax highlighting on
 if &listchars ==# 'eol:$'
   set listchars=tab:>\ ,trail:-,extends:>,precedes:<,nbsp:+
 endif
-set statusline=%F%m%r%h%w[%L][%{&ff}]%y[%p%%][%04l,%04v][%{fugitive#statusline()}]
-" set statusline=%F%m%r%h%w[%L][%{&ff}]%y[%p%%][%04l,%04v]
-"              | | | | |  |   |      |  |     |    |
-"              | | | | |  |   |      |  |     |    + current column
-"              | | | | |  |   |      |  |     +-- current line
-"              | | | | |  |   |      |  +-- current % into file
-"              | | | | |  |   |      +-- current syntax in square brackets
-"              | | | | |  |   +-- current fileformat
-"              | | | | |  +-- number of lines
-"              | | | | +-- preview flag in square brackets
-"              | | | +-- help flag in square brackets
-"              | | +-- readonly flag in square bracketskkk
-"              | +-- rodified flag in square brackets
-"              +-- full path to file in the buffer
-"   		   ||+- show toolbar
+
 if has("gui_running")
 	set guioptions+=T	" include toolbar
 	set guioptions+=m	" show menu
@@ -152,6 +149,25 @@ endif
 
 " Odds n Ends
 set ttymouse=xterm2 " makes it work in everything
+
+" ------------------------------------------------------------------------------
+" Configure VIM Status Line
+" ------------------------------------------------------------------------------
+set statusline=\ "
+set statusline+=%1*%-25.80f%*\ 						"filename min 25, max 80 (right justified)
+set statusline+=%2*
+set statusline+=%h 									"help file flag
+set statusline+=%r 									"read only flag
+set statusline+=%m 									"modified flag
+set statusline+=%w 									"preview flag
+set statusline+=%*\ "
+set statusline+=%3*[
+set statusline+=%{strlen(&ft)?&ft:'none'} 			"filetype
+set statusline+=]%*\ "
+set statusline+=[%{&ff}]\ "							"file format
+set statusline+=%4*%{fugitive#statusline()}%*\ " 	"git status
+set statusline+=%= 									" right align
+set statusline+=%8*%-14.(%l,%c%V%)\ %<%P%* 			"offset
 
 " ------------------------------------------------------------------------------
 " Mappings
@@ -223,6 +239,11 @@ let g:miniBufExplMapWindowNavArrows = 1
 let g:miniBufExplMapCTabSwitchBufs = 1
 let g:miniBufExplModSelTarget = 1
 
+" turnon whitespace cleaning except for...
+let g:better_whitespace_enabled = 1
+let g:strip_whitespace_on_save = 1
+" let g:better_whitespace_filetypes_blacklist=['<filetype1>', '<filetype2>', '<etc>']
+
 " ------------------------------------------------------------------------------
 " scala
 " ------------------------------------------------------------------------------
@@ -232,25 +253,9 @@ au BufEnter *.scala setl formatprg=java\ -jar\ /Users/stefanb/Exec/scalariform.j
 nmap <leader>m :SortScalaImports<CR>gggqG<C-o><C-o><leader><w>
 
 " ------------------------------------------------------------------------------
-" highlight unwanted(trailing) whitespace
+"  filetype mappings
 " ------------------------------------------------------------------------------
-" http://vim.wikia.com/wiki/Highlight_unwanted_spaces
-highlight ExtraWhitespace ctermbg=red guibg=red
-autocmd ColorScheme * highlight ExtraWhitespace guibg=red
-autocmd BufEnter * match ExtraWhitespace /\s\+$/
-autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
-autocmd InsertLeave * match ExtraWhiteSpace /\s\+$/
-autocmd BufRead,BufWritePre *.* :call TrimWhiteSpace()
 autocmd BufRead,BufNewFile *.dms set filetype=sql
-
-" ------------------------------------------------------------------------------
-" strip trailing whitespace on a file
-" ------------------------------------------------------------------------------
-function! TrimWhiteSpace()
-    "%s/\s\+$//e
-    %s/[ \t]\+$//ge
-    %s!^\( \+\)\t!\=StrRepeat("\t", 1 + strlen(submatch(1)) / 8)!ge
-endfunction
 
 " ------------------------------------------------------------------------------
 " cusotm fold text function cleaner than the default
