@@ -443,9 +443,8 @@ if [ -z "$RANPROFILE" ]; then
 	fi
 
 	#include any local environment variables
-	export LOCAL_SETENV=~/.bash_${HOSTNANE}
-	if [ -f $LOCAL_SETENV ]; then
-		source ${LOCAL_SETENV}
+	if [ -f ~/.bash_local ]; then
+		source ~/.bash_local
 	fi
 
 	if [[ $JAVA_HOME ]]; then

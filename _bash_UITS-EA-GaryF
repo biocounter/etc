@@ -6,7 +6,7 @@ export OCI_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/Oracle/instantclient_12_1
 export ORACLE_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/Oracle
 export LD_LIBRARY_PATH=$(cygpath -u $USBDRVPATH)/PortableApps/Oracle
 export PERL_HOME=~/perl5/bin
-export SCALA_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/scala
+export SCALA_HOME=~/lib/scala-2.11.1
 export SQLPATH=$OCI_HOME
 export USR_BIN=~/bin
 
