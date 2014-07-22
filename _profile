@@ -9,6 +9,7 @@
 #				 /etc/bashrc		system-wide environment variabls and functions
 #				 ~/.bash_profile  	personal environment variables and startup programs should go into
 # 				 ~/.bashrc  		personal aliases and functions
+# 		 this file is not read by bash if ~/.bash_profile or ~/.bash_login exists
 #bash_version   :4.1.11(2)-release
 #============================================================================
 
@@ -23,7 +24,9 @@ MANPATH="/usr/local/man:/usr/share/man:/usr/man:${MANPATH}"
 INFOPATH="/usr/local/info:/usr/share/info:/usr/info:${INFOPATH}"
 
 # Set the user id
-USER="$(id -un)"
+if [[ -z "$USER" ]]; then
+	USER="$(id -un)"
+fi
 
 # setup command history file
 export HISTSIZE=1000
@@ -66,28 +69,31 @@ profile_d () {
   unset file
 }
 
-if [ ! "x${BASH_VERSION}" = "x"  ]; then
-  HOSTNAME="$(/usr/bin/hostname)"
-  profile_d sh
-  [ -f "/etc/bash.bashrc" ] && . "/etc/bash.bashrc"
-elif [ ! "x${KSH_VERSION}" = "x" ]; then
-  typeset -l HOSTNAME="$(/usr/bin/hostname)"
-  profile_d sh
-  PS1=$(print '\033]0;${PWD}\n\033[32m${USER}@${HOSTNAME} \033[33m${PWD/${HOME}/~}\033[0m\n$ ')
-elif [ ! "x${ZSH_VERSION}" = "x" ]; then
-  HOSTNAME="$(/usr/bin/hostname)"
-  profile_d zsh
-  PS1='(%n@%m)[%h] %~ %% '
-elif [ ! "x${POSH_VERSION}" = "x" ]; then
-  HOSTNAME="$(/usr/bin/hostname)"
-  PS1="$ "
-else
-  HOSTNAME="$(/usr/bin/hostname)"
-  profile_d sh
-  PS1="$ "
+if [[ -z "$HOSTNAME" ]]; then
+	if [ ! "x${BASH_VERSION}" = "x"  ]; then
+	  HOSTNAME="$(/usr/bin/hostname)"
+	  profile_d sh
+	  [ -f "/etc/bash.bashrc" ] && . "/etc/bash.bashrc"
+	elif [ ! "x${KSH_VERSION}" = "x" ]; then
+	  typeset -l HOSTNAME="$(/usr/bin/hostname)"
+	  profile_d sh
+	  PS1=$(print '\033]0;${PWD}\n\033[32m${USER}@${HOSTNAME} \033[33m${PWD/${HOME}/~}\033[0m\n$ ')
+	elif [ ! "x${ZSH_VERSION}" = "x" ]; then
+	  HOSTNAME="$(/usr/bin/hostname)"
+	  profile_d zsh
+	  PS1='(%n@%m)[%h] %~ %% '
+	elif [ ! "x${POSH_VERSION}" = "x" ]; then
+	  HOSTNAME="$(/usr/bin/hostname)"
+	  PS1="$ "
+	else
+	  HOSTNAME="$(/usr/bin/hostname)"
+	  profile_d sh
+	  PS1="$ "
+	fi
 fi
 
 export PATH MANPATH INFOPATH USER TMP TEMP PRINTER HOSTNAME PS1 SHELL tmp temp
+
 
 #----------------------------------------------------------------------------
 # Check to see if mkpasswd/mkgroup needs to be run try and cut down the emails
