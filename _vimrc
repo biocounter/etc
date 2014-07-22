@@ -12,7 +12,7 @@
 " ------------------------------------------------------------------------
 " Startup
 " ------------------------------------------------------------------------
-let s:running_windows = has("win16") || has("win32") || has("win74")
+let s:running_windows = has("win16") || has("in32") || has("win74")
 let s:colorful_term = (&term =~ "xterm") || (&term =~ "screen")
 
 " ------------------------------------------------------------------------
@@ -70,24 +70,72 @@ endif
 " ------------------------------------------------------------------------------
 " Envorinment Configuration
 " ------------------------------------------------------------------------------
-" if (s:running_windows)
-" 	set shell=\"C:\Windows\SysWow64\cmd.exe\"
-" 	set shellcmdflag=/c
-" 	set shellxquote=("
-" 	let $TMP="c:/tmp"
-"	set diffexpr=MyDiff()
-" endif
-"if has("gui_running")
-"	if has("gui_win32")
-"		" this fails if there are any spaces in the path
-"		set shell=%CYGWIN_HOME%\bin\bash.exe
-"		set shellcmdflag=--login\ -c
-"		set shellxquote=\"
-"		command! -complete=shellcmd -nargs=* -bang Shell call s:ExecuteInShell(<q-args>, '<bang>')
-""	cabbrev shell Shell
-"	endif
-"endif
+
+" create backup and temporary directories if they don't exist
+function! InitBackupDir()
+  if has('win32') || has('win32unix') "windows/cygwin
+    let l:separator = '_'
+  else
+    let l:separator = '.'
+  endif
+  let l:parent = $HOME . '/' . l:separator . 'vim/'
+  let l:backup = l:parent . 'backup/'
+  let l:tmp = l:parent . 'tmp/'
+  if exists('*mkdir')
+    if !isdirectory(l:parent)
+      call mkdir(l:parent)
+    endif
+    if !isdirectory(l:backup)
+      call mkdir(l:backup)
+    endif
+    if !isdirectory(l:tmp)
+      call mkdir(l:tmp)
+    endif
+  endif
+  let l:missing_dir = 0
+  if isdirectory(l:tmp)
+    execute 'set backupdir=' . escape(l:backup, ' ') . '/,.'
+  else
+    let l:missing_dir = 1
+  endif
+  if isdirectory(l:backup)
+    execute 'set directory=' . escape(l:tmp, ' ') . '/,.'
+  else
+    let l:missing_dir = 1
+  endif
+  if l:missing_dir
+    echo 'Warning: Unable to create backup directories:' l:backup 'and' l:tmp
+    echo 'Try: mkdir -p' l:backup
+    echo 'and: mkdir -p' l:tmp
+    set backupdir=.
+    set directory=.
+  endif
+endfunction
+
+call InitBackupDir()
 set directory=.,$TMP,$TEMP
+
+" add windows executables
+if has('win32') || has ('win64')
+	let $PATH.=';' . 'E:\PortableApps\CygwinPortable\home\furashg\bin_win'
+	let $PATH.=';' . 'E:\PortableApps\CygwinPortable\home\furashg\bin'
+	let $PATH.=';' . 'E:\PortableApps\Anaconda\App\Anaconda3'
+	let $PATH.=';' . 'E:\PortableApps\Anaconda\App\Anaconda3\Scripts'
+	let $PATH.=';' . 'E:\PortableApps\Java\jre8\bin'
+	let $PATH.=';' . 'E:\PortableApps\Java\jre8\scala'
+endif
+
+" configure shell for windows
+if (s:running_windows)
+	set shell=\"C:\Windows\SysWow64\cmd.exe\"
+ 	set shellcmdflag=/c
+ 	set shellxquote=("
+	set diffexpr=MyDiff()
+endif
+
+" ------------------------------------------------------------------------------
+" Vim DIFF
+" ------------------------------------------------------------------------------
 set diffopt+=vertical " diff files side by side
 set diffopt+=icase    " diff ignores case
 set diffopt+=iwhite   " diff ignores whitespace
@@ -169,6 +217,11 @@ set statusline+=%4*%{fugitive#statusline()}%*\ " 	"git status
 set statusline+=%= 									" right align
 set statusline+=%8*%-14.(%l,%c%V%)\ %<%P%* 			"offset
 
+
+" ------------------------------------------------------------------------------
+"  Set Environment Variables
+" ------------------------------------------------------------------------------
+
 " ------------------------------------------------------------------------------
 " Mappings
 " ------------------------------------------------------------------------------
@@ -221,6 +274,7 @@ nnoremap <Leader>s :s/\<<C-r><C-w>\>/
 " TODO: create custom fold function for sqr
 autocmd FileType sqr setlocal tabstop=2 shiftwidth=2 softtabstop=2 expandtab
 autocmd BufRead,BufNewFile *.sqr,*.sqc setlocal tabstop=2 shiftwidth=2 softtabstop=0 expandtab
+" todo: fix to work on both windows and cygwin/linux
 " use empty(s:running_windows) if string instead of number
 if (s:running_windows)
 	autocmd FileType xml,xsl,html exe ":silent %!xml fo -t"
