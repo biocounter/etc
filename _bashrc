@@ -456,6 +456,11 @@ if [ -z "$RANPROFILE" ]; then
 		addtopath $SCALA_HOME/bin
 	fi
 
+	if [[ $NODE_HOME ]]; then
+		addtopath $NODE_HOME
+		addtopath $NODE_PATH
+	fi
+
 	# add user's local binaries and scripts
 	if [ -d ~/bin ]; then
 		addtopath ~/bin

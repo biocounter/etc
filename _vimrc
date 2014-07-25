@@ -117,6 +117,7 @@ set directory=.,$TMP,$TEMP
 
 " add windows executables
 if has('win32') || has ('win64')
+	let $PATH.=';' . 'E:\PortableApps\gnuwin32\bin'
 	let $PATH.=';' . 'E:\PortableApps\CygwinPortable\home\furashg\bin_win'
 	let $PATH.=';' . 'E:\PortableApps\CygwinPortable\home\furashg\bin'
 	let $PATH.=';' . 'E:\PortableApps\Anaconda\App\Anaconda3'
