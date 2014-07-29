@@ -447,8 +447,7 @@ if [ -z "$RANPROFILE" ]; then
 		source ~/.bash_local
 	fi
 
-	if [[ $JAVA_HOME ]]; then
-		addtopath $JAVA_HOME/bin
+	if [[ $JAVA_HOME ]]; then addtopath $JAVA_HOME/bin
 		export CLASSPATH=~/usr/lib/java/*
 	fi
 
@@ -464,6 +463,11 @@ if [ -z "$RANPROFILE" ]; then
 	# add user's local binaries and scripts
 	if [ -d ~/bin ]; then
 		addtopath ~/bin
+	fi
+
+	# add windows binaries for cygwin
+	if [ -d ~/bin_win ] && [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+		addtopath ~/bin_win
 	fi
 fi
 
