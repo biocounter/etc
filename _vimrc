@@ -234,10 +234,10 @@ map <c-space> ?
 map <silent> <leader><cr> :noh<cr>
 
 "move between splits/windows with control-[movement]
-map <C-j> <C-W>j
-map <C-k> <C-W>k
-map <C-h> <C-W>h
-map <C-l> <C-W>l
+nmap <silent> <c-k> :wincmd k<CR>
+nmap <silent> <c-j> :wincmd j<CR>
+nmap <silent> <c-h> :wincmd h<CR>
+nmap <silent> <c-l> :wincmd l<CR>
 
 " Close the current buffer
 map <leader>bd :Bclose<cr>
