@@ -5,6 +5,6 @@
 #export PYTHONHOME=/usr/lib/python3.3/bin
 export SCALA_HOME=~/lib/scala-2.11.1
 addtopath $SCALA_HOME
-alias jython='java -jar ~/lib/jython-standalone-2.7.b2.jar'
+alias jython='${JAVA_HOME}/bin/java -jar ~/lib/jython-standalone-2.7.b2.jar'
 export JAVA_HOME=~/lib/jdk1.8.0_11
 addtopath $JAVA_HOME/bin
