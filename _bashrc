@@ -446,29 +446,6 @@ if [ -z "$RANPROFILE" ]; then
 	if [ -f ~/.bash_local ]; then
 		source ~/.bash_local
 	fi
-
-	if [[ $JAVA_HOME ]]; then addtopath $JAVA_HOME/bin
-		export CLASSPATH=~/usr/lib/java/*
-	fi
-
-	if [[ $SCALA_HOME ]]; then
-		addtopath $SCALA_HOME/bin
-	fi
-
-	if [[ $NODE_HOME ]]; then
-		addtopath $NODE_HOME
-		addtopath $NODE_PATH
-	fi
-
-	# add user's local binaries and scripts
-	if [ -d ~/bin ]; then
-		addtopath ~/bin
-	fi
-
-	# add windows binaries for cygwin
-	if [ -d ~/bin_win ] && [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
-		addtopath ~/bin_win
-	fi
 fi
 
 if [ -d ~/perl5 ]; then
@@ -559,19 +536,18 @@ if [ -f ~/.dircolors ]; then
 fi
 
 # Regular Colors
-BLACk='\e[0;30m'        # Black
-RED='\e[0;31m'          # RED
-GREEN='\e[0;32m'        # GREEN
-YELLOW='\e[0;33m'       # Yellow
+BLACK='\e[0;30m'        # BLACK
 BLUE='\e[0;34m'         # BLUE
-PURPle='\e[0;35m'       # Purple
-CYAN='\e[0;36m'         # Cyan
-WHITE='\e[0;37m'        # WHITE
-NC='\e[0m'              # Text RESET
-RESET='\e[0m'              # Text RESET
-FANCYX='\342\234\227'
 CHECKMARK='\342\234\223'
-
+CYAN='\e[0;36m'         # Cyan
+FANCYX='\342\234\227'
+GREEN='\e[0;32m'        # GREEN
+NC='\e[0m'              # Text RESET
+PURPle='\e[0;35m'       # Purple
+RED='\e[0;31m'          # RED
+RESET='\e[0m'              # Text RESET
+WHITE='\e[0;37m'        # WHITE
+YELLOW='\e[0;33m'       # Yellow
 
 # run on startup
 if [[ -f ~/.dircolors ]]; then
@@ -611,9 +587,9 @@ set_prompt () {
     # If root, just print the host in RED. Otherwise, print the current user
     # and host in GREEN.
     if [[ $EUID == 0 ]]; then
-        PS1+="$RED[\\h]"
+        PS1+="$RED \\h"
     else
-        PS1+="$GREEN[\\h]"
+        PS1+="$GREEN \\h"
     fi
     # Print the working directory and prompt marker in BLUE, and RESET
     # the text color to the default.
@@ -623,13 +599,12 @@ set_prompt () {
 		if [ "$GIT_STATE" != "[master]" ]; then
 			GIT_STATE="${RED}"$GIT_STATE"${RESET}"
 		fi
-		PS1+="$BLUE[`date +%m/%d`][\w]${GIT_STATE}${RESET}\n[\A] \$ "
+		PS1+="$BLUE `date +%m/%d` \w ${GIT_STATE}${RESET}\n\A \$ "
 	else
-		PS1+="$BLUE[`date +%m/%d`][\w]${RESET}\n[\A] \$ "
+		PS1+="$BLUE `date +%m/%d` \w ${RESET}\n\A \$ "
 	fi
 }
 export -f set_prompt
 PROMPT_COMMAND='set_prompt'
 # remove duplicate entries from the path
 #export PATH=`echo $PATH | tr ':' '\n' | sort | uniq | tr '\n' ':'`
-
