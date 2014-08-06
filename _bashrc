@@ -562,14 +562,14 @@ export LESSOPEN="| /usr/bin/src-hilite-lesspipe.sh %s"
 export LESS=' -R '
 
 # display git repository status on prompt
-if which git >/dev/null; then
-	GIT_ENABLED='Y'
-	source ~/bin/git-prompt.sh
-	export GIT_PS1_SHOWDIRTYSTATE='Y'       # show staged (*) and unstaged (+)
-	export GIT_PS1_SHOWSTASHSTATE='Y'       # show stashed ($)
-	export GIT_PS1_SHOWUNTRACKEDFILES='Y'   # show untracked (%)
-	export GIT_PS1_=SHOWUPSTREAM="auto"     # show behind (<), ahead (>), diverged (=), none (=)
-fi
+#if which git >/dev/null; then
+	#GIT_ENABLED='Y'
+	#source ~/bin/git-prompt.sh
+	#export GIT_PS1_SHOWDIRTYSTATE='Y'       # show staged (*) and unstaged (+)
+	#export GIT_PS1_SHOWSTASHSTATE='Y'       # show stashed ($)
+	#export GIT_PS1_SHOWUNTRACKEDFILES='Y'   # show untracked (%)
+	#export GIT_PS1_=SHOWUPSTREAM="auto"     # show behind (<), ahead (>), diverged (=), none (=)
+#fi
 
 set_prompt () {
     Last_Command=$? # Must come first!
@@ -605,6 +605,6 @@ set_prompt () {
 	fi
 }
 export -f set_prompt
-PROMPT_COMMAND='set_prompt'
+#PROMPT_COMMAND='set_prompt'
 # remove duplicate entries from the path
 #export PATH=`echo $PATH | tr ':' '\n' | sort | uniq | tr '\n' ':'`

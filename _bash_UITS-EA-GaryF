@@ -26,6 +26,9 @@ addtopath $NODE_HOME
 export NODE_PATH=$(cygpath -u $USBDRVPATH)/PortableApps/NodeJsPortable/App/AppData/npm/node_modules
 addtopath $NODE_PATH
 
+export ANT_HOME=$(cygpath - u $USBDRVPATH)/PortableApps/apache-ant-1.9.4/bin
+addtopath $ANT_HOME
+
 #------------------------------------------------------------------------------------
 # run on startup
 #------------------------------------------------------------------------------------
