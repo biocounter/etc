@@ -1,6 +1,6 @@
 #export JAVA_HOME=$(cygpat -u $USBDRVPATH)/PortableApps/Java/jdk-7u60
 # java 8 is required for jjs command
-export JAVA_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/Java/jdk1.8.0_05
+export JAVA_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/Java/jdk1.8.0_11
 addtopath $JAVA_HOME/bin
 
 export NLS_LANG=AMERICAN_AMERICA.UTF8
@@ -24,10 +24,10 @@ export USR_BIN=~/bin
 addtopath $USR_BIN
 addtopath ~/bin_win
 
-export NODE_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/NodeJsPortable/App/nodejs
-addtopath $NODE_HOME
-export NODE_PATH=$(cygpath -u $USBDRVPATH)/PortableApps/NodeJsPortable/App/AppData/npm/node_modules
-addtopath $NODE_PATH
+#export NODE_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/NodeJsPortable/App/nodejs
+#addtopath $NODE_HOME
+#export NODE_PATH=$(cygpath -u $USBDRVPATH)/PortableApps/NodeJsPortable/App/AppData/npm/node_modules
+#addtopath $NODE_PATH
 
 export ANT_HOME=$(cygpath - u $USBDRVPATH)/PortableApps/apache-ant-1.9.4/bin
 addtopath $ANT_HOME
