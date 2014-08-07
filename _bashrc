@@ -509,6 +509,8 @@ if [[ ${BASH_VERSINFO[5]} == *cygwin* ]] || [[ ${BASH_VERSINFO[0]} == 4 ]]; then
 fi
 
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+	alias java=~/bin/run-java.sh
+	alias javac=~/bin/run-javac.sh
 	alias clp="printf '%s [%s %s %s] %s\n' '--' `date '+%m/%d %I:%m %p'`  '------------------------------------------------------------------------------------' > /dev/clipboard"
 	alias dnt='echo -e `date "+%A %B %d, %Y"`" "`date "+%I:%M %p"` > /dev/clipboard'
 	alias dow='date "+%A" > /dev/clipboard'
@@ -605,6 +607,7 @@ set_prompt () {
 	fi
 }
 export -f set_prompt
-#PROMPT_COMMAND='set_prompt'
-# remove duplicate entries from the path
+PROMPT_COMMAND='set_prompt'
+
+# TODO remove duplicate entries from the path and trailing :
 #export PATH=`echo $PATH | tr ':' '\n' | sort | uniq | tr '\n' ':'`
