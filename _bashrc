@@ -438,7 +438,7 @@ if [ -z "$RANPROFILE" ]; then
 	export RANPROFILE=true
 
 	if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
-		export PATH="/usr/local/script:/usr/script:/script:/sbin"
+		export PATH="/usr/local/bin:/usr/bin:/bin:/sbin"
 		addtopath /cygdrive/c/Windows/SysWOW64 /cygdrive/c/Windows/System32
 	fi
 
@@ -448,20 +448,38 @@ if [ -z "$RANPROFILE" ]; then
 	fi
 fi
 
+addtopath ~/script
+
 if [ -d ~/perl5 ]; then
 	PERL_MB_OPT="--install_base \"~/perl5\""; export PERL_MB_OPT;
 	PERL_MM_OPT="INSTALL_BASE=~/perl5"; export PERL_MM_OPT;
-	addtopath ~/perl5/script
+	addtopath ~/perl5/bin
 fi
 
-# setup python
-if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
-	export OCI_HOME=$USBDRV/PortableApps/Oracle/instantclient_12_1
-else
-	export OCI_HOME=~/usr/lib/instantclient_12_1
+if [ -n "$OCI_HOME" ]; then
+	addtopath $OCI_HOME
 fi
-addtopath $OCI_HOME
 export PYTHONSTARTUP=~/.pystartup
+
+if [ -n "~/bin/scalalikejdbc-cli" ]; then
+	addtopath ~/bin/scalalikejdbc-cli
+fi
+
+if [ -n "$JYTHON_HOME" ]; then
+	addtopath $JYTHON_HOME
+fi
+
+if [ -n "$SCALA_HOME" ]; then
+	addtopath $SCALA_HOME/bin
+fi
+
+if [ -n "$JAVA_HOME" ]; then
+	addtopath $JAVA_HOME/bin
+fi
+
+if [ -n "$ANT_HOME" ]; then
+	addtopath $ANT_HOME/bin
+fi
 
 # remove duplicate entries from PATH
 export PATH=`awk -F: '{for (i=1;i<=NF;i++) { if ( !x[$i]++ ) printf("%s:",$i); }}' <<< $PATH`
@@ -481,7 +499,7 @@ alias grep='grep --color'                                                       
 alias gtypist='gtypist -wi'
 alias h='history'
 alias j='jobs -l'
-alias jjs='rlwrap $JAVA_HOME/script/jjs'
+alias jjs='rlwrap $JAVA_HOME/bin/jjs'
 alias la='ls -A'                                                                                  # all but . and ..
 alias ld='du -hs * | grep -e "^[0-9].*G\s" -e "^[0-9].*M\s" | sort -n -k 2,2 -s'
 alias less='less -r'                                                                              # raw control characters
@@ -492,13 +510,13 @@ alias mkdir='mkdir -p'                                                          
 alias more='less'                                                                                 # more is less
 alias mv='mv -i'                                                                                  # Prevents accidentally clobbering files.
 alias mydiff='diff -ywEa --suppress-common-lines --minimal'                                       # personal zip preferences
-alias nospace="perl /usr/local/script/rename 's/ /_' *"                                              # underscore all files in dir
-alias pdfbox='java -jar ~/script/pdfbox-app-1.8.5.jar '
+alias nospace="perl /usr/local/bin/rename 's/ /_' *"                                              # underscore all files in dir
+alias pdfbox='java -jar ~/bin/pdfbox-app-1.8.5.jar '
 alias r='fc -s'                                                                                   # execute last command
 alias rm='rm -i'
-alias renamne='perl /usr/local/script/rename'
+alias renamne='perl /usr/local/bin/rename'
 alias scala='rlwrap scala'
-alias startxwin='run /usr/script/bash.exe -l -c "/usr/script/startxwin -- -nolock -unixkill"'
+alias startxwin='run /usr/bin/bash.exe -l -c "/usr/bin/startxwin -- -nolock -unixkill"'
 alias vdir='ls --color=auto --format=long'
 alias vi='vim'                                                                                    # cygwin installs a minimal vi
 alias whence='type -a'                                                                            # where, of a sort
@@ -509,17 +527,17 @@ if [[ ${BASH_VERSINFO[5]} == *cygwin* ]] || [[ ${BASH_VERSINFO[0]} == 4 ]]; then
 fi
 
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
-	alias java=~/script/run-java.sh
-	alias javac=~/script/run-javac.sh
+	alias java=~/bin/run-java.sh
+	alias javac=~/bin/run-javac.sh
 	alias clp="printf '%s [%s %s %s] %s\n' '--' `date '+%m/%d %I:%m %p'`  '------------------------------------------------------------------------------------' > /dev/clipboard"
 	alias dnt='echo -e `date "+%A %B %d, %Y"`" "`date "+%I:%M %p"` > /dev/clipboard'
 	alias dow='date "+%A" > /dev/clipboard'
 	alias dtm='printf "[%s %s] " `date "+%y%m%d"` `date "+%H:%M"` > /dev/clipboard'
 	alias fdt='date "+%B %d, %Y" > /dev/clipboard'
 	alias md='cyg-wrapper.sh "$USBDRV/PortableApps/MarkdownWinPortable/MarkdownWin.exe" --fork=2'
-	alias newterm='mintty /script/env CHERE_INVOKING=1 /script/bash -l &'
+	alias newterm='mintty /bin/env CHERE_INVOKING=1 /bin/bash -l &'
 	alias npp='cyg-wrapper.sh "$USBDRV/PortableApps/Notepad++Portable/Notepad++Portable.exe" --fork=2'			 # run notepad++ in a separate shell
-	alias pdfbox='java -jar "$(cygpath -w ~/usr/script/pdfbox-app-1.8.5.jar)" '
+	alias pdfbox='java -jar "$(cygpath -w ~/usr/bin/pdfbox-app-1.8.5.jar)" '
 	alias sumatra='startSumatra.sh'
 	alias tts='echo [`date "+%I:%M %p"`] > /dev/clipboard'
 
@@ -560,13 +578,13 @@ date
 
 # Set up syntax highlighting for 'less' (requires source-highlight package)
 # See http://www.gnu.org/software/src-highlite/source-highlight.html
-export LESSOPEN="| /usr/script/src-hilite-lesspipe.sh %s"
+export LESSOPEN="| /usr/bin/src-hilite-lesspipe.sh %s"
 export LESS=' -R '
 
 # display git repository status on prompt
 #if which git >/dev/null; then
 	#GIT_ENABLED='Y'
-	#source ~/script/git-prompt.sh
+	#source ~/bin/git-prompt.sh
 	#export GIT_PS1_SHOWDIRTYSTATE='Y'       # show staged (*) and unstaged (+)
 	#export GIT_PS1_SHOWSTASHSTATE='Y'       # show stashed ($)
 	#export GIT_PS1_SHOWUNTRACKEDFILES='Y'   # show untracked (%)
@@ -593,21 +611,9 @@ set_prompt () {
     else
         PS1+="$GREEN \\h"
     fi
-    # Print the working directory and prompt marker in BLUE, and RESET
-    # the text color to the default.
-    #PS1+="$BLUE\\w \\\$$RESET "
-	if [ "$GIT_ENABLED" == "Y" ] && [[ $(find "`pwd`" -maxdepth 1 -type d -iname ".git") ]]; then
-		GIT_STATE=`__git_ps1 "[%s]"`
-		if [ "$GIT_STATE" != "[master]" ]; then
-			GIT_STATE="${RED}"$GIT_STATE"${RESET}"
-		fi
-		PS1+="$BLUE `date +%m/%d` \w ${GIT_STATE}${RESET}\n\A \$ "
-	else
-		PS1+="$BLUE `date +%m/%d` \w ${RESET}\n\A \$ "
-	fi
+
+	PS1+="$BLUE[`date +%m/%d`][\w]${RESET}\n[\A] \$ "
 }
 export -f set_prompt
 PROMPT_COMMAND='set_prompt'
-
-# TODO remove duplicate entries from the path and trailing :
-#export PATH=`echo $PATH | tr ':' '\n' | sort | uniq | tr '\n' ':'`
+#EOF
