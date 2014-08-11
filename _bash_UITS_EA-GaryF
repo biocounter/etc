@@ -1,23 +1,24 @@
 #export JAVA_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/Java/jdk-7u60
 # java 8 is required for jjs command
-export JAVA_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/Java/jdk1.8.0_05
+export JAVA_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/Java/jdk1.8.0_11
 
 export NLS_LANG=AMERICAN_AMERICA.UTF8
-export OCI_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/Oracle/instantclient_12_1
-export ORACLE_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/Oracle
-export LD_LIBRARY_PATH=$(cygpath -u $USBDRVPATH)/PortableApps/Oracle
+export OCI_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/instantclient_12_1_x64
+export ORACLE_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/instantclient_12_1_x64
+export LD_LIBRARY_PATH=$(cygpath -u $USBDRVPATH)/PortableApps/instantclient_12_1_x64
 export SQLPATH=$OCI_HOME
+export TNS_ADMIN=%~d0/PortableApps/instantclient_12_1_x64/network/admin
 
 export PERL_HOME=~/perl5/bin
 
 export SCALA_HOME=~/lib/scala-2.11.2
-addtopath $SCALA_HOME/bin
 
 export JYTHON_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/jython2.7b2
 
 export ANT_HOME=$(cygpath - u $USBDRVPATH)/PortableApps/apache-ant-1.9.4/bin
 
 #------------------------------------------------------------------------------------
+#
 # run on startup
 #------------------------------------------------------------------------------------
 

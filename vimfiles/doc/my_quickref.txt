@@ -1,0 +1,103 @@
+*my_quickref.txt* my (gary furash)
+
+ VIM Quick Reference
+--------------------------------------------------------------------------------
+==================================================================================
+
+#--------------------------------------------------------------------------------
+# Navigation
+#--------------------------------------------------------------------------------
+$				n	end of line
+0				n	(zero) start of line
+:Explore		c	open file explorer window
+:e {directory}	c	open file explorer starting w/ that directory
+<F1> 			n	turn on/update highlighting for all lines with markers *
+<F2>            n	turn off highlighting for lines with markers *
+<F5>            n	add a mark on the current line (and highlight)
+<SHIFT-F2> 		n	erase all markers [a-z] *
+<SHIFT-F5> 		n	remove the mark on the current line
+<leader>bs		n	split buffers horizontally
+<leader>bv		n	split buffers vertically
+Ctrl-6			n	return to explorer window
+E				n	jump to end of words (no punctuation)
+G				n	Go To command (prefix with number			n	5G goes to line 5)
+W				n	jump by words (spaces separate words)
+^				n	first non-blank character of line
+b				n	jump backward by words (punctuation considered words)
+e				n	jump to end of words (punctuation considered words)
+g{h,j,k,l}		n	move visually (e.g., within a wrapped line of text)
+h				n	move left
+j				n	move down
+k				n	move up
+l				n	move right
+w				n	jump by start of words (punctuation considered words)
+
+#--------------------------------------------------------------------------------
+# Marking text
+#--------------------------------------------------------------------------------
+v				v	start visual mode, mark lines, then do command (such as y-yank)
+V				v	start Linewise visual mode
+o				v	move to other end of marked area
+Ctrl+v			v	start visual block mode
+O				v	move to Other corner of block
+aw				v	mark a word
+ab				v	a () block (with braces)
+aB				v	a {} block (with brackets)
+ib				v	inner () block
+iB				v	inner {} block
+Esc				v	exit visual mode
+
+#--------------------------------------------------------------------------------
+# Manipulating Text
+#--------------------------------------------------------------------------------
+.				n	repeat last command
+2yy				v	yank 2 lines
+<				v	shift left
+> 				v	shift right
+A				n	append at the end of the line
+Esc				n	exit insert mode
+:g/^\s*$/d		c	delete blank lines
+I				n	insert at the beginning of the line
+J				n	join line below to the current one
+O				n	open blank line above current line
+P				n,v	put (paste) before cursor
+S				n	delete line at cursor and substitute text (same as cc)
+a				n	append after the cursor
+c$				n	change (replace) to the end of line
+cc				n	change (replace) an entire line
+cw				n	change (replace) to the end of word
+d				v	delete marked text
+dd				n,v	delete (cut) a line
+dw				n,v	delete (cut) the current word
+ea				n	append at end of word
+i				n	start insert mode at cursor
+o				n	open (append) blank line below current line (no need to press return)
+p				n,v	put (paste) the clipboard after cursor
+r				n	replace a single character (does not use insert mode)
+s				n	delete character at cursor and subsitute text
+u				n	undo
+v				n	delete (cut) current character
+x				n	delete (cut) current character
+x2yy 			n  	yank 2 lines
+xp				n	transpose two letters (delete and paste, technically)
+y				v	yank (copy) marked text
+y$				n,v	yank to end of line
+yw				n,v	yank word
+yy				n,v	yank (copy) a line
+~				v	switch case
+
+#--------------------------------------------------------------------------------
+# Search and Replace
+#--------------------------------------------------------------------------------
+/{pattern}		n,c	search for pattern
+?{pattern}		n,c	search backward for pattern
+B				n	jump backward by words (no punctuation)
+n				n	repeat last search in same direction
+
+#--------------------------------------------------------------------------------
+# how to cut and paste a column
+#--------------------------------------------------------------------------------
+1. 	enter visual block mode (Ctrl+V)
+2. 	select the column with (h,j,k,l) and cut (x) them into the buffer
+3. 	move the cursor to the upper left corner of where you want to place the
+	column and insert (P)

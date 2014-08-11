@@ -443,6 +443,7 @@ if [ -z "$RANPROFILE" ]; then
 	fi
 
 	#include any local environment variables
+	#TODO: get via ~/etc/_bash_{$COMPUTERNAME/HOSTNAME}
 	if [ -f ~/.bash_local ]; then
 		source ~/.bash_local
 	fi
@@ -461,8 +462,8 @@ if [ -n "$OCI_HOME" ]; then
 fi
 export PYTHONSTARTUP=~/.pystartup
 
-if [ -n "~/bin/scalalikejdbc-cli" ]; then
-	addtopath ~/bin/scalalikejdbc-cli
+if [ -n "~/script/scalalikejdbc-cli" ]; then
+	addtopath ~/script/scalalikejdbc-cli
 fi
 
 if [ -n "$JYTHON_HOME" ]; then
@@ -483,6 +484,8 @@ fi
 
 # remove duplicate entries from PATH
 export PATH=`awk -F: '{for (i=1;i<=NF;i++) { if ( !x[$i]++ ) printf("%s:",$i); }}' <<< $PATH`
+# remove trailing characters from PATH
+export PATH=$(sed 's/:$//ig' <<< $PATH)
 
 #-------------------------------------------------------------------------------
 # aliases
@@ -511,12 +514,13 @@ alias more='less'                                                               
 alias mv='mv -i'                                                                                  # Prevents accidentally clobbering files.
 alias mydiff='diff -ywEa --suppress-common-lines --minimal'                                       # personal zip preferences
 alias nospace="perl /usr/local/bin/rename 's/ /_' *"                                              # underscore all files in dir
-alias pdfbox='java -jar ~/bin/pdfbox-app-1.8.5.jar '
+alias pdfbox='java -jar ~/script/pdfbox-app-1.8.5.jar '
 alias r='fc -s'                                                                                   # execute last command
 alias rm='rm -i'
 alias renamne='perl /usr/local/bin/rename'
 alias scala='rlwrap scala'
 alias startxwin='run /usr/bin/bash.exe -l -c "/usr/bin/startxwin -- -nolock -unixkill"'
+alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.argv[1])"'	# add url encoding to path
 alias vdir='ls --color=auto --format=long'
 alias vi='vim'                                                                                    # cygwin installs a minimal vi
 alias whence='type -a'                                                                            # where, of a sort
@@ -527,8 +531,8 @@ if [[ ${BASH_VERSINFO[5]} == *cygwin* ]] || [[ ${BASH_VERSINFO[0]} == 4 ]]; then
 fi
 
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
-	alias java=~/bin/run-java.sh
-	alias javac=~/bin/run-javac.sh
+	alias java=~/script/run-java.sh
+	alias javac=~/script/run-javac.sh
 	alias clp="printf '%s [%s %s %s] %s\n' '--' `date '+%m/%d %I:%m %p'`  '------------------------------------------------------------------------------------' > /dev/clipboard"
 	alias dnt='echo -e `date "+%A %B %d, %Y"`" "`date "+%I:%M %p"` > /dev/clipboard'
 	alias dow='date "+%A" > /dev/clipboard'
@@ -584,7 +588,7 @@ export LESS=' -R '
 # display git repository status on prompt
 #if which git >/dev/null; then
 	#GIT_ENABLED='Y'
-	#source ~/bin/git-prompt.sh
+	#source ~/script/git-prompt.sh
 	#export GIT_PS1_SHOWDIRTYSTATE='Y'       # show staged (*) and unstaged (+)
 	#export GIT_PS1_SHOWSTASHSTATE='Y'       # show stashed ($)
 	#export GIT_PS1_SHOWUNTRACKEDFILES='Y'   # show untracked (%)
