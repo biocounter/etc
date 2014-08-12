@@ -1,0 +1,65 @@
+#-------------------------------------------------------------------------------
+# aliases
+#-------------------------------------------------------------------------------
+alias df='df -h'
+alias dir='ls --color --format=vertical'
+alias du='du -h'
+alias egrep='egrep --color=auto'                                                                  # show differences in colour
+alias explorer='cyg-wrapper.sh "explorer" --slashed-opt'
+alias fgrep='fgrep --color=auto'                                                                  # show differences in colour
+alias fn='{ alias && export -f; } | egrep "\(\)|alias" | sed "s/alias //ig" | cut -d= -f1 | sort'
+alias gitlog='git log --pretty=format:"[%h] %ae, %ar: %s" --stat'
+alias grep='grep --color'                                                                         # show differences in colour
+alias gtypist='gtypist -wi'
+alias h='history'
+alias j='jobs -l'
+alias jjs='rlwrap $JAVA_HOME/bin/jjs'
+alias la='ls -A'                                                                                  # all but . and ..
+alias ld='du -hs * | grep -e "^[0-9].*G\s" -e "^[0-9].*M\s" | sort -n -k 2,2 -s'
+alias less='less -r'                                                                              # raw control characters
+alias ll='lls -l'                                                                                  # long list
+alias lls='ls -hF --color'                                                                         # classify files in colour
+alias markdown='python3 -m markdown  '
+alias mkdir='mkdir -p'                                                                            # Prevents accidentally clobbering files.
+alias more='less'                                                                                 # more is less
+alias mv='mv -i'                                                                                  # Prevents accidentally clobbering files.
+alias mydiff='diff -ywEa --suppress-common-lines --minimal'                                       # personal zip preferences
+alias nospace="perl /usr/local/bin/rename 's/ /_' *"                                              # underscore all files in dir
+alias pdfbox='java -jar ~/script/pdfbox-app-1.8.5.jar '
+alias r='fc -s'                                                                                   # execute last command
+alias rm='rm -i'
+alias renamne='perl /usr/local/bin/rename'
+alias scala='rlwrap scala'
+alias startxwin='run /usr/bin/bash.exe -l -c "/usr/bin/startxwin -- -nolock -unixkill"'
+alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.argv[1])"'	# add url encoding to path
+alias vdir='ls --color=auto --format=long'
+alias vi='vim'                                                                                    # cygwin installs a minimal vi
+alias whence='type -a'                                                                            # where, of a sort
+alias xml='xmlstarlet'
+
+if [[ ${BASH_VERSINFO[5]} == *cygwin* ]] || [[ ${BASH_VERSINFO[0]} == 4 ]]; then
+	alias l='ls -A -B --color=tty --group-directories-first -F --ignore="desktop.ini" --ignore="NTUSER*" --ignore="ntuser*"'
+fi
+
+if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+	alias java=~/script/run-java.sh
+	alias javac=~/script/run-javac.sh
+	alias clp="printf '%s [%s %s %s] %s\n' '--' `date '+%m/%d %I:%m %p'`  '------------------------------------------------------------------------------------' > /dev/clipboard"
+	alias dnt='echo -e `date "+%A %B %d, %Y"`" "`date "+%I:%M %p"` > /dev/clipboard'
+	alias dow='date "+%A" > /dev/clipboard'
+	alias dtm='printf "[%s %s] " `date "+%y%m%d"` `date "+%H:%M"` > /dev/clipboard'
+	alias fdt='date "+%B %d, %Y" > /dev/clipboard'
+	alias md='cyg-wrapper.sh "$USBDRV/PortableApps/MarkdownWinPortable/MarkdownWin.exe" --fork=2'
+	alias newterm='mintty /bin/env CHERE_INVOKING=1 /bin/bash -l &'
+	alias npp='cyg-wrapper.sh "$USBDRV/PortableApps/Notepad++Portable/Notepad++Portable.exe" --fork=2'			 # run notepad++ in a separate shell
+	alias pdfbox='java -jar "$(cygpath -w ~/usr/bin/pdfbox-app-1.8.5.jar)" '
+	alias sumatra='startSumatra.sh'
+	alias tts='echo [`date "+%I:%M %p"`] > /dev/clipboard'
+
+	# for cygwin PortableApps
+	if [ "$USBDRV" != "" ]; then
+		alias gvim='cyg-wrapper.sh "$USBDRV/PortableApps/gVimPortable/gvimPortable.exe" --fork=2 --binary-opt=--cmd,"set shellslash",--cmd,"set shell=bash",--cmd,"set ff=unix"'
+		alias wde='cyg-wrapper.sh "$USBDRV/PortableApps/WdePortable/wde.exe" --fork=2'
+	fi
+fi
+

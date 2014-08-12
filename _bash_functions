@@ -1,0 +1,354 @@
+#----------------------------------------------------------------------------
+# Functions to help us manage paths.  Second argument is the name of the
+# path variable to be modified (default: PATH)
+#----------------------------------------------------------------------------
+pathremove () {
+        local IFS=':'
+        local NEWPATH
+        local DIR
+        local PATHVARIABLE=${2:-PATH}
+        for DIR in ${!PATHVARIABLE} ; do
+                if [ "$DIR" != "$1" ] ; then
+                  NEWPATH=${NEWPATH:+$NEWPATH:}$DIR
+                fi
+        done
+        export $PATHVARIABLE="$NEWPATH"
+}
+export -f pathremove
+
+pathprepend () {
+        pathremove $1 $2
+        local PATHVARIABLE=${2:-PATH}
+        export $PATHVARIABLE="$1${!PATHVARIABLE:+:${!PATHVARIABLE}}"
+}
+export -f pathprepend
+
+pathappend () {
+	pathremove $1 $2
+	local PATHVARIABLE=${2:-PATH}
+	#TODO incorporate ADDTOPATH CYGPATH
+	export $PATHVARIABLE="${!PATHVARIABLE:+${!PATHVARIABLE}:}$1"
+}
+export -f pathappend
+
+function bashify {	# convert environment variable to cygwin format
+	if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+		local p
+		for p ; do
+		 if [ "${!p}" ] ; then
+			   eval 'export '$p'=$(cygpath -pu "$'$p'")'
+		 fi
+		done
+	fi
+}
+export -f bashify
+
+function addtopath { # add value to path if it does not exist
+	local p=$1
+	if [ -d "$p" ]; then
+		if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+			p=`cygpath -pu $p`
+		fi
+		# the last path value of path trumps
+		if [[ "${PATH}" != *:"${p}":* ]] ; then
+			export PATH=$PATH:$p
+		fi
+	fi
+}
+export -f addtopath
+
+# Truncate oversized lines on input. Mostly for display use. Example: grep foo log | fitterm
+fitterm () { cut -c 1-$( tput cols ) ; }
+export -f fitterm
+
+# This function defines a 'cd' replacement function capable of keeping,
+# displaying and accessing history of visited directories, up to 10 entries.
+# To use it, uncomment it, source this file and try 'cd --'.
+# acd_func 1.0.5, 10-nov-2004
+# Petar Marinov, http:/geocities.com/h2428, this is public domain
+cd_func () {
+  local x2 the_new_dir adir index
+  local -i cnt
+
+  if [[ $1 ==  "--" ]]; then
+    dirs -v
+    return 0
+  fi
+
+  the_new_dir=$1
+  [[ -z $1 ]] && the_new_dir=$HOME
+
+  if [[ ${the_new_dir:0:1} == '-' ]]; then
+    #
+    # Extract dir N from dirs
+    index=${the_new_dir:1}
+    [[ -z $index ]] && index=1
+    adir=$(dirs +$index)
+    [[ -z $adir ]] && return 1
+    the_new_dir=$adir
+  fi
+
+  #
+  # '~' has to be substituted by ${HOME}
+  [[ ${the_new_dir:0:1} == '~' ]] && the_new_dir="${HOME}${the_new_dir:1}"
+
+  #
+  # Now change to the new dir and add to the top of the stack
+  pushd "${the_new_dir}" > /dev/null
+  [[ $? -ne 0 ]] && return 1
+  the_new_dir=$(pwd)
+
+  #
+  # Trim down everything beyond 11th entry
+  popd -n +11 2>/dev/null 1>/dev/null
+
+  #
+  # Remove any other occurence of this dir, skipping the top of the stack
+  for ((cnt=1; cnt <= 10; cnt++)); do
+    x2=$(dirs +${cnt} 2>/dev/null)
+    [[ $? -ne 0 ]] && return 0
+    [[ ${x2:0:1} == '~' ]] && x2="${HOME}${x2:1}"
+    if [[ "${x2}" == "${the_new_dir}" ]]; then
+      popd -n +$cnt 2>/dev/null 1>/dev/null
+      cnt=cnt-1
+    fi
+  done
+
+  return 0
+}
+export -f cd_func
+alias cd=cd_func
+
+function ll(){ ls -l "$@"| egrep "^d" ; ls -lXB "$@" 2>&-| egrep -v "^d|total "; }
+export -f ll
+
+# Find a file with a pattern in name:
+function ff() { find . -type f -iname '*'$*'*' -ls ; }
+export -f ff
+
+# Find a file with pattern $1 in name and Execute $2 on it:
+function fe() { find . -type f -iname '*'$1'*' -exec "${2:-file}" {} \;		; }
+export -f fe
+
+function fstr() { # find pattern in a set of filesand highlight them
+	OPTIND=1
+	local case=""
+	local usage="fstr: find string in files.  Usage: fstr [-i] \"pattern\" [\"filename pattern\"] "
+	while getopts :it opt; do
+		case "$opt" in
+			i) case="-i " ;;
+			*) echo "$usage"; return;;
+		esac
+	done
+	shift $(( $OPTIND - 1 ))
+	if [ "$#" -lt 1 ]; then
+		echo "$usage"
+		return;
+	fi
+	local SMSO=$(tput smso)
+	local RMSO=$(tput rmso)
+	find . -type f -name "${2:-*}" -print0 | xargs -0 grep -sn ${case} "$1" 2>&- | \
+	sed "s/$1/${SMSO}\0${RMSO}/gI" | more
+}
+export -f fstr
+
+function cuttail() { # cut last n lines in file, 10 by default
+	nlines=${2:-10}
+	sed -n -e :a -e "1,${nlines}!{P;N;D;};N;ba" $1
+}
+
+function lowercase() { # move filenames to lowercase
+	 for file ; do
+		filename=${file##*/}
+		case "$filename" in
+		 */*) dirname==${file%/*} ;;
+		 *) dirname=.;;
+		esac
+		nf=$(echo $filename | tr A-Z a-z)
+		newname="${dirname}/${nf}"
+		if [ "$nf" != "$filename" ]; then
+		 mv "$file" "$newname"
+		 echo "lowercase: $file --> $newname"
+		else
+		 echo "lowercase: $file not changed."
+		fi
+	done
+}
+export -f lowercase
+
+function ccd {	# clear the screen, change directory, list contents
+	clear
+	cd "$1"
+	l
+}
+export -f ccd
+
+function dateprefix { # add YYYYMM to files in %CD%
+	date_prefix=$(date + %Y%m)
+	for file in *.*
+	do
+		mv $file		"$date_prefix ${file%.*}.${file##*.}"
+	done
+}
+export -f dateprefix
+
+function extract () {
+	if [ ! -f "$1" ] ; then
+		echo "'$1' is not a valid file!"
+		return 1
+	fi
+
+	# Assoc. array of commands for extracting archives
+	declare -A xcmd
+	xcmd=(
+		[.tar.bz2]="tar xvjf"
+		[.tar.gz]="tar xvzf"
+		[.bz2]="bunzip2"
+		[.rar]="unrar x"
+		[.gz]="gunzip"
+		[.tar]="tar xvf"
+		[.zip]="unzip"
+		[.Z]="uncompress"
+		[.7z]="7z x"
+	)
+	# extension aliases
+	xcmd[.tbz2]="${xcmd[.tar.bz2]}"
+	xcmd[.tgz]="${xcmd[.tar.gz]}"
+
+	# See which extension the given file uses
+	fext=""
+	for i in ${!xcmd[@]}; do
+		if [ $(grep -o ".\{${#i}\}$" <<< $1) == "$i" ]; then
+			fext="$i"
+			break
+		fi
+	done
+
+	# Die if we couldn't discover what archive type it is
+	if [ -z "$fext" ]; then
+		echo "don't know how to extract '$1'..."
+		return 1
+	fi
+
+	# Extract & cd if we can
+	fbase=$(basename "$1" "$fext")
+	if ${xcmd[$fext]} "$1" && [ -d "$fbase" ]; then
+		cd "$fbase"
+	fi
+}
+export -f extract
+
+function uppercase()		# move filenames to uppercase
+{
+	for file ; do
+	filename=${file##*/}
+	case "$filename" in
+	*/*) dirname==${file%/*} ;;
+	*) dirname=.;;
+	esac
+	nf=$(echo $filename | tr a-z A-Z)
+	newname="${dirname}/${nf}"
+	if [ "$nf" != "$filename" ]; then
+		mv "$file" "$newname"
+		echo "uppercase: $file --> $newname"
+	else
+		echo "uppercase: $file not changed."
+	fi
+	done
+}
+export -f uppercase
+
+function swap() {				 # swap 2 filenames around
+	local TMPFILE=tmp.$$
+	mv "$1" $TMPFILE
+	mv "$2" "$1"
+	mv $TMPFILE "$2"
+}
+export -f swap
+
+bak () { # save a copy of a file with a file stamp
+	filename="$(basename "$1")"
+	extension="${filename##*.}"
+	filename="${filename%.*}"
+	filetime=$(date -r "$1" +%Y%m%d$H%M%S)
+	cp "$1" ${filename}_${filetime}.${extension}
+}
+export -f bak
+
+function my_ps() { ps $@ -u $USER -o pid,%cpu,%mem,bsdtime,command ; }
+export -f my_ps
+function pp() { my_ps f | awk '!/awk/ && $0~var' var=${1:-".*"} ; }
+export -f pp
+
+function ii() { # get current host related info
+	echo -e "\nYou are logged on ${RED}$HOST"
+	echo -e "\nAdditionnal information:$NC " ; uname -a
+	echo -e "\n${RED}Users logged on:$NC " ; w -h
+	echo -e "\n${RED}Current date :$NC " ; date
+	echo -e "\n${RED}Memory stats :$NC " ; free
+	my_ip 2>&- ;
+	echo -e "\n${RED}Local IP Address :$NC" ; echo ${MY_IP:-"Not connected"}
+	echo -e "\n${RED}ISP Address :$NC" ; echo ${MY_ISP:-"Not connected"}
+	echo
+}
+export -f ii
+
+function repeat() { # repeat n times command
+	local i max
+	max=$1; shift;
+	for ((i=1; i <= max ; i++)); do		# --> C-like syntax
+		eval "$@";
+	done
+}
+export -f repeat
+
+function ask() {
+	echo -n "$@" '[y/n] ' ; read ans
+	case "$ans" in
+	y*|Y*) return 0 ;;
+	*) return 1 ;;
+	esac
+}
+export -f ask
+
+function cdb() {
+	USAGE="Usage: cdb [-c|-g|-d|-l] [bookmark]" ;
+	if		[ ! -e ~/.cd_bookmarks ] ; then
+	mkdir ~/.cd_bookmarks
+	fi
+
+	case $1 in
+		# create bookmark
+		-c) shift
+			if [ ! -f ~/.cd_bookmarks/$1 ] ; then
+				echo "cd `pwd`" > ~/.cd_bookmarks/"$1" ;
+			else
+				echo "Try again! Looks like there is already a bookmark '$1'"
+			fi
+			;;
+		# goto bookmark
+		-g) shift
+			if [ -f ~/.cd_bookmarks/$1 ] ; then
+				source ~/.cd_bookmarks/"$1"
+			else
+				echo "Mmm...looks like your bookmark has spontaneously combusted. What I mean to say is that your bookmark does not exist." ;
+			fi
+			;;
+		# delete bookmark
+		-d) shift
+			if [ -f ~/.cd_bookmarks/$1 ] ; then
+				rm -rf ~/.cd_bookmarks/"$1" ;
+			else
+				echo "Oops, forgot to specify the bookmark" ;
+			fi
+			;;
+		# list bookmarks
+		-l) shift
+			ls -l ~/.cd_bookmarks/ ;
+			;;
+		*) echo "$USAGE" ;
+			;;
+	esac
+}
+export -f cdb
+
