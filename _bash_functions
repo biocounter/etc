@@ -3,23 +3,23 @@
 # path variable to be modified (default: PATH)
 #----------------------------------------------------------------------------
 pathremove () {
-        local IFS=':'
-        local NEWPATH
-        local DIR
-        local PATHVARIABLE=${2:-PATH}
-        for DIR in ${!PATHVARIABLE} ; do
-                if [ "$DIR" != "$1" ] ; then
-                  NEWPATH=${NEWPATH:+$NEWPATH:}$DIR
-                fi
-        done
-        export $PATHVARIABLE="$NEWPATH"
+	local IFS=':'
+	local NEWPATH
+	local DIR
+	local PATHVARIABLE=${2:-PATH}
+	for DIR in ${!PATHVARIABLE} ; do
+			if [ "$DIR" != "$1" ] ; then
+				NEWPATH=${NEWPATH:+$NEWPATH:}$DIR
+			fi
+	done
+	export $PATHVARIABLE="$NEWPATH"
 }
 export -f pathremove
 
 pathprepend () {
-        pathremove $1 $2
-        local PATHVARIABLE=${2:-PATH}
-        export $PATHVARIABLE="$1${!PATHVARIABLE:+:${!PATHVARIABLE}}"
+	pathremove $1 $2
+	local PATHVARIABLE=${2:-PATH}
+	export $PATHVARIABLE="$1${!PATHVARIABLE:+:${!PATHVARIABLE}}"
 }
 export -f pathprepend
 
@@ -27,7 +27,9 @@ pathappend () {
 	pathremove $1 $2
 	local PATHVARIABLE=${2:-PATH}
 	#TODO incorporate ADDTOPATH CYGPATH
-	export $PATHVARIABLE="${!PATHVARIABLE:+${!PATHVARIABLE}:}$1"
+	if [ -f $1 ]; then
+		export $PATHVARIABLE="${!PATHVARIABLE:+${!PATHVARIABLE}:}$1"
+	fi
 }
 export -f pathappend
 
@@ -44,12 +46,16 @@ function bashify {	# convert environment variable to cygwin format
 export -f bashify
 
 function addtopath { # add value to path if it does not exist
-	local p=$1
+	local p=${1%/} 				# remove trailing slash
+
 	if [ -d "$p" ]; then
 		if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
 			p=`cygpath -pu $p`
 		fi
-		# the last path value of path trumps
+
+		# TODO: figure out how to use pathremove
+
+		# don't add it if it exists already
 		if [[ "${PATH}" != *:"${p}":* ]] ; then
 			export PATH=$PATH:$p
 		fi

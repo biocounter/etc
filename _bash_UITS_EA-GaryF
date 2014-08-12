@@ -14,7 +14,7 @@ export SCALA_HOME=~/lib/scala-2.11.2
 
 export JYTHON_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/jython2.7b2
 
-export ANT_HOME=$(cygpath - u $USBDRVPATH)/PortableApps/apache-ant-1.9.4/bin
+export ANT_HOME=$HOME/lib/apache-ant-1.9.4/bin
 
 #------------------------------------------------------------------------------------
 #

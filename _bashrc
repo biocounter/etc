@@ -96,45 +96,40 @@ if [ -z "$RANPROFILE" ]; then
 	if [ -f ~/.bash_local ]; then
 		source ~/.bash_local
 	fi
-fi
 
-addtopath ~/script
+	addtopath $HOME/script
 
-if [ -d ~/perl5 ]; then
-	PERL_MB_OPT="--install_base \"~/perl5\""; export PERL_MB_OPT;
-	PERL_MM_OPT="INSTALL_BASE=~/perl5"; export PERL_MM_OPT;
-	addtopath ~/perl5/bin
-fi
+	if [ -d ~/perl5 ]; then
+		PERL_MB_OPT="--install_base \"~/perl5\""; export PERL_MB_OPT;
+		PERL_MM_OPT="INSTALL_BASE=~/perl5"; export PERL_MM_OPT;
+	fi
 
-if [ -n "$OCI_HOME" ]; then
-	addtopath $OCI_HOME
-fi
-export PYTHONSTARTUP=~/.pystartup
-
-if [ -n "~/script/scalalikejdbc-cli" ]; then
-	addtopath ~/script/scalalikejdbc-cli
-fi
-
-if [ -n "$JYTHON_HOME" ]; then
-	addtopath $JYTHON_HOME
-fi
-
-if [ -n "$SCALA_HOME" ]; then
-	addtopath $SCALA_HOME/bin
-fi
-
-if [ -n "$JAVA_HOME" ]; then
+	# add interpreters
 	addtopath $JAVA_HOME/bin
-fi
+	addtopath $JYTHON_HOME
+	addtopath $SCALA_HOME/bin
 
-if [ -n "$ANT_HOME" ]; then
+	# add binaries and scripts
+	addtopath $HOME/script
+	addtopath $OCI_HOME
 	addtopath $ANT_HOME/bin
-fi
+	addtopath ~/perl5/bin
+	addtopath $HOME/lib/scalikejdbc-cli
+	addtopath $HOME/lib/jlibs-r1771/bin
 
-# remove duplicate entries from PATH
-export PATH=`awk -F: '{for (i=1;i<=NF;i++) { if ( !x[$i]++ ) printf("%s:",$i); }}' <<< $PATH`
-# remove trailing characters from PATH
-export PATH=$(sed 's/:$//ig' <<< $PATH)
+	export PYTHONSTARTUP=~/.pystartup
+
+	if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+		export CLASSPATH=$(cygpath -wa "$HOME/lib")\\*.jar
+	else
+		export CLASSPATH=$HOME/lib/*.jar
+	fi
+
+	# remove duplicate entries from PATH
+	export PATH=`awk -F: '{for (i=1;i<=NF;i++) { if ( !x[$i]++ ) printf("%s:",$i); }}' <<< $PATH`
+	# remove trailing characters from PATH
+	export PATH=$(sed 's/:$//ig' <<< $PATH)
+fi
 
 #------------------------------------------------------------------------------
 # aliases
