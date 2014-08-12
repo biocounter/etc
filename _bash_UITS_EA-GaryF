@@ -4,11 +4,10 @@ export JAVA_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/Java/jdk1.8.0_11
 
 export NLS_LANG=AMERICAN_AMERICA.UTF8
 export OCI_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/instantclient_12_1_x64
-export ORACLE_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/instantclient_12_1_x64
-export LD_LIBRARY_PATH=$(cygpath -u $USBDRVPATH)/PortableApps/instantclient_12_1_x64
+export ORACLE_HOME=$OCI_HOME
+export LD_LIBRARY_PATH=$OCI_HOME
 export SQLPATH=$OCI_HOME
-export TNS_ADMIN=%~d0/PortableApps/instantclient_12_1_x64/network/admin
-
+export TNS_ADMIN=$OCI_HOME/network/admin
 export PERL_HOME=~/perl5/bin
 
 export SCALA_HOME=~/lib/scala-2.11.2
