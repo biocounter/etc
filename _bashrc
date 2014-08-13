@@ -97,7 +97,7 @@ if [ -z "$RANPROFILE" ]; then
 		source ~/.bash_local
 	fi
 
-	addtopath $HOME/script
+	addtopath $HOME/bin
 
 	if [ -d ~/perl5 ]; then
 		PERL_MB_OPT="--install_base \"~/perl5\""; export PERL_MB_OPT;
