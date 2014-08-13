@@ -110,7 +110,7 @@ if [ -z "$RANPROFILE" ]; then
 	addtopath $SCALA_HOME/bin
 
 	# add binaries and scripts
-	addtopath $HOME/script
+	addtopath $HOME/bin
 	addtopath $OCI_HOME
 	addtopath $ANT_HOME/bin
 	addtopath ~/perl5/bin
@@ -205,5 +205,7 @@ set_prompt () {
 	PS1+="$BLUE[`date +%m/%d`][\w]${RESET}\n[\A] \$ "
 }
 export -f set_prompt
-PROMPT_COMMAND='set_prompt'
+#PROMPT_COMMAND='set_prompt'
+#TODO: integrate below into above
+PS1="\n\e${CYAN}[`date +%m/%d` \@][\u@\h][\w]${NC}\n\$ "
 #EOF

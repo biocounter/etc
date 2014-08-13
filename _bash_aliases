@@ -25,7 +25,7 @@ alias more='less'                                                               
 alias mv='mv -i'                                                                                  # Prevents accidentally clobbering files.
 alias mydiff='diff -ywEa --suppress-common-lines --minimal'                                       # personal zip preferences
 alias nospace="perl /usr/local/bin/rename 's/ /_' *"                                              # underscore all files in dir
-alias pdfbox='java -jar ~/script/pdfbox-app-1.8.5.jar '
+alias pdfbox='java -jar ~/bin/pdfbox-app-1.8.5.jar '
 alias r='fc -s'                                                                                   # execute last command
 alias rm='rm -i'
 alias renamne='perl /usr/local/bin/rename'
@@ -42,8 +42,8 @@ if [[ ${BASH_VERSINFO[5]} == *cygwin* ]] || [[ ${BASH_VERSINFO[0]} == 4 ]]; then
 fi
 
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
-	alias java=~/script/run-java.sh
-	alias javac=~/script/run-javac.sh
+	alias java=~/bin/run-java.sh
+	alias javac=~/bin/run-javac.sh
 	alias clp="printf '%s [%s %s %s] %s\n' '--' `date '+%m/%d %I:%m %p'`  '------------------------------------------------------------------------------------' > /dev/clipboard"
 	alias dnt='echo -e `date "+%A %B %d, %Y"`" "`date "+%I:%M %p"` > /dev/clipboard'
 	alias dow='date "+%A" > /dev/clipboard'

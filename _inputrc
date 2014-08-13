@@ -1,16 +1,17 @@
 # .inputc
 # the inputrc file which is used to set up key control with the bash shell
-#
+
 set meta-flag on
 set input-meta on
 set convert-meta off
 set output-meta on
+set completion-ignore-case on
 
 # use vi style editing
 set editing-mode vi
 
 # edit using a single line
-set horizontal-scroll-mode On
+set horizontal-scroll-mode on
 
 # rebind some keys
 Meta-h: backward-kill-word
