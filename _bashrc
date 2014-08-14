@@ -174,12 +174,13 @@ export LESS=' -R '
 # display git repository status on prompt
 #if which git >/dev/null; then
 	#GIT_ENABLED='Y'
-	#source ~/script/git-prompt.sh
+	#source ~/bin/git-prompt.sh
 	#export GIT_PS1_SHOWDIRTYSTATE='Y'       # show staged (*) and unstaged (+)
 	#export GIT_PS1_SHOWSTASHSTATE='Y'       # show stashed ($)
 	#export GIT_PS1_SHOWUNTRACKEDFILES='Y'   # show untracked (%)
 	#export GIT_PS1_=SHOWUPSTREAM="auto"     # show behind (<), ahead (>), diverged (=), none (=)
 #fi
+#        ZSH:  setopt PROMPT_SUBST ; PS1='[%n@%m %c$(__git_ps1 " (%s)")]\$ '
 
 set_prompt () {
     Last_Command=$? # Must come first!
@@ -197,15 +198,13 @@ set_prompt () {
     # If root, just print the host in RED. Otherwise, print the current user
     # and host in GREEN.
     if [[ $EUID == 0 ]]; then
-        PS1+="$RED \\h"
+        PS1+="$RED [\u@\h]"
     else
-        PS1+="$GREEN \\h"
+        PS1+="$GREEN [\u@\h]"
     fi
 
-	PS1+="$BLUE[`date +%m/%d`][\w]${RESET}\n[\A] \$ "
+	PS1+="${CYAN}[`date +%m/%d` \@][\w]${NC}\n\$ "
 }
 export -f set_prompt
-#PROMPT_COMMAND='set_prompt'
-#TODO: integrate below into above
-PS1="\n\e${CYAN}[`date +%m/%d` \@][\u@\h][\w]${NC}\n\$ "
+PROMPT_COMMAND='set_prompt'
 #EOF
