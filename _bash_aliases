@@ -19,6 +19,7 @@ alias ld='du -hs * | grep -e "^[0-9].*G\s" -e "^[0-9].*M\s" | sort -n -k 2,2 -s'
 alias less='less -r'                                                                              # raw control characters
 alias ll='lls -l'                                                                                  # long list
 alias lls='ls -hF --color'                                                                         # classify files in colour
+alias ltree="find . -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'" 	# print a directory tree
 alias markdown='python3 -m markdown  '
 alias mkdir='mkdir -p'                                                                            # Prevents accidentally clobbering files.
 alias more='less'                                                                                 # more is less
