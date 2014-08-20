@@ -214,7 +214,7 @@ set statusline+=%3*[
 set statusline+=%{strlen(&ft)?&ft:'none'} 			"filetype
 set statusline+=]%*\ "
 set statusline+=[%{&ff}]\ "							"file format
-set statusline+=%4*%{fugitive#statusline()}%*\ " 	"git status
+"set statusline+=%4*%{fugitive#statusline()}%*\ " 	"git status
 set statusline+=%= 									" right align
 set statusline+=%8*%-14.(%l,%c%V%)\ %<%P%* 			"offset
 
