@@ -1,23 +1,31 @@
 #export JAVA_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/Java/jdk-7u60
 # java 8 is required for jjs command
 export JAVA_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/Java/jdk1.8.0_11
+export PATH=$PATH:$JAVA_HOME/bin
 
 export NLS_LANG=AMERICAN_AMERICA.UTF8
 export OCI_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/instantclient_12_1_x64
+export PATH=$PATH:$OCI_HOME
 export ORACLE_HOME=$OCI_HOME
 export LD_LIBRARY_PATH=$OCI_HOME
 export SQLPATH=$OCI_HOME
 export TNS_ADMIN=$OCI_HOME/network/admin
 export PERL_HOME=~/perl5/bin
 
-export SCALA_HOME=~/lib/scala-2.11.2
+export SCALA_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/scala
+export PATH=$PATH:$SCALA_HOME/bin
 
 export JYTHON_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/jython2.7b2
 
-export ANT_HOME=$HOME/lib/apache-ant-1.9.4/bin
+export ANT_HOME=$HOME/lib/apache-ant-1.9.4
+export PATH=$PATH:$ANT_HOME/bin
+
+# Set NodeJS Interpreter
+export NODE_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/nodejs
+export NODE_PATH=$NODE_HOME/npm/node_modules
+export PATH=$PATH:$NODE_HOME:$NODE_PATH
 
 #------------------------------------------------------------------------------------
-#
 # run on startup
 #------------------------------------------------------------------------------------
 

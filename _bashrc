@@ -440,25 +440,13 @@ fi
 #TODO: get via ~/etc/_bash_{$COMPUTERNAME/HOSTNAME}
 [[ -f "~/etc/_bash_$HOSTNAME" ]] && . ~/etc/_bash_$HOSTNAME
 
-addtopath $HOME/bin
-
 if [ -d ~/perl5 ]; then
 	PERL_MB_OPT="--install_base \"~/perl5\""; export PERL_MB_OPT;
 	PERL_MM_OPT="INSTALL_BASE=~/perl5"; export PERL_MM_OPT;
 fi
 
-# add interpreters
-addtopath $JAVA_HOME/bin
-addtopath $JYTHON_HOME
-addtopath $SCALA_HOME/bin
-
 # add binaries and scripts
 addtopath $HOME/bin
-addtopath $OCI_HOME
-addtopath $ANT_HOME/bin
-addtopath ~/perl5/bin
-addtopath $HOME/lib/scalikejdbc-cli
-addtopath $HOME/lib/jlibs-r1771/bin
 
 export PYTHONSTARTUP=~/.pystartup
 
