@@ -1,5 +1,5 @@
 # add the following line to your ~/.bashrc and ~/.bash_profile files
-# [ -f "${HOME}/etc/_bashrc" ] && ${HOME}/etc/_bashrc
+# [ -f "${HOME}/etc/_bashrc" ] && . ${HOME}/etc/_bashrc
 
 #-------------------------------------------------------------------------------
 #  only run once
@@ -574,7 +574,7 @@ set_prompt () {
         PS1+="$GREEN [\u@\h]"
     fi
 
-	PS1+="${CYAN}[`date +%m/%d` \@][\w]${NC}\n\$ "
+	PS1+="${CYAN}[`date +%m/%d` \t][\w]${NC}\n\$ "
 }
 export -f set_prompt
 PROMPT_COMMAND='set_prompt'
