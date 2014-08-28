@@ -1,1 +1,3 @@
 Align.vba: call delete('/home/furashg/.vim/plugin/AlignPlugin.vim')|call delete('/home/furashg/.vim/plugin/AlignMapsPlugin.vim')|call delete('/home/furashg/.vim/plugin/cecutil.vim')|call delete('/home/furashg/.vim/doc/Align.txt')|call delete('/home/furashg/.vim/autoload/Align.vim')|call delete('/home/furashg/.vim/autoload/AlignMaps.vim')
+getscript.vba: call delete('/home/furashg/.vim/plugin/getscriptPlugin.vim')|call delete('/home/furashg/.vim/autoload/getscript.vim')|call delete('/home/furashg/.vim/GetLatest/GetLatestVimScripts.dist')|call delete('/home/furashg/.vim/doc/pi_getscript.txt')
+zoomwin.vba: call delete('/home/furashg/.vim/plugin/ZoomWinPlugin.vim')|call delete('/home/furashg/.vim/doc/ZoomWin.txt')|call delete('/home/furashg/.vim/autoload/ZoomWin.vim')

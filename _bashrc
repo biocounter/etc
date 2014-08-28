@@ -502,7 +502,7 @@ alias whence='type -a'                                                          
 alias xml='xmlstarlet'
 
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]] || [[ ${BASH_VERSINFO[0]} == 4 ]]; then
-	alias l='ls -A -B --color=tty --group-directories-first -F --ignore="desktop.ini" --ignore="NTUSER*" --ignore="ntuser*"'
+	alias l='ls -B --color=tty --group-directories-first -F --ignore="desktop.ini" --ignore="NTUSER*" --ignore="ntuser*"'
 fi
 
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
