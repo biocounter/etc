@@ -490,6 +490,7 @@ alias mv='mv -i'                                                                
 alias mydiff='diff -ywEa --suppress-common-lines --minimal'                                       # personal zip preferences
 alias nospace="perl /usr/local/bin/rename 's/ /_' *"                                              # underscore all files in dir
 alias pdfbox='java -jar ~/bin/pdfbox-app-1.8.5.jar '
+alias jpgtopdf='for f in *.jp*g ; do convert ./"$f" ./"${f%.jpg}.pdf"; done'
 alias r='fc -s'                                                                                   # execute last command
 alias rm='rm -i'
 alias renamne='perl /usr/local/bin/rename'

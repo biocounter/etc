@@ -1,6 +1,6 @@
 #export JAVA_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/Java/jdk-7u60
 # java 8 is required for jjs command
-export JAVA_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/Java/jdk1.8.0_11
+export JAVA_HOME=$(cygpath -u $USBDRVPATH)/PortableApps/Java/java8
 export PATH=$PATH:$JAVA_HOME/bin
 
 export NLS_LANG=AMERICAN_AMERICA.UTF8
