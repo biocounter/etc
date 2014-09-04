@@ -11,7 +11,7 @@ set completion-ignore-case on
 set editing-mode vi
 
 # edit using a single line
-set horizontal-scroll-mode on
+#set horizontal-scroll-mode on
 
 # rebind some keys
 Meta-h: backward-kill-word

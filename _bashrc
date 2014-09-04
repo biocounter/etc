@@ -517,7 +517,7 @@ if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
 	alias md='cyg-wrapper.sh "$USBDRV/PortableApps/MarkdownWinPortable/MarkdownWin.exe" --fork=2'
 	alias newterm='mintty /bin/env CHERE_INVOKING=1 /bin/bash -l &'
 	alias npp='cyg-wrapper.sh "$USBDRV/PortableApps/Notepad++Portable/Notepad++Portable.exe" --fork=2'			 # run notepad++ in a separate shell
-	alias pdfbox='java -jar "$(cygpath -w ~/usr/bin/pdfbox-app-1.8.5.jar)" '
+	alias pdfbox='java -jar "$(cygpath -w ~/bin/pdfbox-app-1.8.5.jar)" '
 	alias sumatra='startSumatra.sh'
 	alias tts='echo [`date "+%I:%M %p"`] > /dev/clipboard'
 

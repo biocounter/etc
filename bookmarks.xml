@@ -1,16 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bookmarks>
-   <site url="http://andrei.gmxhome.de/eclipse" selected="true" name="Bytecode Outline Plugin"/>
+   <site url="http://www.wickedshell.net/updatesite" selected="true" name="${p2.metadata.repo.name}"/>
+   <site url="http://eclipse-cs.sourceforge.net/update" selected="true" name="Checkstyle Plugin"/>
    <site url="http://eclipse-color-theme.github.com/update" selected="true" name="Eclipse Color Theme"/>
+   <site url="https://raw.github.com/guari/eclipse-ui-theme/master/com.github.eclipseuitheme.themes.updatesite" selected="true" name="Eclipse Moonrise UI Theme"/>
+   <site url="http://eclipsesql.sourceforge.net" selected="true" name="Eclipse SQL Plugin"/>
+   <site url="http://jautodoc.sourceforge.net/update" selected="true" name="JAutodoc Plugin"/>
+   <site url="http://download.eclipse.org/releases/kepler" selected="true" name="Kepler"/>
+   <site url="http://logviewer.eclipselabs.org.codespot.com/git/de.anbos.eclipse.logviewer.update" selected="true" name="Log Viewer Plugin"/>
+   <site url="http://pluginbox.sourceforge.net" selected="true" name="Log Viewer Plugin"/>
    <site url="http://pydev.org/updates" selected="true" name="Pydev IDE"/>
-   <site url="http://editorxml.sourceforge.net/updates" selected="true" name="Rinzo XML Editor Plugin"/>
+   <site url="http://pydev.sf.net/updates/" selected="true" name="PyDev Update Site"/>
+   <site url="http://download.scala-ide.org/sdk/lithium/e38/scala211/dev/site" selected="true" name="Scala IDE"/>
+   <site url="http://download.eclipse.org/eclipse/updates/4.3" selected="true" name="The Eclipse Project Updates"/>
+   <site url="http://andrei.gmxhome.de/eclipse/" selected="true" name="update site: http://andrei.gmxhome.de/eclipse/"/>
+   <site url="http://editorxml.sourceforge.net/updates/" selected="true" name="update site: http://editorxml.sourceforge.net/updates/"/>
    <site url="http://vrapper.sourceforge.net/update-site/stable" selected="true" name="Vrapper Plugin"/>
-   <site url="http://findbugs.cs.umd.edu/eclipse" selected="true" name="Find Bugs Plugin"/>
    <site url="http://zipeditor.sourceforge.net/update" selected="true" name="Zip Editor Plugin"/>
-   <site url="http://eclipse-cs.sourceforge.net/update" selected = "true" name="Checkstyle Plugin"/>
-   <site url="http://andrei.gmxhome.de/eclipse" selected = "true" name="AnyEdit Plugin"/>
-   <site url="http://logviewer.eclipselabs.org.codespot.com/git/de.anbos.eclipse.logviewer.update" selected = "true" name="Log Viewer Plugin"/>
-   <site url="http://pluginbox.sourceforge.net" selected = "true" name="Log Viewer Plugin"/>
-   <site url="http://jautodoc.sourceforge.net/update" selected = "true" name="JAutodoc Plugin"/>
-   <site url="http://community-downloads.quest.com/toadsoft/toadextensions/eclipse/freeware" selected = "true" name = "Toad Extension"/>
+   <site url="http://download.eclipse.org/egit/updates" selected="false" name=""/>
+   <site url="http://download.eclipse.org/technology/subversive/1.1/update-site/" selected="false" name=""/>
+   <site url="http://download.forge.objectweb.org/eclipse-update/" selected="false" name=""/>
+   <site url="http://eclipse-cs.sf.net/update" selected="false" name=""/>
+   <site url="http://findbugs.cs.umd.edu/eclipse/" selected="false" name=""/>
+   <site url="http://update.eclemma.org/" selected="false" name=""/>
+   <site url="http://www.eclipse.org/modeling/updates/" selected="false" name=""/>
 </bookmarks>
