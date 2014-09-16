@@ -450,12 +450,6 @@ addtopath $HOME/bin
 
 export PYTHONSTARTUP=~/.pystartup
 
-if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
-	export CLASSPATH=$(cygpath -wa "$HOME/lib")\\*.jar
-else
-	export CLASSPATH=$HOME/lib/*.jar
-fi
-
 # remove duplicate entries from PATH
 export PATH=`awk -F: '{for (i=1;i<=NF;i++) { if ( !x[$i]++ ) printf("%s:",$i); }}' <<< $PATH`
 # remove trailing characters from PATH
