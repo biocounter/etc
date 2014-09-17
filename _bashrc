@@ -432,7 +432,6 @@ if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
 fi
 
 #include any local environment variables
-set -x
 [ -f ~/etc/_bash_$HOSTNAME ] && . ~/etc/_bash_$HOSTNAME
 
 # add binaries and scripts
