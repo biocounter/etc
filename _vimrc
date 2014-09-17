@@ -144,7 +144,7 @@ set diffopt+=iwhite   " diff ignores whitespace
 " ------------------------------------------------------------------------------
 " Vim UI
 " ------------------------------------------------------------------------------
-colorscheme seoul256
+colorscheme wombat256
 set cursorline
 set display+=lastline    " show last line of text
 set laststatus=2         " always show the status line

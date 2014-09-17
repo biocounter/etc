@@ -11,4 +11,7 @@ export LD_LIBRARY_PATH=$OCI_HOME
 export SQLPATH=$OCI_HOME
 export TNS_ADMIN=$OCI_HOME/network/admin
 
-export PYTHONHOME=/lib/python3.2
+# divorce python from windows
+unset PYTHONHOME
+unset PYTHONPATH
+export PYTHONSTARTUP=~/etc/_pystartup
