@@ -432,7 +432,6 @@ if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
 fi
 
 #include any local environment variables
-#TODO: get via ~/etc/_bash_{$COMPUTERNAME/HOSTNAME}
 set -x
 [ -f ~/etc/_bash_$HOSTNAME ] && . ~/etc/_bash_$HOSTNAME
 
