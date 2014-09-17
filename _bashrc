@@ -65,11 +65,6 @@ export HISTIGNORE=$'[ \t]*:&:[fb]g:exit:ls' # Ignore the ls command as well
 export PROMPT_COMMAND="history -a"
 
 #----------------------------------------------------------------------------
-# include settings, environment variables, etc. for this host
-#----------------------------------------------------------------------------
-[[ -f ~/etc/_bash_${HOSTNAME} ]] && . ~/etc/_bash_${HOSTNAME}
-
-#----------------------------------------------------------------------------
 # commonly used functions
 #----------------------------------------------------------------------------
 pathremove () {
@@ -438,12 +433,8 @@ fi
 
 #include any local environment variables
 #TODO: get via ~/etc/_bash_{$COMPUTERNAME/HOSTNAME}
-[[ -f "~/etc/_bash_$HOSTNAME" ]] && . ~/etc/_bash_$HOSTNAME
-
-if [ -d ~/perl5 ]; then
-	PERL_MB_OPT="--install_base \"~/perl5\""; export PERL_MB_OPT;
-	PERL_MM_OPT="INSTALL_BASE=~/perl5"; export PERL_MM_OPT;
-fi
+set -x
+[ -f ~/etc/_bash_$HOSTNAME ] && . ~/etc/_bash_$HOSTNAME
 
 # add binaries and scripts
 addtopath $HOME/bin
@@ -454,6 +445,7 @@ export PYTHONSTARTUP=~/.pystartup
 export PATH=`awk -F: '{for (i=1;i<=NF;i++) { if ( !x[$i]++ ) printf("%s:",$i); }}' <<< $PATH`
 # remove trailing characters from PATH
 export PATH=$(sed 's/:$//ig' <<< $PATH)
+set +x
 
 #------------------------------------------------------------------------------
 # aliases
