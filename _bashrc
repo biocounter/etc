@@ -23,9 +23,6 @@ export TIMEFORMAT=$'\nreal %3R	user %3U	sys %3S	pcpu %P\n'
 set -o ignoreeof                 # don't use ^D to exit
 set -o noclobber
 set -o notify                    # don't wait for job termination notification
-#set -o vi                        # this breaks bash completion
-set editing-mode vi
-set nocompatible
 set nodosfilewarnings            # turn off dos file warnings
 shopt -s cdable_vars
 shopt -s cdspell                 # When changing directory small typos can be ignoRED by bash
@@ -36,6 +33,12 @@ shopt -s no_empty_cmd_completion # bash>=2.04 only
 shopt -s nocaseglob              # Use case-insensitive filename globbing
 shopt -s sourcepath
 ulimit -S -c 0                   # Don't want any coREDumps
+
+# set alt-e as a toggle for VI line editing, default to EMACS
+set -o vi
+bind '"\ee": emacs-editing-mode'
+set -o emacs
+bind '"\ee": vi-editing-mode'
 
 #-------------------------------------------------------------------------------
 # History Options
@@ -565,12 +568,13 @@ set_prompt () {
 
     # Add a bright white exit status for the last command
     PS1="$White\$? "
+
     # If it was successful, print a green check mark. Otherwise, print
     # a red X.
     if [[ $Last_Command == 0 ]]; then
-        PS1+="$Green$Checkmark "
+        PS1+="$Green$Checkmark$Reset "
     else
-        PS1+="$Red$FancyX "
+        PS1+="$Red$FancyX$Reset "
     fi
 
 	# show the command number for reference
@@ -578,9 +582,9 @@ set_prompt () {
     # If root, just print the host in red. Otherwise, print the current user
     # and host in green.
     if [[ $EUID == 0 ]]; then
-        PS1+="[$Red\\h]"
+        PS1+="$Red[\\h]"
     else
-        PS1+="[$Green\\u@\\h]"
+        PS1+="$Green[\\u@\\h]"
     fi
     # Print the working directory and prompt marker in blue, and reset
     # the text color to the default.
