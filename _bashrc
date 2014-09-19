@@ -2,8 +2,12 @@
 # [ -f "${HOME}/etc/_bashrc" ] && . ${HOME}/etc/_bashrc
 
 #-------------------------------------------------------------------------------
-#  only run once
+# do not run ?
 #-------------------------------------------------------------------------------
+# If not running interactively, don't do anything
+[[ "$-" != *i* ]] && return
+
+# only run once
 [ -n "$RANPROFILE" ] && return
 export RANPROFILE=true
 
@@ -19,7 +23,7 @@ export TIMEFORMAT=$'\nreal %3R	user %3U	sys %3S	pcpu %P\n'
 set -o ignoreeof                 # don't use ^D to exit
 set -o noclobber
 set -o notify                    # don't wait for job termination notification
-set -o vi                        # use VI for editing
+#set -o vi                        # use VI for editing
 set nocompatible
 set nodosfilewarnings            # turn off dos file warnings
 shopt -s cdable_vars
@@ -31,23 +35,6 @@ shopt -s no_empty_cmd_completion # bash>=2.04 only
 shopt -s nocaseglob              # Use case-insensitive filename globbing
 shopt -s sourcepath
 ulimit -S -c 0                   # Don't want any coREDumps
-
-#-------------------------------------------------------------------------------
-# Completion options
-# These completion tuning parameters change the default behavior of bash_completion:
-#-------------------------------------------------------------------------------
-# Define to access remotely checked-out files over passwordless ssh for CVS
-COMP_CVS_REMOTE=1
-#
-# Define to avoid stripping description in --option=description of './configure --help'
-COMP_CONFIGURE_HINTS=1
-#
-# Define to avoid flattening internal contents of tar files
-COMP_TAR_INTERNAL_PATHS=1
-#
-# Uncomment to turn on programmable completion enhancements.
-# Any completions you add in ~/.bash_completion are sourced last.
-[[ -f /etc/bash_completion ]] && . /etc/bash_completion
 
 #-------------------------------------------------------------------------------
 # History Options
@@ -422,6 +409,57 @@ function cdb() {
 }
 export -f cdb
 
+# This function defines a 'cd' replacement function capable of keeping,
+# displaying and accessing history of visited directories, up to 10 entries.
+# To use it, uncomment it, source this file and try 'cd --'.
+cd_func () {
+  local x2 the_new_dir adir index
+  local -i cnt
+
+  if [[ $1 ==  "--" ]]; then
+    dirs -v
+    return 0
+  fi
+
+  the_new_dir=$1
+  [[ -z $1 ]] && the_new_dir=$HOME
+
+  if [[ ${the_new_dir:0:1} == '-' ]]; then
+    #
+    # Extract dir N from dirs
+    index=${the_new_dir:1}
+    [[ -z $index ]] && index=1
+    adir=$(dirs +$index)
+    [[ -z $adir ]] && return 1
+    the_new_dir=$adir
+  fi
+
+  # '~' has to be substituted by ${HOME}
+  [[ ${the_new_dir:0:1} == '~' ]] && the_new_dir="${HOME}${the_new_dir:1}"
+
+  # Now change to the new dir and add to the top of the stack
+  pushd "${the_new_dir}" > /dev/null
+  [[ $? -ne 0 ]] && return 1
+  the_new_dir=$(pwd)
+
+  # Trim down everything beyond 11th entry
+  popd -n +11 2>/dev/null 1>/dev/null
+
+  # Remove any other occurence of this dir, skipping the top of the stack
+  for ((cnt=1; cnt <= 10; cnt++)); do
+    x2=$(dirs +${cnt} 2>/dev/null)
+    [[ $? -ne 0 ]] && return 0
+    [[ ${x2:0:1} == '~' ]] && x2="${HOME}${x2:1}"
+    if [[ "${x2}" == "${the_new_dir}" ]]; then
+      popd -n +$cnt 2>/dev/null 1>/dev/null
+      cnt=cnt-1
+    fi
+  done
+
+  return 0
+}
+alias cd=cd_func
+
 #-------------------------------------------------------------------------------
 # environment variables
 #-------------------------------------------------------------------------------
@@ -443,7 +481,6 @@ export PYTHONSTARTUP=~/.pystartup
 export PATH=`awk -F: '{for (i=1;i<=NF;i++) { if ( !x[$i]++ ) printf("%s:",$i); }}' <<< $PATH`
 # remove trailing characters from PATH
 export PATH=$(sed 's/:$//ig' <<< $PATH)
-set +x
 
 #------------------------------------------------------------------------------
 # aliases
@@ -491,45 +528,34 @@ if [[ ${BASH_VERSINFO[5]} == *cygwin* ]] || [[ ${BASH_VERSINFO[0]} == 4 ]]; then
 fi
 
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+	alias clp="printf '%s [%s %s %s] %s\n' '--' `date '+%m/%d %I:%m %p'`  '------------------------------------------------------------------------------------' > /dev/clipboard"
 	alias java=~/bin/run-java.sh
 	alias javac=~/bin/run-javac.sh
-	alias clp="printf '%s [%s %s %s] %s\n' '--' `date '+%m/%d %I:%m %p'`  '------------------------------------------------------------------------------------' > /dev/clipboard"
 	alias dnt='echo -e `date "+%A %B %d, %Y"`" "`date "+%I:%M %p"` > /dev/clipboard'
 	alias dow='date "+%A" > /dev/clipboard'
 	alias dtm='printf "[%s %s] " `date "+%y%m%d"` `date "+%H:%M"` > /dev/clipboard'
 	alias fdt='date "+%B %d, %Y" > /dev/clipboard'
-	alias md='cyg-wrapper.sh "$USBDRV/PortableApps/MarkdownWinPortable/MarkdownWin.exe" --fork=2'
+	alias md='cyg-wrapper.sh "/cygdrive/c/Progra/cygdrive/c/Markdown2/MarkdownPad2.exe" --fork=2'
 	alias newterm='mintty /bin/env CHERE_INVOKING=1 /bin/bash -l &'
-	alias npp='cyg-wrapper.sh "$USBDRV/PortableApps/Notepad++Portable/Notepad++Portable.exe" --fork=2'			 # run notepad++ in a separate shell
+	alias npp='cyg-wrapper.sh "/cygdrive/c/Progra/cygdrive/c/Notepad++/notepad++.exe" --fork=2'			 # run notepad++ in a separate shell
 	alias pdfbox='java -jar "$(cygpath -w ~/bin/pdfbox-app-1.8.5.jar)" '
 	alias sumatra='startSumatra.sh'
 	alias tts='echo [`date "+%I:%M %p"`] > /dev/clipboard'
-
-	# for cygwin PortableApps
-	if [ "$USBDRV" != "" ]; then
-		alias gvim='cyg-wrapper.sh "$USBDRV/PortableApps/gVimPortable/gvimPortable.exe" --fork=2 --binary-opt=--cmd,"set shellslash",--cmd,"set shell=bash",--cmd,"set ff=unix"'
-		alias wde='cyg-wrapper.sh "$USBDRV/PortableApps/WdePortable/wde.exe" --fork=2'
-	fi
+	alias gvim='cyg-wrapper.sh "/cygdrive/c/Progra/cygdrive/c/Vim/vim74/gvim.exe" --fork=2 --binary-opt=--cmd,"set shellslash",--cmd,"set shell=bash",--cmd,"set ff=unix"'
 fi
 
 #------------------------------------------------------------------------------
 # setup colors and prompt
 #------------------------------------------------------------------------------
-[[ -f ~/.dircolors ]] && eval `dircolors ~/.dircolors`
-
-# Regular Colors
-BLACK='\e[0;30m'        # BLACK
-BLUE='\e[0;34m'         # BLUE
-CHECKMARK='\342\234\223'
-CYAN='\e[0;36m'         # Cyan
-FANCYX='\342\234\227'
-GREEN='\e[0;32m'        # GREEN
-NC='\e[0m'              # Text RESET
-PURPle='\e[0;35m'       # Purple
-RED='\e[0;31m'          # RED
-RESET='\e[0m'              # Text RESET
-WHITE='\e[0;37m'        # WHITE
+BLACK='\e[0;30m'        # black
+RED='\e[0;31m'          # Red
+GREEN='\e[0;32m'        # Green
 YELLOW='\e[0;33m'       # Yellow
+BLUE='\e[0;34m'         # Blue
+PURPLE='\e[0;35m'       # Purple
+CYAN='\e[0;36m'         # Cyan
+WHITE='\e[0;37m'        # White
+NC='\e[0m'       # Text Reset
 
 echo -e "${CYAN}This is BASH ${RED}${BASH_VERSION%.*}${CYAN}${NC}"
 date
@@ -539,28 +565,6 @@ date
 export LESSOPEN="| /usr/bin/src-hilite-lesspipe.sh %s"
 export LESS=' -R '
 
-set_prompt () {
-    Last_Command=$? # Must come first!
-
-    # Add a bright WHITE exit status for the last command
-    PS1="\n$WHITE\$? "
-
-    # if it was successful, print a GREEN check mark. Otherwise, print a RED X.
-    if [[ $Last_Command == 0 ]]; then
-        PS1+="$GREEN$CHECKMARK "
-    else
-        PS1+="$RED$FANCYX "
-    fi
-    # If root, just print the host in RED. Otherwise, print the current user
-    # and host in GREEN.
-    if [[ $EUID == 0 ]]; then
-        PS1+="$RED [\u@\h]"
-    else
-        PS1+="$GREEN [\u@\h]"
-    fi
-
-	PS1+="${CYAN}[\d \A][\w]${NC}\n\$ "
-}
-export -f set_prompt
-PROMPT_COMMAND='set_prompt'
-#EOF
+#PS1="${CYAN}[\d \A][\w]${NC}\n\$ "
+export PROMPT_COMMAND='export H1="`history 1|sed -e "s/^[\ 0-9]*//; s/[\d0\d31\d34\d39\d96\d127]*//g; s/\(.\{1,50\}\).*$/\1/g"`";history -a;echo -e "sgr0\ncnorm\nrmso"|tput -S'
+export PS1='\n\e[1;30m[\j:\!\e[1;30m]\e[0;36m \@ \d \e[1;30m[\e[1;34m\u@\H\e[1;30m:\e[0;37m`tty 2>/dev/null` \e[0;32m+${SHLVL}\e[1;30m] \e[1;37m\w\e[0;37m\[\033]0;[ ${H1}... ] \w - \u@\H +$SHLVL @`tty 2>/dev/null`\007\]\n\[\]\$ '
