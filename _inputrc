@@ -57,6 +57,9 @@ $if Bash
   set completion-ignore-case on
   set show-all-if-ambiguous on
 
+  # show ":" for for command mode or "+" for emacs
+  set show-mode-in-prompt on
+
   # Expand homedir name
   #set expand-tilde on
 

@@ -35,6 +35,7 @@ shopt -s sourcepath
 ulimit -S -c 0                   # Don't want any coREDumps
 
 # set alt-e as a toggle for VI line editing, default to EMACS
+echo "use alt-e to toggle between editing modes"
 set -o vi
 bind '"\ee": emacs-editing-mode'
 set -o emacs
