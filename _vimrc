@@ -53,9 +53,10 @@ set foldenable foldmethod=indent                                   " Turn on fol
 set foldopen=block,hor,mark,percent,quickfix,tag                   " what movements open folds
 set foldtext=SimpleFoldText()                                      " Custom fold text function (cleaner than default)
 set formatoptions=rq                                               " Automatically insert comment leader on return, and let gq format comments
-set ignorecase incsearch hlsearch                                  " search: ignore case, higlight matches
+"set ignorecase incsearch hlsearch                                 " search: ignore case, higlight matches
+set ignorecase hlsearch                                  		   " search: ignore case, higlight matches
 if maparg('<C-L>', 'n') ==# ''
-  nnoremap <silent> <C-L> :nohlsearch<CR><C-L>
+	nnoremap <silent> <C-L> :nohlsearch<CR><C-L>
 endif
 set nolist                                                         " do not show hidden characters
 set nowrap shiftround shiftwidth=4                                 " configure (no) line wrapping
@@ -64,7 +65,7 @@ set tabstop=4 nosmarttab noexpandtab                               " use real ta
 set wildignore=*.dll,*.o,*.obj,*.bak,*.exe,*.pyc,*.jpg,*.gif,*.png " ignore these list file extensions
 set wildmode=list:longest                                          " turn on wild mode huge list
 if &encoding ==# 'latin1' && has('gui_running')
-  set encoding=utf-8
+	set encoding=utf-8
 endif
 
 " ------------------------------------------------------------------------------
@@ -73,43 +74,43 @@ endif
 
 " create backup and temporary directories if they don't exist
 function! InitBackupDir()
-  if has('win32') || has('win32unix') "windows/cygwin
-    let l:separator = '_'
-  else
-    let l:separator = '.'
-  endif
-  let l:parent = $HOME . '/' . l:separator . 'vim/'
-  let l:backup = l:parent . 'backup/'
-  let l:tmp = l:parent . 'tmp/'
-  if exists('*mkdir')
-    if !isdirectory(l:parent)
-      call mkdir(l:parent)
-    endif
-    if !isdirectory(l:backup)
-      call mkdir(l:backup)
-    endif
-    if !isdirectory(l:tmp)
-      call mkdir(l:tmp)
-    endif
-  endif
-  let l:missing_dir = 0
-  if isdirectory(l:tmp)
-    execute 'set backupdir=' . escape(l:backup, ' ') . '/,.'
-  else
-    let l:missing_dir = 1
-  endif
-  if isdirectory(l:backup)
-    execute 'set directory=' . escape(l:tmp, ' ') . '/,.'
-  else
-    let l:missing_dir = 1
-  endif
-  if l:missing_dir
-    echo 'Warning: Unable to create backup directories:' l:backup 'and' l:tmp
-    echo 'Try: mkdir -p' l:backup
-    echo 'and: mkdir -p' l:tmp
-    set backupdir=.
-    set directory=.
-  endif
+	if has('win32') || has('win32unix') "windows/cygwin
+		let l:separator = '_'
+	else
+		let l:separator = '.'
+	endif
+	let l:parent = $HOME . '/' . l:separator . 'vim/'
+	let l:backup = l:parent . 'backup/'
+	let l:tmp = l:parent . 'tmp/'
+	if exists('*mkdir')
+		if !isdirectory(l:parent)
+			call mkdir(l:parent)
+		endif
+		if !isdirectory(l:backup)
+			call mkdir(l:backup)
+		endif
+		if !isdirectory(l:tmp)
+			call mkdir(l:tmp)
+		endif
+	endif
+	let l:missing_dir = 0
+	if isdirectory(l:tmp)
+		execute 'set backupdir=' . escape(l:backup, ' ') . '/,.'
+	else
+		let l:missing_dir = 1
+	endif
+	if isdirectory(l:backup)
+		execute 'set directory=' . escape(l:tmp, ' ') . '/,.'
+	else
+		let l:missing_dir = 1
+	endif
+	if l:missing_dir
+		echo 'Warning: Unable to create backup directories:' l:backup 'and' l:tmp
+		echo 'Try: mkdir -p' l:backup
+		echo 'and: mkdir -p' l:tmp
+		set backupdir=.
+		set directory=.
+	endif
 endfunction
 
 call InitBackupDir()
@@ -117,13 +118,13 @@ set directory=.,$TMP,$TEMP
 
 " add windows executables
 if has('win32') || has ('win64')
-	let $PATH.=';' . 'E:\PortableApps\gnuwin32\bin'
-	let $PATH.=';' . 'E:\PortableApps\CygwinPortable\home\furashg\bin_win'
-	let $PATH.=';' . 'E:\PortableApps\CygwinPortable\home\furashg\bin'
-	let $PATH.=';' . 'E:\PortableApps\Anaconda\App\Anaconda3'
-	let $PATH.=';' . 'E:\PortableApps\Anaconda\App\Anaconda3\Scripts'
-	let $PATH.=';' . 'E:\PortableApps\Java\jre8\bin'
-	let $PATH.=';' . 'E:\PortableApps\Java\jre8\scala'
+	let $PATH.=';' . 'C:\Progra~2\gnuwin32\bin'
+	let $PATH.=';' . '%USERPROFILE%\bin'
+	let $PATH.=';' . '%JAVA_HOME%\bin'
+	let $PATH.=';' . ';%ORACLE_HOME%;'
+	let $PATH.=';' . '%PYTHONHOME%;'
+	let $PATH.=';' . '%PYTHONHOME%\Scripts;'
+	let $PATH.=';' . '%PYTHONHOME%\Lib\site-packages\PyQt4;'
 endif
 
 " configure shell for windows
@@ -166,15 +167,30 @@ set showtabline=0
 set sidescrolloff=10     " Keep 5 lines at the size
 syntax on                " syntax highlighting on
 if &listchars ==# 'eol:$'
-  set listchars=tab:>\ ,trail:-,extends:>,precedes:<,nbsp:+
+	set listchars=tab:>\ ,trail:-,extends:>,precedes:<,nbsp:+
 endif
 
 if has("gui_running")
-	set guioptions+=T	" include toolbar
-	set guioptions+=m	" show menu
 	let &t_Co=256
 	set guitablabel=%M\ %t
+	set ch=2			" Make command line two lines high
+	set guioptions+=aegimrLt
+	set guioptions-=T	" include toolbar
+	set hlsearch		" Switch on search pattern highlighting.
 endif
+
+" set font based on operating system
+if has("gui_running")
+	if has("gui_gtk2")
+	:set guifont=Luxi\ Mono\ 12
+	elseif has("x11")
+	" Also for GTK 1
+	:set guifont=*-lucidatypewriter-medium-r-normal-*-*-180-*-*-m-*-*
+	elseif has("gui_win32")
+	set guifont=Consolas:h10:cANSI
+	endif
+endif
+
 if has("terminfo")
 	let &t_Sf="\ESC[3%p1%dm"
 	let &t_Sb="\ESC[4%p1%dm"
@@ -193,7 +209,7 @@ endif
 
 " Allow color schemes to do bright colors without forcing bold.
 if &t_Co == 8 && $TERM !~# '^linux'
-  set t_Co=16
+	set t_Co=16
 endif
 
 " Odds n Ends
@@ -250,8 +266,8 @@ map <leader>cd :cd %:p:h<cr>:pwd<cr>
 
 " Specify the behavior when switching between buffers
 try
-  set switchbuf=useopen,usetab,newtab
-  set stal=2
+	set switchbuf=useopen,usetab,newtab
+	set stal=2
 catch
 endtry
 
@@ -379,31 +395,31 @@ endfunction
 " select text visually, then press ~ to cycle through upper, lower, title case
 " ------------------------------------------------------------------------------
 function! TwiddleCase(str)
-  if a:str ==# toupper(a:str)
+	if a:str ==# toupper(a:str)
 	let result = tolower(a:str)
-  elseif a:str ==# tolower(a:str)
+	elseif a:str ==# tolower(a:str)
 	let result = substitute(a:str,'\(\<\w\+\>\)', '\u\1', 'g')
-  else
+	else
 	let result = toupper(a:str)
-  endif
-  return result
+	endif
+	return result
 endfunction
 vnoremap ~ y:call setreg('', TwiddleCase(@"), getregtype(''))<CR>gv""Pgv
 
 " ------------------------------------------------------------------------
 function! ListUniqueSort(list, ...)
 " ------------------------------------------------------------------------
-  let dictionary = {}
-  for i in a:list
+	let dictionary = {}
+	for i in a:list
 	let dictionary[string(i)] = i
-  endfor
-  let result = []
-  if ( exists( 'a:1' ) )
+	endfor
+	let result = []
+	if ( exists( 'a:1' ) )
 	let result = sort( values( dictionary ), a:1 )
-  else
+	else
 	let result = sort( values( dictionary ) )
-  endif
-  return result
+	endif
+	return result
 endfunction
 
 " ------------------------------------------------------------------------------
