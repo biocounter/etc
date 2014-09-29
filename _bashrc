@@ -465,6 +465,7 @@ cd_func () {
 }
 alias cd=cd_func
 
+
 #-------------------------------------------------------------------------------
 # environment variables
 #-------------------------------------------------------------------------------
@@ -513,6 +514,7 @@ alias markdown='python3 -m markdown  '
 alias mkdir='mkdir -p'                                                                            # Prevents accidentally clobbering files.
 alias more='less'                                                                                 # more is less
 alias mv='mv -i'                                                                                  # Prevents accidentally clobbering files.
+alias myadd='find . -type l >> .gitignore; sort -u .gitignore -o .gitignore; git add .'
 alias mydiff='diff -ywEa --suppress-common-lines --minimal'                                       # personal zip preferences
 alias nospace="perl /usr/local/bin/rename 's/ /_' *"                                              # underscore all files in dir
 alias pdfbox='java -jar ~/bin/pdfbox-app-1.8.5.jar '
