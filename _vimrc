@@ -133,7 +133,7 @@ if has('win32') || has ('win64')
 	let &shell='C:/bin/cygwin64/bin/bash.exe' . ' --rcfile /cygdrive/c/users/' . $USERNAME . '/etc/_bashrc ' . '-i '
  	set shellcmdflag=-c
  	set shellxquote=\"
-"set diffexpr=MyDiff()
+	set diffexpr=MyDiff()
 endif
 
 " ------------------------------------------------------------------------------
@@ -280,6 +280,8 @@ nnoremap <C-p> :bprevious<CR>
 nnoremap <Leader>a :%s/\<<C-r><C-w>\>/
 " Replace word under cursor in line
 nnoremap <Leader>s :s/\<<C-r><C-w>\>/
+
+command! -nargs=* Wrap set wrap linebreak nolist
 
 " ------------------------------------------------------------------------------
 " Autocommands (run on ... for filetype ...)
