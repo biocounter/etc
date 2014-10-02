@@ -116,23 +116,24 @@ endfunction
 call InitBackupDir()
 set directory=.,$TMP,$TEMP
 
-" add windows executables
+" add windows executables, configure shell for windows
 if has('win32') || has ('win64')
-	let $PATH.=';' . 'C:\Progra~2\gnuwin32\bin'
-	let $PATH.=';' . '%USERPROFILE%\bin'
-	let $PATH.=';' . '%JAVA_HOME%\bin'
-	let $PATH.=';' . ';%ORACLE_HOME%;'
-	let $PATH.=';' . '%PYTHONHOME%;'
-	let $PATH.=';' . '%PYTHONHOME%\Scripts;'
-	let $PATH.=';' . '%PYTHONHOME%\Lib\site-packages\PyQt4;'
-endif
-
-" configure shell for windows
-if (s:running_windows)
-	set shell=\"C:\Windows\SysWow64\cmd.exe\"
- 	set shellcmdflag=/c
- 	set shellxquote=("
-	set diffexpr=MyDiff()
+	"let $PATH.=';' . 'C:\Progra~2\gnuwin32\bin'
+	"let $PATH.=';' . '%USERPROFILE%\bin'
+	"let $PATH.=';' . '%JAVA_HOME%\bin'
+	"let $PATH.=';' . ';%ORACLE_HOME%;'
+	"let $PATH.=';' . '%PYTHONHOME%;'
+	"let $PATH.=';' . '%PYTHONHOME%\Scripts;'
+	"let $PATH.=';' . '%PYTHONHOME%\Lib\site-packages\PyQt4;'
+	"TODO: toggle based on CYGWIN_HOME environemnt variable or user command
+	"set shell=cmd.exe
+ 	"set shellcmdflag=/c
+ 	"set shellxquote=("
+	let $PATH='C:\bin\cygwin64\bin;C:\bin\Cygwin64\usr\local\bin;C:\bin\Cygwin64\usr\bin\;' . $PATH
+	let &shell='C:/bin/cygwin64/bin/bash.exe' . ' --rcfile /cygdrive/c/users/' . $USERNAME . '/etc/_bashrc ' . '-i '
+ 	set shellcmdflag=-c
+ 	set shellxquote=\"
+"set diffexpr=MyDiff()
 endif
 
 " ------------------------------------------------------------------------------
@@ -145,7 +146,7 @@ set diffopt+=iwhite   " diff ignores whitespace
 " ------------------------------------------------------------------------------
 " Vim UI
 " ------------------------------------------------------------------------------
-colorscheme wombat256
+colorscheme omen
 set cursorline
 set display+=lastline    " show last line of text
 set laststatus=2         " always show the status line
@@ -187,7 +188,7 @@ if has("gui_running")
 	" Also for GTK 1
 	:set guifont=*-lucidatypewriter-medium-r-normal-*-*-180-*-*-m-*-*
 	elseif has("gui_win32")
-	set guifont=Consolas:h10:cANSI
+	set guifont=DejaVu_Sans_Mono:h9:cANSI
 	endif
 endif
 

@@ -548,7 +548,7 @@ if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
 	alias pdfbox='java -jar "$(cygpath -w ~/bin/pdfbox-app-1.8.5.jar)" '
 	alias sumatra='startSumatra.sh'
 	alias tts='echo [`date "+%I:%M %p"`] > /dev/clipboard'
-	alias gvim='cyg-wrapper.sh "/cygdrive/c/Progra/cygdrive/c/Vim/vim74/gvim.exe" --fork=2 --binary-opt=--cmd,"set shellslash",--cmd,"set shell=bash",--cmd,"set ff=unix"'
+	alias gvim='cyg-wrapper.sh "/cygdrive/c/Progra~2/Vim/vim74/gvim.exe" --fork=2 --binary-opt=--cmd,"set shellslash",--cmd,"set shell=bash",--cmd,"set ff=unix"'
 fi
 
 #------------------------------------------------------------------------------
