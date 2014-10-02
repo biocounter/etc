@@ -454,3 +454,28 @@ function! ToggleFoldLevel()
 	endif
 endfunction
 nnoremap <leader>f :call ToggleFoldLevel()<cr>
+
+function! WordProcessorMode()
+	setlocal formatoptions=1
+	setlocal noexpandtab
+	map j gj
+	map k gk
+	setlocal spell spelllang=en_us
+	"set thesaurus+=/Users/sbrown/.vim/thesaurus/mthesaur.txt
+	set complete+=s
+	set formatprg=par
+	setlocal wrap
+	setlocal linebreak
+endfunction
+command! Wp call WordProcessorMode()
+
+function! CodeMode()
+	set nowrap shiftround shiftwidth=4                                 " configure (no) line wrapping
+	set smartindent                                                    " perform c-like indenting
+	set tabstop=4 nosmarttab noexpandtab                               " use real tab characters
+	map gj gj
+	map gk gk
+	set nolinebreak
+endfunction
+command! Code call CodeMode()
+
