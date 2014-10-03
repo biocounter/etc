@@ -542,13 +542,13 @@ if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
 	alias dow='date "+%A" > /dev/clipboard'
 	alias dtm='printf "[%s %s] " `date "+%y%m%d"` `date "+%H:%M"` > /dev/clipboard'
 	alias fdt='date "+%B %d, %Y" > /dev/clipboard'
-	alias md='cyg-wrapper.sh "/cygdrive/c/Progra/cygdrive/c/Markdown2/MarkdownPad2.exe" --fork=2'
+	alias md='cyg-wrapper.sh "c:\Progra~2\Markdown\MarkdownPad2.exe" --fork=2'
 	alias newterm='mintty /bin/env CHERE_INVOKING=1 /bin/bash -l &'
-	alias npp='cyg-wrapper.sh "/cygdrive/c/Progra/cygdrive/c/Notepad++/notepad++.exe" --fork=2'			 # run notepad++ in a separate shell
+	alias npp='cyg-wrapper.sh "c:\Progra~2\Notepad++\notepad++.exe" --fork=2'			 # run notepad++ in a separate shell
 	alias pdfbox='java -jar "$(cygpath -w ~/bin/pdfbox-app-1.8.5.jar)" '
 	alias sumatra='startSumatra.sh'
 	alias tts='echo [`date "+%I:%M %p"`] > /dev/clipboard'
-	alias gvim='cyg-wrapper.sh "/cygdrive/c/Progra~2/Vim/vim74/gvim.exe" --fork=2 --binary-opt=--cmd,"set shellslash",--cmd,"set shell=bash",--cmd,"set ff=unix"'
+	alias gvim='cyg-wrapper.sh "C:/Progra~2/Vim/vim74/gvim.exe" --fork=2 --binary-opt=--cmd,"set shellslash",--cmd,"set shell=bash",--cmd,"set ff=unix"'
 fi
 
 #------------------------------------------------------------------------------

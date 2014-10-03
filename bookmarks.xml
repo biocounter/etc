@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bookmarks>
-   <site url="http://eclipse-color-theme.github.com/update" selected="true" name="com.github.eclipsecolortheme.updatesite"/>
-   <site url="http://eclipsesql.sourceforge.net/" selected="true" name="Eclipse SQL Explorer"/>
-   <site url="http://download.eclipse.org/egit/updates" selected="true" name="EGit P2 Repository"/>
-   <site url="http://eclipse.jeeeyul.net/update/" selected="true" name="Jeeeyul’s Eclipse Update Site"/>
-   <site url="http://download.eclipse.org/releases/luna" selected="true" name="Luna"/>
-   <site url="http://www.nodeclipse.org/updates/" selected="true" name="Nodeclipse Updates"/>
-   <site url="http://www.ancitconsulting.com/gitHub-pr" selected="true" name="org.ancit.github.utils.p2site"/>
-   <site url="http://zapletnev.github.io/eclipse-regexp/repository/" selected="true" name="org.eclipse.regexp.site"/>
-   <site url="https://dl-ssl.google.com/android/eclipse/" selected="true" name="p2repo"/>
-   <site url="http://pydev.sf.net/updates/" selected="true" name="PyDev Update Site"/>
-   <site url="http://download.eclipse.org/eclipse/updates/4.4" selected="true" name="The Eclipse Project Updates"/>
-   <site url="http://basti1302.github.com/startexplorer/update/" selected="true" name="Update Site"/>
-   <site url="http://andrei.gmxhome.de/eclipse/" selected="true" name="update site: http://andrei.gmxhome.de/eclipse/"/>
-   <site url="http://editorxml.sourceforge.net/updates/" selected="true" name="update site: http://editorxml.sourceforge.net/updates/"/>
-   <site url="http://vrapper.sourceforge.net/update-site/stable" selected="true" name="Vrapper"/>
+  <site url="http://eclipse-color-theme.github.com/update" selected="true" name="com.github.eclipsecolortheme.updatesite"/>
+  <site url="http://eclipsesql.sourceforge.net/" selected="true" name="Eclipse SQL Explorer"/>
+  <site url="http://download.eclipse.org/egit/updates" selected="true" name="EGit P2 Repository"/>
+  <site url="http://eclipse.jeeeyul.net/update/" selected="true" name="Jeeeyul’s Eclipse Update Site"/>
+  <site url="http://www.nodeclipse.org/updates/" selected="true" name="Nodeclipse Updates"/>
+  <site url="http://www.ancitconsulting.com/gitHub-pr" selected="true" name="org.ancit.github.utils.p2site"/>
+  <site url="http://zapletnev.github.io/eclipse-regexp/repository/" selected="true" name="org.eclipse.regexp.site"/>
+  <site url="https://dl-ssl.google.com/android/eclipse/" selected="true" name="p2repo"/>
+  <site url="http://pydev.sf.net/updates/" selected="true" name="PyDev Update Site"/>
+  <site url="http://download.eclipse.org/eclipse/updates/4.4" selected="true" name="The Eclipse Project Updates"/>
+  <site url="http://basti1302.github.com/startexplorer/update/" selected="true" name="Update Site"/>
+  <site url="http://andrei.gmxhome.de/eclipse/" selected="true" name="update site: http://andrei.gmxhome.de/eclipse/"/>
+  <site url="http://editorxml.sourceforge.net/updates/" selected="true" name="update site: http://editorxml.sourceforge.net/updates/"/>
+  <site url=selected="true" name="Vrapper"/>
 </bookmarks>
