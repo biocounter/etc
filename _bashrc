@@ -337,11 +337,6 @@ bak () { # save a copy of a file with a file stamp
 }
 export -f bak
 
-function my_ps() { ps $@ -u $USER -o pid,%cpu,%mem,bsdtime,command ; }
-export -f my_ps
-function pp() { my_ps f | awk '!/awk/ && $0~var' var=${1:-".*"} ; }
-export -f pp
-
 function ii() { # get current host related info
 	echo -e "\nYou are logged on ${RED}$HOST"
 	echo -e "\nAdditionnal information:$NC " ; uname -a
@@ -363,15 +358,6 @@ function repeat() { # repeat n times command
 	done
 }
 export -f repeat
-
-function ask() {
-	echo -n "$@" '[y/n] ' ; read ans
-	case "$ans" in
-	y*|Y*) return 0 ;;
-	*) return 1 ;;
-	esac
-}
-export -f ask
 
 function cdb() {
 	USAGE="Usage: cdb [-c|-g|-d|-l] [bookmark]" ;
@@ -490,7 +476,7 @@ export PATH=$(sed 's/:$//ig' <<< $PATH)
 #------------------------------------------------------------------------------
 # aliases
 #------------------------------------------------------------------------------
-alias PATH="echo $PATH | tr ':' '\n'"					# show the path in a human-readable format
+alias PATH="echo $PATH | tr ':' '\n'"			# show the path in a human-readable format
 alias dir='ls --color --format=vertical'
 alias egrep='egrep --color=auto'                                                                  # show differences in colour
 alias explorer='cyg-wrapper.sh "explorer" --slashed-opt'
@@ -507,7 +493,6 @@ alias l='ls -altr '
 alias la='ls -A'                                                                                  # all but . and ..
 alias ld='du -hs * | grep -e "^[0-9].*G\s" -e "^[0-9].*M\s" | sort -n -k 2,2 -s'
 alias less='less -r'                                                                              # raw control characters
-alias ll='ls -aFltr --color $* | less -R'
 alias lls='ls -hF --color'                                                                         # classify files in colour
 alias ltree="find . -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'" 	# print a directory tree
 alias markdown='python3 -m markdown  '
