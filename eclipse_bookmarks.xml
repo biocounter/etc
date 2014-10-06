@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bookmarks>
+   <site url="http://eclipse-color-theme.github.com/update" selected="true" name="Eclipse Color Theme Plugin"/>
+   <site url="http://zapletnev.github.io/eclipse-regexp/repository/" selected="true" name="Eclipse Regexp Plugin"/>
+   <site url="http://eclipsesql.sourceforge.net/" selected="true" name="Eclipse SQL Plugin"/>
+   <site url="http://download.eclipse.org/egit/updates" selected="true" name="EGit Plugin"/>
+   <site url="http://eclipse.jeeeyul.net/update/" selected="true" name="Jeeeyul&apos;s Plugins"/>
+   <site url="http://pydev.sf.net/updates/" selected="true" name="PyDev Update Site"/>
+   <site url="http://basti1302.github.com/startexplorer/update/" selected="true" name="Start Explorer Plugin"/>
+   <site url="http://download.eclipse.org/eclipse/updates/4.4" selected="true" name="The Eclipse Project Updates"/>
+   <site url="http://vrapper.sourceforge.net/update-site/stable" selected="true" name="Vrapper Plugin"/>
+   <site url="http://editorxml.sourceforge.net/updates/" selected="true" name="XML Editor Plugin"/>
+</bookmarks>
