@@ -1,97 +1,141 @@
-Node.vim
-========
-[![Build status](https://travis-ci.org/moll/vim-node.png?branch=master)](https://travis-ci.org/moll/vim-node)
+vim-shellutils
+====
 
-Tools to make Vim superb for developing with Node.js.  
-It's the Node equivalent of [Rails.vim (vimscript #1567)](https://github.com/tpope/vim-rails) and [Rake.vim (vimscript #3669)](https://github.com/tpope/vim-rake).
+**Overview**
 
-This is just the first release to get the nodes rolling. If you've collected great helpers and shortcuts that help you work with Node, please share them via [email](mailto:andri@dot.ee), [Twitter](https://twitter.com/theml) or [GitHub issues](https://github.com/moll/vim-node/issues) so we could incorporate them here, too! Thanks!
+Provides shell-like commands such as `'rm'`, `'ls'`, and so on from cmd-line.
 
-### Tour
+## Description
 
-- Use `gf` on paths or requires to open the same file Node.js would.
-- Use `gf` on `require(".")` to open `./index.js`
-- Use `gf` on `require("./dir")` to open `./dir/index.js`
-- Use `gf` on `require("./foo")` to open `foo.js`.
-- Use `gf` on `require("./package")` and have it open package.json.
-- Use `gf` on `require("module")` to open the module's main file (parsed for you from `package.json`).
-- Use `gf` on `require("module/lib/utils")` and open files inside the module.
-- Automatically sets the filetype to JavaScript for files with Node's shebang (`#!`).
-- Use `[I` etc. to look for a keyword in required files (Sets Vim's `&include`).
-- Use `:Nedit` to quickly edit any module, file in a module or your project file.
-- Use `:Nopen` to quickly edit any module and `lcd` to its directory.
-- Lets you even open Node's core modules. They're shown straight from Node's online repository without you having to download everything.
-- Node.vim itself is tested with a thorough automated integration test suite! No cowboy coding here!
+The vim-shellutils provides shell-like commands such as `'rm'`, `'ls'`, and so on. This plugin is written in pure Vim script. This is because you can execute shell-like commands as long as you have huge Vim 7.3+. In addition, thanks to this plugin, you can execute it without exiting the Vim. If you want to make some direcotries, all you have to do is type `:Mkdir dirA dirB` from cmd-line.
 
-Expect more to come soon and feel free to let me know what you're after!
+![](http://cl.ly/image/391D0P3Q0t2x/vim-shellutils.gif)
 
-PS. Node.vim is absolutely intended to work on Windows, but not yet tested there at all. If you could help, try it out and report issues, I'd be grateful!
+## Requirement
 
+Vim (**+Huge**) 7.3 or more
 
-Installing
-----------
-The easiest and most modular way is to download this to `~/.vim/bundle`:
-```
-mkdir -p ~/.vim/bundle/node
-```
+## Usage
 
-Using Git:
-```
-git clone https://github.com/moll/vim-node.git ~/.vim/bundle/node
-```
+### Ls
 
-Using Wget:
-```
-wget https://github.com/moll/vim-node/archive/master.tar.gz -O- | tar -xf- --strip-components 1 -C ~/.vim/bundle/node
-```
+	:Ls[!] [{path}]
+	
+Show up some files in the {path} directory to cmd-line. If you want to show up all the files, including the files that begin with a dot in the {path} directory, then please put a bang. (`:Ls!`) If you omit the {path}, the current directory is specified as {path}.
 
-Then prepend that directory to Vim's `&runtimepath` (or use [Pathogen](https://github.com/tpope/vim-pathogen)):
-```
-set runtimepath^=~/.vim/bundle/node
-```
+### File
+
+	:File [{path}]
+
+Display {path} file information to cmd-line.If the {path} argument is omitted, set current buffer as {path}. The `:File` display many file information such as `'ls -l'` of shell. 
+
+For example,
+	
+	[file] rw-r--r-- 2014-08-15 17:02:58 (5KB) shellutils.txt
+
+### Rm
+
+	:Rm[!] [{path}]
 
 
-Using
------
-Open any JavaScript file inside a Node project and you're all set.
+Remove the {path} file. If the {path} argument is omitted, remove the current buffer. The `:Rm` inquires whether you really delete the {path} file. If you don't do this, then please put a bang. (`:Rm!`)
 
-- Use `gf` inside `require("...")` to jump to source and module files.
-- Use `[I` on any keyword to look for it in the current and required files.
-- Use `:Nedit module_name` to edit the main file of a module.
-- Use `:Nedit module_name/lib/foo` to edit its `lib/foo.js` file.
-- Use `:Nedit .` to edit your Node projects main (usually `index.js`) file.
+### Mkdir
 
-#### Want to customize settings for files inside a Node projects?
-Use the `Node` autocommand. For example:
-```vim
-autocmd User Node if &filetype == "javascript" | setlocal expandtab | endif
-```
+	:Mkdir {path}
 
-#### Want `<C-w>f` to open the file under the cursor in a new vertical split?
-`<C-w>f` by default opens it in a horizontal split. To have it open vertically, drop this in your `vimrc`:
-```vim
-autocmd User Node
-  \ if &filetype == "javascript" |
-  \   nmap <buffer> <C-w>f <Plug>NodeVSplitGotoFile |
-  \   nmap <buffer> <C-w><C-f> <Plug>NodeVSplitGotoFile |
-  \ endif
-```
+Create the {path} directory(ies), if they do not already exist. Unlike 'mkdir' of shell, The `:Mkdir` always set '-p' option, thus create directory(ies) when parent directory if no existing.
 
-License
--------
-Node.vim is released under a *Lesser GNU Affero General Public License*, which in summary means:
+### Touch
 
-- You **can** use this program for **no cost**.
-- You **can** use this program for **both personal and commercial reasons**.
-- You **do not have to share your own program's code** which uses this program.
-- You **have to share modifications** (e.g bug-fixes) you've made to this program.
+	:Touch {path}
 
-For more convoluted language, see the `LICENSE` file.
+Create blank files. Unlike that of the shell, do not edit its last modified time.
+
+### Cat
+
+	:Cat {path}
+
+Concatenate FILE(s), to cmd-line.
+
+### Head
+
+	:Head {path}
+
+Print the first 10 lines of each FILE to cmd-line. With no FILE, read current buffer.
+
+### Tail
+
+	:Tail {path}
+
+Print the last 10 lines of each FILE to cmd-line. With no FILE, read current buffer.
+
+### Cp
+
+	:Cp[!] {src}    {dest}
+	:Cp[!] {src}... {directory}
+
+Copy {src} to {dest}, or multiple {src}s to {directory}. Prompt whether to overwrite existing regular destination files. If you don't do this, then please put a bang. (`:Cp!`)
+
+### Mv
+
+	:Mv[!] {src}    {dest}
+	:Mv[!] {src}... {directory}
+
+Rename {src} to {dest}, or move {src}s to {directory}. Prompt whether to overwrite existing regular destination files. If you don't do this, then please put a bang. (`:Mv!`)
+
+*For more information, see also [help](./doc/vim-shelltils.txt)*
+
+## Installation
+
+### Manually
+
+Put all files under `$VIM`.
+
+### Pathogen (<https://github.com/tpope/vim-pathogen>)
+
+Install with the following command.
+
+	git clone https://github.com/b4b4r07/vim-shellutils ~/.vim/bundle/lightline.vim
+
+### Vundle (<https://github.com/gmarik/Vundle.vim>)
+
+Add the following configuration to your `.vimrc`.
+
+	Plugin 'b4b4r07/vim-shellutils'
+
+Install with `:PluginInstall`.
+
+- See [Bundle interface change](https://github.com/gmarik/Vundle.vim/blob/v0.10.2/doc/vundle.txt#L372-L396).
 
 
-About
------
-**[Andri Möll](http://themoll.com)** authored this in SublemacslipseMate++.  
-[Monday Calendar](https://mondayapp.com) supported the engineering work.  
+### NeoBundle (<https://github.com/Shougo/neobundle.vim>)
 
-If you find Node.vim needs improving or you've got a question, please don't hesitate to email me anytime at [andri@dot.ee](mailto:andri@dot.ee), tweet at [@theml](https://twitter.com/theml) or [create an issue online](https://github.com/moll/vim-node/issues).
+Add the following configuration to your `.vimrc`.
+
+	NeoBundle 'b4b4r07/vim-shellutils'
+
+Install with `:NeoBundleInstall`.
+
+## Licence
+
+>The MIT License ([MIT](http://opensource.org/licenses/MIT))
+>
+>Copyright (c) 2014 b4b4r07
+>
+>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+>
+>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+>
+>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+## Author
+
+| [![twitter/b4b4r07](http://www.gravatar.com/avatar/8238c3c0be55b887aa9d6d59bfefa504.png)](http://twitter.com/b4b4r07 "Follow @b4b4r07 on Twitter") |
+|:---:|
+| [b4b4r07](http://github.com/b4b4r07/ "b4b4r07 on GitHub") |
+
+## See also
+
+- [Help file](./doc/vim-shelltils.txt)
+- [b4b4r07/vim-autocdls](https://github.com/b4b4r07/vim-autocdls)
