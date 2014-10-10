@@ -127,21 +127,22 @@ if has('win32') || has ('win64')
 	"let $PATH.=';' . '%PYTHONHOME%\Lib\site-packages\PyQt4;'
 	"TODO: toggle based on CYGWIN_HOME environemnt variable or user command
 	"set shell=cmd.exe
- 	"set shellcmdflag=/c
- 	"set shellxquote=("
+		"set shellcmdflag=/c
+		"set shellxquote=("
 	let $PATH='C:\bin\cygwin64\bin;C:\bin\Cygwin64\usr\local\bin;C:\bin\Cygwin64\usr\bin\;' . $PATH
 	let &shell='C:/bin/cygwin64/bin/bash.exe' . ' --rcfile /cygdrive/c/users/' . $USERNAME . '/etc/_bashrc ' . '-i '
- 	set shellcmdflag=-c
- 	set shellxquote=\"
-	set diffexpr=MyDiff()
+		set shellcmdflag=-c
+		set shellxquote=\"
+"	set diffexpr=MyDiff()
 endif
 
 " ------------------------------------------------------------------------------
 " Vim DIFF
 " ------------------------------------------------------------------------------
-set diffopt+=vertical " diff files side by side
+set diffopt=vertical " diff files side by side
 set diffopt+=icase    " diff ignores case
 set diffopt+=iwhite   " diff ignores whitespace
+set diffopt+=filler	 	" show filler lines	to keep windows synchronized
 
 " ------------------------------------------------------------------------------
 " Vim UI
@@ -188,7 +189,7 @@ if has("gui_running")
 	" Also for GTK 1
 	:set guifont=*-lucidatypewriter-medium-r-normal-*-*-180-*-*-m-*-*
 	elseif has("gui_win32")
-	set guifont=Ubuntu_Mono:h11:cANSI
+	set guifont=Ubuntu_Mono:h10:cANSI
 	endif
 endif
 
@@ -219,21 +220,16 @@ set ttymouse=xterm2 " makes it work in everything
 " ------------------------------------------------------------------------------
 " Configure VIM Status Line
 " ------------------------------------------------------------------------------
-set statusline=\ "
-set statusline+=%1*%-25.80f%*\ 						"filename min 25, max 80 (right justified)
-set statusline+=%2*
-set statusline+=%h 									"help file flag
-set statusline+=%r 									"read only flag
-set statusline+=%m 									"modified flag
-set statusline+=%w 									"preview flag
-set statusline+=%*\ "
-set statusline+=%3*[
-set statusline+=%{strlen(&ft)?&ft:'none'} 			"filetype
-set statusline+=]%*\ "
-set statusline+=[%{&ff}]\ "							"file format
-"set statusline+=%4*%{fugitive#statusline()}%*\ " 	"git status
-set statusline+=%= 									" right align
-set statusline+=%8*%-14.(%l,%c%V%)\ %<%P%* 			"offset
+set laststatus=2                             " always show statusbar
+set statusline=
+set statusline+=%-10.3n\                     " buffer number
+set statusline+=%f\                          " filename
+set statusline+=%h%m%r%w                     " status flags
+set statusline+=\[%{strlen(&ft)?&ft:'none'}] " file type
+set statusline+=%=                           " right align remainder
+set statusline+=0x%-8B                       " character value
+set statusline+=%-14(%l,%c%V%)               " line, character
+set statusline+=%<%P                         " file position
 
 " ------------------------------------------------------------------------------
 " Mappings
