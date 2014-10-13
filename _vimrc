@@ -147,7 +147,7 @@ set diffopt+=filler	 	" show filler lines	to keep windows synchronized
 " ------------------------------------------------------------------------------
 " Vim UI
 " ------------------------------------------------------------------------------
-colorscheme omen
+colorscheme molokai
 set cursorline
 set display+=lastline    " show last line of text
 set laststatus=2         " always show the status line
