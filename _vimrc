@@ -221,15 +221,15 @@ set ttymouse=xterm2 " makes it work in everything
 " Configure VIM Status Line
 " ------------------------------------------------------------------------------
 set laststatus=2                             " always show statusbar
-set statusline=
-set statusline+=%-10.3n\                     " buffer number
-set statusline+=%f\                          " filename
-set statusline+=%h%m%r%w                     " status flags
-set statusline+=\[%{strlen(&ft)?&ft:'none'}] " file type
-set statusline+=%=                           " right align remainder
-set statusline+=0x%-8B                       " character value
-set statusline+=%-14(%l,%c%V%)               " line, character
-set statusline+=%<%P                         " file position
+"set statusline=
+"set statusline+=%-10.3n\                     " buffer number
+"set statusline+=%f\                          " filename
+"set statusline+=%h%m%r%w                     " status flags
+"set statusline+=\[%{strlen(&ft)?&ft:'none'}] " file type
+"set statusline+=%=                           " right align remainder
+"set statusline+=0x%-8B                       " character value
+"set statusline+=%-14(%l,%c%V%)               " line, character
+"set statusline+=%<%P                         " file position
 
 " ------------------------------------------------------------------------------
 " Mappings
@@ -283,7 +283,6 @@ command! -nargs=* Wrap set wrap linebreak nolist
 nnoremap <F5> "=strftime("%m/%d/%y")<CR>P
 inoremap <F5> <C-R>=strftime("%m/%d/%y")<CR>
 iab <expr> dts strftime("%m/%d/%y")
-
 
 " ------------------------------------------------------------------------------
 " Autocommands (run on ... for filetype ...)
