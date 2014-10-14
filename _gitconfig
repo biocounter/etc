@@ -1,0 +1,22 @@
+[user]
+	name = "Gary Furash"
+	email = "furashgary@gmail.com"
+ 
+[color]
+	ui = auto
+ 
+[core]
+	editor = vim
+	whitespace = trailing-space,space-before-tab
+ 
+[banch]
+	autosetupmerge = true
+ 
+[merge]
+	tool = vimdiff
+	stat = true
+ 
+[alias]
+	unstage = reset HEAD
+	hist = log --pretty=format:\"%h %ad %s%d [%an]\" --date=short
+	deleted = log --diff-filter=D --summary
