@@ -458,7 +458,10 @@ alias cd=cd_func
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
 	export PATH="/usr/local/bin:/usr/bin:/bin:/sbin"
 	addtopath /cygdrive/c/Windows/SysWOW64 /cygdrive/c/Windows/System32
+	export JAVA_HOME=$(cygpath -ua "$JAVA_HOME")
+	addtopath $JAVA_HOME/bin
 fi
+
 
 #include any local environment variables
 [ -f ~/etc/_bash_$HOSTNAME ] && . ~/etc/_bash_$HOSTNAME
@@ -502,7 +505,7 @@ alias mv='mv -i'                                                                
 alias myadd='find . -type l >> .gitignore; sort -u .gitignore -o .gitignore; git add .'
 alias mydiff='diff -ywEa --suppress-common-lines --minimal'                                       # personal zip preferences
 alias nospace="perl /usr/local/bin/rename 's/ /_' *"                                              # underscore all files in dir
-alias pdfbox='java -jar ~/bin/pdfbox-app-1.8.5.jar '
+alias pdfbox='java -jar $(cygpath -wa "$USERPROFILE\bin\pdfbox.jar") '
 alias r='fc -s'                                                                                   # execute last command
 alias rename='perl /usr/local/bin/rename'
 alias rm='rm -i'
