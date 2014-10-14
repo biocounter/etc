@@ -279,6 +279,12 @@ nnoremap <Leader>s :s/\<<C-r><C-w>\>/
 
 command! -nargs=* Wrap set wrap linebreak nolist
 
+" Insert Date and Time
+nnoremap <F5> "=strftime("%m/%d/%y")<CR>P
+inoremap <F5> <C-R>=strftime("%m/%d/%y")<CR>
+iab <expr> dts strftime("%m/%d/%y")
+
+
 " ------------------------------------------------------------------------------
 " Autocommands (run on ... for filetype ...)
 " ------------------------------------------------------------------------------
