@@ -503,9 +503,9 @@ alias mydiff='diff -ywEa --suppress-common-lines --minimal'                     
 alias nospace="perl /usr/local/bin/rename 's/ /_' *"                                              # underscore all files in dir
 #TODO: move this to a script
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
-	alias pdfbox='java -jar $(cygpath -wa "C:\Users\furashg\bin\pdfbox-1.8.7.jar") '
+	alias pdfbox='java -jar $(cygpath -was "$USERPROFILE\\bin\\pdfbox--app-1.8.7.jar") '
 else
-	alias pdfbox='java -jar ~/bin/pdfbox-1.8.7.jar") '
+	alias pdfbox='java -jar ~/bin/pdfbox-app-1.8.7.jar") '
 fi
 alias r='fc -s'                                                                                   # execute last command
 alias rename='perl /usr/local/bin/rename'
@@ -531,7 +531,6 @@ if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
 	alias md='cyg-wrapper.sh "c:\Progra~2\Markdown\MarkdownPad2.exe" --fork=2'
 	alias newterm='mintty /bin/env CHERE_INVOKING=1 /bin/bash -l &'
 	alias npp='cyg-wrapper.sh "c:\Progra~2\Notepad++\notepad++.exe" --fork=2'			 # run notepad++ in a separate shell
-	alias pdfbox='java -jar "$(cygpath -w ~/bin/pdfbox-app-1.8.5.jar)" '
 	alias sumatra='startSumatra.sh'
 	alias tts='echo [`date "+%I:%M %p"`] > /dev/clipboard'
 	alias gvim='cyg-wrapper.sh "C:/Progra~2/Vim/vim74/gvim.exe" --fork=2 --binary-opt=--cmd,"set shellslash",--cmd,"set shell=bash",--cmd,"set ff=unix"'
