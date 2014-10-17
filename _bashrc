@@ -514,9 +514,9 @@ alias urlencode='python -c "import sys, urllib as ul; print ul.quote_plus(sys.ar
 alias vi='vim'                                                                                    # cygwin installs a minimal vi
 
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]] || [[ ${BASH_VERSINFO[0]} == 4 ]]; then
-	alias ll='ls -hBF --color --group-directories-first'
+	alias l='ls -hBF --color --group-directories-first'
 else
-	alias ll='ls -hBF --color'
+	alias l='ls -hBF --color'
 fi
 
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
