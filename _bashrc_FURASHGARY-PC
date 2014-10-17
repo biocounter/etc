@@ -1,0 +1,15 @@
+#-------------------------------------------------------------------------------
+# Author:	G. Furash
+# Usage: 	add the following to .bashrc 
+# 				[ -f ~/etc/_bash_$HOSTNAME ] && . ~/etc/_bash_$HOSTNAME
+#-------------------------------------------------------------------------------
+
+export CYGWIN_HOME=/cygdrive/c/bin/Cygwin64
+export JAVA_HOME=$(cygpath -ua "$JAVA_HOME")
+export OCI_HOME=$(cygpath -ua "$OCI_HOME")
+export ORACLE_HOME=$(cygpath -ua "$ORACLE_HOME")
+unset PYTHONHOME
+unset PYTHONPATH
+unset TCL_LIBRARY
+export TNS_ADMIN=$(cygpath -ua "$TNS_ADMIN")
+export PATH=$PATH:$JAVA_HOME/BIN:$ORACLE_HOME

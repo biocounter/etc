@@ -462,9 +462,8 @@ if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
 	addtopath $JAVA_HOME/bin
 fi
 
-
 #include any local environment variables
-[ -f ~/etc/_bash_$HOSTNAME ] && . ~/etc/_bash_$HOSTNAME
+[ -f "${HOME}/etc/_bashrc_$HOSTNAME" ] && . "${HOME}/etc/_bashrc_${HOSTNAME}"
 
 # add binaries and scripts
 addtopath $HOME/bin
