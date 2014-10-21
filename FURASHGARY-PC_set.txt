@@ -1,0 +1,337 @@
+ALLUSERSPROFILE=C:\ProgramData
+APPDATA=C:\Users\furashg\AppData\Roaming
+BASH_FUNC_addtopath%%=() {  local p=${1%/};
+ if [ -d "$p" ]; then
+ if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+ p=`cygpath -pu $p`;
+ fi;
+ if [[ "${PATH}" != *:"${p}":* ]]; then
+ export PATH=$PATH:$p;
+ fi;
+ fi
+}
+BASH_FUNC_bak%%=() {  filename="$(basename "$1")";
+ extension="${filename##*.}";
+ filename="${filename%.*}";
+ filetime=$(date -r "$1" +%Y%m%d$H%M%S);
+ cp "$1" ${filename}_${filetime}.${extension}
+}
+BASH_FUNC_bashify%%=() {  if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+ local p;
+ for p in "$@";
+ do
+ if [ "${!p}" ]; then
+ eval 'export '$p'=$(cygpath -pu "$'$p'")';
+ fi;
+ done;
+ fi
+}
+BASH_FUNC_ccd%%=() {  clear;
+ cd_func "$1";
+ l
+}
+BASH_FUNC_cdb%%=() {  USAGE="Usage: cdb [-c|-g|-d|-l] [bookmark]";
+ if [ ! -e ~/.cd_bookmarks ]; then
+ mkdir ~/.cd_bookmarks;
+ fi;
+ case $1 in 
+ -c)
+ shift;
+ if [ ! -f ~/.cd_bookmarks/$1 ]; then
+ echo "cd `pwd`" > ~/.cd_bookmarks/"$1";
+ else
+ echo "Try again! Looks like there is already a bookmark '$1'";
+ fi
+ ;;
+ -g)
+ shift;
+ if [ -f ~/.cd_bookmarks/$1 ]; then
+ source ~/.cd_bookmarks/"$1";
+ else
+ echo "Mmm...looks like your bookmark has spontaneously combusted. What I mean to say is that your bookmark does not exist.";
+ fi
+ ;;
+ -d)
+ shift;
+ if [ -f ~/.cd_bookmarks/$1 ]; then
+ rm -rf ~/.cd_bookmarks/"$1";
+ else
+ echo "Oops, forgot to specify the bookmark";
+ fi
+ ;;
+ -l)
+ shift;
+ ls -l ~/.cd_bookmarks/
+ ;;
+ *)
+ echo "$USAGE"
+ ;;
+ esac
+}
+BASH_FUNC_cd_func%%=() {  local x2 the_new_dir adir index;
+ local -i cnt;
+ if [[ $1 == "--" ]]; then
+ dirs -v;
+ return 0;
+ fi;
+ the_new_dir=$1;
+ [[ -z $1 ]] && the_new_dir=$HOME;
+ if [[ ${the_new_dir:0:1} == '-' ]]; then
+ index=${the_new_dir:1};
+ [[ -z $index ]] && index=1;
+ adir=$(dirs +$index);
+ [[ -z $adir ]] && return 1;
+ the_new_dir=$adir;
+ fi;
+ [[ ${the_new_dir:0:1} == '~' ]] && the_new_dir="${HOME}${the_new_dir:1}";
+ pushd "${the_new_dir}" > /dev/null;
+ [[ $? -ne 0 ]] && return 1;
+ the_new_dir=$(pwd);
+ popd -n +11 2> /dev/null > /dev/null;
+ for ((cnt=1; cnt <= 10; cnt++))
+ do
+ x2=$(dirs +${cnt} 2>/dev/null);
+ [[ $? -ne 0 ]] && return 0;
+ [[ ${x2:0:1} == '~' ]] && x2="${HOME}${x2:1}";
+ if [[ "${x2}" == "${the_new_dir}" ]]; then
+ popd -n +$cnt 2> /dev/null > /dev/null;
+ cnt=cnt-1;
+ fi;
+ done;
+ return 0
+}
+BASH_FUNC_dateprefix%%=() {  date_prefix=$(date + %Y%m);
+ for file in *.*;
+ do
+ mv $file "$date_prefix ${file%.*}.${file##*.}";
+ done
+}
+BASH_FUNC_extract%%=() {  if [ ! -f "$1" ]; then
+ echo "'$1' is not a valid file!";
+ return 1;
+ fi;
+ declare -A xcmd;
+ xcmd=([.tar.bz2]="tar xvjf" [.tar.gz]="tar xvzf" [.bz2]="bunzip2" [.rar]="unrar x" [.gz]="gunzip" [.tar]="tar xvf" [.zip]="unzip" [.Z]="uncompress" [.7z]="7z x");
+ xcmd[.tbz2]="${xcmd[.tar.bz2]}";
+ xcmd[.tgz]="${xcmd[.tar.gz]}";
+ fext="";
+ for i in ${!xcmd[@]};
+ do
+ if [ $(grep -o ".\{${#i}\}$" <<< $1) == "$i" ]; then
+ fext="$i";
+ break;
+ fi;
+ done;
+ if [ -z "$fext" ]; then
+ echo "don't know how to extract '$1'...";
+ return 1;
+ fi;
+ fbase=$(basename "$1" "$fext");
+ if ${xcmd[$fext]} "$1" && [ -d "$fbase" ]; then
+ cd_func "$fbase";
+ fi
+}
+BASH_FUNC_fe%%=() {  find . -type f -iname '*'$1'*' -exec "${2:-file}" {} \;
+}
+BASH_FUNC_ff%%=() {  find . -type f -iname '*'$*'*' -ls
+}
+BASH_FUNC_fitterm%%=() {  cut -c 1-$( tput cols )
+}
+BASH_FUNC_fstr%%=() {  OPTIND=1;
+ local case="";
+ local usage="fstr: find string in files.  Usage: fstr [-i] \"pattern\" [\"filename pattern\"] ";
+ while getopts :it opt; do
+ case "$opt" in 
+ i)
+ case="-i "
+ ;;
+ *)
+ echo "$usage";
+ return
+ ;;
+ esac;
+ done;
+ shift $(( $OPTIND - 1 ));
+ if [ "$#" -lt 1 ]; then
+ echo "$usage";
+ return;
+ fi;
+ local SMSO=$(tput smso);
+ local RMSO=$(tput rmso);
+ find . -type f -name "${2:-*}" -print0 | xargs -0 grep -sn ${case} "$1" 2>&- | sed "s/$1/${SMSO}\0${RMSO}/gI" | more
+}
+BASH_FUNC_ii%%=() {  echo -e "\nYou are logged on ${RED}$HOST";
+ echo -e "\nAdditionnal information:$NC ";
+ uname -a;
+ echo -e "\n${RED}Users logged on:$NC ";
+ w -h;
+ echo -e "\n${RED}Current date :$NC ";
+ date;
+ echo -e "\n${RED}Memory stats :$NC ";
+ free;
+ my_ip 2>&-;
+ echo -e "\n${RED}Local IP Address :$NC";
+ echo ${MY_IP:-"Not connected"};
+ echo -e "\n${RED}ISP Address :$NC";
+ echo ${MY_ISP:-"Not connected"};
+ echo
+}
+BASH_FUNC_ll%%=() {  ls -l "$@" | egrep "^d";
+ ls -lXB "$@" 2>&- | egrep -v "^d|total "
+}
+BASH_FUNC_lowercase%%=() {  for file in "$@";
+ do
+ filename=${file##*/};
+ case "$filename" in 
+ */*)
+ dirname==${file%/*}
+ ;;
+ *)
+ dirname=.
+ ;;
+ esac;
+ nf=$(echo $filename | tr A-Z a-z);
+ newname="${dirname}/${nf}";
+ if [ "$nf" != "$filename" ]; then
+ mv "$file" "$newname";
+ echo "lowercase: $file --> $newname";
+ else
+ echo "lowercase: $file not changed.";
+ fi;
+ done
+}
+BASH_FUNC_pathappend%%=() {  pathremove $1 $2;
+ local PATHVARIABLE=${2:-PATH};
+ if [ -f $1 ]; then
+ export $PATHVARIABLE="${!PATHVARIABLE:+${!PATHVARIABLE}:}$1";
+ fi
+}
+BASH_FUNC_pathprepend%%=() {  pathremove $1 $2;
+ local PATHVARIABLE=${2:-PATH};
+ export $PATHVARIABLE="$1${!PATHVARIABLE:+:${!PATHVARIABLE}}"
+}
+BASH_FUNC_pathremove%%=() {  local IFS=':';
+ local NEWPATH;
+ local DIR;
+ local PATHVARIABLE=${2:-PATH};
+ for DIR in ${!PATHVARIABLE};
+ do
+ if [ "$DIR" != "$1" ]; then
+ NEWPATH=${NEWPATH:+$NEWPATH:}$DIR;
+ fi;
+ done;
+ export $PATHVARIABLE="$NEWPATH"
+}
+BASH_FUNC_repeat%%=() {  local i max;
+ max=$1;
+ shift;
+ for ((i=1; i <= max ; i++))
+ do
+ eval "$@";
+ done
+}
+BASH_FUNC_swap%%=() {  local TMPFILE=tmp.$$;
+ mv "$1" $TMPFILE;
+ mv "$2" "$1";
+ mv $TMPFILE "$2"
+}
+BASH_FUNC_uppercase%%=() {  for file in "$@";
+ do
+ filename=${file##*/};
+ case "$filename" in 
+ */*)
+ dirname==${file%/*}
+ ;;
+ *)
+ dirname=.
+ ;;
+ esac;
+ nf=$(echo $filename | tr a-z A-Z);
+ newname="${dirname}/${nf}";
+ if [ "$nf" != "$filename" ]; then
+ mv "$file" "$newname";
+ echo "uppercase: $file --> $newname";
+ else
+ echo "uppercase: $file not changed.";
+ fi;
+ done
+}
+COMMONPROGRAMFILES=C:\Program Files (x86)\Common Files
+CommonProgramFiles(x86)=C:\Program Files (x86)\Common Files
+CommonProgramW6432=C:\Program Files\Common Files
+COMPUTERNAME=FURASHGARY-PC
+COMSPEC=C:\Windows\system32\cmd.exe
+CYGWIN_HOME=/cygdrive/c/bin/Cygwin64
+EDITOR=vi
+EXECIGNORE=*.dll
+FP_NO_HOST_CHECK=NO
+HISTCONTROL=ignoredups
+HISTIGNORE=[ 	]*:&:[fb]g:exit:ls
+HOME=C:\Users\furashg
+HOMEDRIVE=C:
+HOMEPATH=\Users\furashg
+HOSTFILE=/cygdrive/c/Users/furashg/.hosts
+HOSTNAME=FURASHGARY-PC
+INFOPATH=/usr/local/info:/usr/share/info:/usr/info
+JAVA_HOME=/cygdrive/c/Progra~1/Java/jdk1.8.0_20
+LANG=en_US.UTF-8
+LC_ALL=C
+LD_LIBRARY_PATH=C:\Progra~1\Oracle\instantclient_12_1
+LESS= -R 
+LESSOPEN=| /usr/bin/src-hilite-lesspipe.sh %s
+LIBGL_ALWAYS_INDIRECT=1
+LOCALAPPDATA=C:\Users\furashg\AppData\Local
+LOGONSERVER=\\LION
+NLS_LANG=AMERICAN_AMERICA.UTF8
+NUMBER_OF_PROCESSORS=4
+OCI_HOME=/cygdrive/c/Progra~1/Oracle/instantclient_11_2
+OLDPWD=/cygdrive/c/Users/furashg
+ORACLE_HOME=/cygdrive/c/Progra~1/Oracle/instantclient_11_2
+ORIGINAL_PATH=/cygdrive/c/Progra~2/Intel/iCLS Client:/cygdrive/c/Progra~1/Intel/iCLS Client:/cygdrive/c/ProgramData/Oracle/Java/javapath:/cygdrive/c/Windows/system32:/cygdrive/c/Windows:/cygdrive/c/Windows/System32/Wbem:/cygdrive/c/Windows/System32/WindowsPowerShell/v1.0:/cygdrive/c/Progra~1/Intel/WiFi/bin:/cygdrive/c/Progra~1/Common Files/Intel/WirelessCommon:/cygdrive/c/Progra~2/Intel/OpenCL SDK/2.0/bin/x86:/cygdrive/c/Progra~2/Intel/OpenCL SDK/2.0/bin/x64:/cygdrive/c/Progra~1/Intel/INTEL(~2/DAL:/cygdrive/c/Progra~1/Intel/INTEL(~2/IPT:/cygdrive/c/Progra~2/Intel/INTEL(~1/DAL:/cygdrive/c/Progra~2/Intel/INTEL(~1/IPT:/cygdrive/c/Progra~1/Java/jdk1.8.0_20/bin:/cygdrive/c/Progra~1/Oracle/instantclient_11_2:/cygdrive/c/bin/WinPython/python-3.3.5.amd64:/cygdrive/c/bin/WinPython/python-3.3.5.amd64/Scripts:/cygdrive/c/bin/WinPython/python-3.3.5.amd64/Lib/site-packages/PyQt4:/cygdrive/c/Users/furashg/bin:/cygdrive/c/bin/EclipseADT/tools/lib:/cygdrive/c/PROGRA~2/git/bin
+OS=Windows_NT
+PATH=C:\bin\Cygwin64\usr\local\bin;C:\bin\Cygwin64\bin;C:\bin\Cygwin64\bin;C:\bin\Cygwin64\sbin;C:\Windows\SysWOW64;C:\Progra~1\Java\jdk1.8.0_20\bin;C:\Progra~1\Java\jdk1.8.0_20\BIN;C:\Progra~1\Oracle\instantclient_11_2;C:\Users\furashg\bin
+PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
+PRINTER=\\GUTENBERG\UITS-EA-RICOH Aficio MP C3500 PS
+PROCESSOR_ARCHITECTURE=x86
+PROCESSOR_ARCHITEW6432=AMD64
+PROCESSOR_IDENTIFIER=Intel64 Family 6 Model 42 Stepping 7, GenuineIntel
+PROCESSOR_LEVEL=6
+PROCESSOR_REVISION=2a07
+PROFILEREAD=true
+ProgramData=C:\ProgramData
+PROGRAMFILES=C:\Program Files (x86)
+ProgramFiles(x86)=C:\Program Files (x86)
+ProgramW6432=C:\Program Files
+PROMPT=$P$G
+PROMPT_COMMAND=set_prompt
+PS1=\n\[\e[01;37m\]$? \[\e[01;32m\]\342\234\223\[\e[00m\] [\#]\[\e[01;32m\][\u@\h]\[\e[01;34m\][\d \A][\w]\[\e[00m\]\n$ 
+PSModulePath=C:\Windows\system32\WindowsPowerShell\v1.0\Modules\
+PUBLIC=C:\Users\Public
+PWD=/cygdrive/c/Users/furashg/etc
+PYTHONSTARTUP=/cygdrive/c/Users/furashg/.pystartup
+RANPROFILE=true
+SESSIONNAME=Console
+SHELL=/bin/bash
+SHLVL=1
+SQLPATH=C:\Progra~1\Oracle\instantclient_11_2
+SYSTEMDRIVE=C:
+SYSTEMROOT=C:\Windows
+TEMP=C:\bin\Cygwin64\tmp
+TERM=xterm-256color
+TIMEFORMAT=
+real %3R	user %3U	sys %3S	pcpu %P
+
+TK_LIBRARY=C:\bin\WinPython\python-3.3.5.amd64\tcl\tcl8.5
+TMP=C:\bin\Cygwin64\tmp
+TNS_ADMIN=/cygdrive/c/Progra~1/Oracle/instantclient_11_2/network/admin
+TZ=America/Phoenix
+USER=furashg
+USERDNSDOMAIN=CATNET.ARIZONA.EDU
+USERDOMAIN=CATNET
+USERNAME=furashg
+USERPROFILE=C:\Users\furashg
+VBOX_INSTALL_PATH=C:\Program Files\Oracle\VirtualBox\
+WINDIR=C:\Windows
+windows_tracing_flags=3
+windows_tracing_logfile=C:\BVTBin\Tests\installpackage\csilogfile.log
+_=/cygdrive/c/Windows/SysWOW64/cmd.exe
