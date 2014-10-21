@@ -515,8 +515,10 @@ alias vi='vim'                                                                  
 
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]] || [[ ${BASH_VERSINFO[0]} == 4 ]]; then
 	alias l='ls -hBF --color --group-directories-first'
+	alias ll='ls -hBF --color --group-directories-first'
 else
 	alias l='ls -hBF --color'
+	alias ll='ls -hBF --color'
 fi
 
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
