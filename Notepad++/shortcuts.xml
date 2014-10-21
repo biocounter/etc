@@ -17,6 +17,8 @@
         <Command name="Open file" Ctrl="no" Alt="yes" Shift="no" Key="116">$(NPP_DIRECTORY)\notepad++.exe $(CURRENT_WORD)</Command>
         <Command name="Open in another instance" Ctrl="no" Alt="yes" Shift="no" Key="117">$(NPP_DIRECTORY)\notepad++.exe $(CURRENT_WORD) -nosession -multiInst</Command>
         <Command name="Send via Outlook" Ctrl="yes" Alt="yes" Shift="yes" Key="79">outlook /a &quot;$(FULL_CURRENT_PATH)&quot;</Command>
+        <Command name="Run CMD in Current Directory" Ctrl="no" Alt="no" Shift="no" Key="0">%WINDIR%\SysWOW64\cmd /K cd /D $(CURRENT_DIRECTORY)</Command>
+        <Command name="Open Explorer in Current Directory" Ctrl="no" Alt="no" Shift="no" Key="0">explorer $(CURRENT_DIRECTORY)</Command>
     </UserDefinedCommands>
     <PluginCommands />
     <ScintillaKeys />
