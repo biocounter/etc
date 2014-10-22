@@ -41,6 +41,13 @@ bind '"\ee": emacs-editing-mode'
 set -o emacs
 bind '"\ee": vi-editing-mode'
 
+# default to vi editing mode unless in Cygwin (where it prevents command-line completion)
+if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+	set -o emacs
+else
+	set -o vi
+fi
+
 #-------------------------------------------------------------------------------
 # History Options
 #-------------------------------------------------------------------------------
@@ -583,9 +590,9 @@ set_prompt () {
 	# show current editing mode
 	mode=`set -o | grep -i '^vi'`
 	if [[ $mode == *on* ]]; then
-		mode_char='v';
+		mode_char='+';
 	else
-		mode_char='e';
+		mode_char='-';
 	fi
 	PS1+="\n[$mode_char] \$ "
 	
