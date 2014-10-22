@@ -575,8 +575,19 @@ set_prompt () {
     else
         PS1+="$Green[\\u@\\h]"
     fi
+	
     # Print the working directory and prompt marker in blue, and reset
     # the text color to the default.
-	PS1+="$Blue[\d \A][\w]$Reset\n\$ "
+	PS1+="$Blue[\d \A][\w]$Reset"
+	
+	# show current editing mode
+	mode=`set -o | grep -i '^vi'`
+	if [[ $mode == *on* ]]; then
+		mode_char='v';
+	else
+		mode_char='e';
+	fi
+	PS1+="\n[$mode_char] \$ "
+	
 }
 PROMPT_COMMAND='set_prompt'
