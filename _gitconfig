@@ -20,3 +20,5 @@
 	unstage = reset HEAD
 	hist = log --pretty=format:\"%h %ad %s%d [%an]\" --date=short
 	deleted = log --diff-filter=D --summary
+[github]
+	user = GaryFurash
