@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bookmarks>
-	<site url="http://basti1302.github.com/startexplorer/update/" selected="true" name="Start Explorer Plugin"/>
-	<site url="http://download.eclipse.org/egit/updates" selected="true" name="EGit Plugin"/>
-	<site url="http://eclipse-color-theme.github.com/update" selected="true" name="Eclipse Color Theme Plugin"/>
-	<site url="http://eclipse.jeeeyul.net/update/" selected="true" name="Jeeeyul's Plugins"/>
-	<site url="http://eclipsesql.sourceforge.net/" selected="true" name="Eclipse SQL Plugin"/>
-	<site url="http://editorxml.sourceforge.net/updates/" selected="true" name="XML Editor Plugin"/>
-	<site url="http://logviewer.eclipselabs.org.codespot.com/git/de.anbos.eclipse.logviewer.update/" selected="true" name="LogViewer Plugin"/>
-	<site url="http://plugins.genymotion.com/eclipse" selected="true" name="Genymotion Plugin"/>
-	<site url="http://pydev.sf.net/updates/" selected="true" name="PyDev Update Site"/>
-	<site url="http://vrapper.sourceforge.net/update-site/stable" selected="true" name="Vrapper Plugin"/>
-	<site url="http://zapletnev.github.io/eclipse-regexp/repository/" selected="true" name="Eclipse Regexp Plugin"/>
+   <site url="http://eclipse-color-theme.github.com/update" selected="true" name="com.github.eclipsecolortheme.updatesite"/>
+   <site url="http://download.eclipse.org/egit/github/updates" selected="true" name="eGit Github Connector"/>
+   <site url="http://download.eclipse.org/egit/updates" selected="true" name="eGit Plugin"/>
+   <site url="http://download.eclipse.org/releases/luna" selected="true" name="Luna"/>
+   <site url="http://download.eclipse.org/mylyn/releases/latest" selected="false" name="Mylyn 3.13 for Eclipse 3.8, 4.3 and 4.4"/>
+   <site url="http://download.eclipse.org/mylyn/releases/luna" selected="false" name="Mylyn for Eclipse Luna"/>
+   <site url="http://www.nodeclipse.org/updates/" selected="true" name="Nodeclipse Updates"/>
+   <site url="http://pluginbox.sourceforge.net" selected="false" name="PluginBox"/>
+   <site url="http://pydev.sf.net/updates/" selected="true" name="PyDev Update Site"/>
+   <site url="http://download.eclipse.org/eclipse/updates/4.4" selected="true" name="The Eclipse Project Updates"/>
+   <site url="http://editorxml.sourceforge.net/updates/" selected="true" name="update site: http://editorxml.sourceforge.net/updates/"/>
+   <site url="http://vrapper.sourceforge.net/update-site/stable" selected="true" name="Vrapper"/>
+   <site url="http://download.eclipse.org/egit/github/updates-2.3" selected="true" name=""/>
 </bookmarks>
