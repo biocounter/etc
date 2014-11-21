@@ -4,17 +4,22 @@
 # 				[ -f ~/etc/_bash_$HOSTNAME ] && . ~/etc/_bash_$HOSTNAME
 #-------------------------------------------------------------------------------
 
-export CYGWIN_HOME=/cygdrive/c/bin/Cygwin64
-export JAVA_HOME=$(cygpath -ua "$JAVA_HOME")
-export OCI_HOME=$(cygpath -ua "$OCI_HOME")
-export ORACLE_HOME=$(cygpath -ua "$ORACLE_HOME")
-unset PYTHONHOME
-unset PYTHONPATH
-unset TCL_LIBRARY
-export TNS_ADMIN=$(cygpath -ua "$TNS_ADMIN")
-export PATH=$PATH:$JAVA_HOME/BIN:$ORACLE_HOME
-export GISTY_DIR="$HOME/gists"
-export GISTY_ACCESS_TOKEN=2db03b168f3dfbbbd3370875f9ed2a8f3703497a
-export GISTY_SSL_VERIFY="NONE"
-export JYTHON_HOME=$(cygpath -ua "$JYTHON_HOME")
-export PATH=$PATH:$JYTHON_HOME
+if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
+	export JYTHON_HOME=$(cygpath -ua "$JYTHON_HOME")
+	export TNS_ADMIN=$(cygpath -ua "$TNS_ADMIN")
+	export JYTHON_HOME=$(cygpath -ua "$JYTHON_HOME")
+	export CYGWIN_HOME=/cygdrive/c/bin/Cygwin64
+	export JAVA_HOME=$(cygpath -ua "$JAVA_HOME")
+	export OCI_HOME=$(cygpath -ua "$OCI_HOME")
+	export ORACLE_HOME=$(cygpath -ua "$ORACLE_HOME")
+	export TNS_ADMIN=$(cygpath -ua "$TNS_ADMIN")
+	export JYTHON_HOME=$(cygpath -ua "$JYTHON_HOME")
+	unset PYTHONHOME
+	unset PYTHONPATH
+	unset TCL_LIBRARY
+	export PATH=$PATH:$JAVA_HOME/BIN:$ORACLE_HOME
+	export GISTY_DIR="$HOME/gists"
+	export GISTY_ACCESS_TOKEN=2db03b168f3dfbbbd3370875f9ed2a8f3703497a
+	export GISTY_SSL_VERIFY="NONE"
+	export PATH=$PATH:$JYTHON_HOME
+fi
