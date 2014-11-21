@@ -486,12 +486,8 @@ export PATH=$(sed 's/:$//ig' <<< $PATH)
 # aliases
 #------------------------------------------------------------------------------
 alias PATH="echo $PATH | tr ':' '\n'"			# show the path in a human-readable format
-alias dir='ls --color --format=vertical'
-alias egrep='egrep --color=auto'                                                                  # show differences in colour
 alias explorer='cyg-wrapper.sh "explorer" --slashed-opt'
-alias fgrep='fgrep --color=auto'                                                                  # show differences in colour
 alias gitlog='git log --pretty=format:"[%h] %ae, %ar: %s" --stat'
-alias grep='grep --color'                                                                         # show differences in colour
 alias gtypist='gtypist -wi'
 alias h='history'
 alias j='jobs -l'
@@ -523,6 +519,10 @@ alias vi='vim'                                                                  
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]] || [[ ${BASH_VERSINFO[0]} == 4 ]]; then
 	alias l='ls -hBF --color --group-directories-first'
 	alias ll='ls -hBF --color --group-directories-first'
+	alias dir='ls --color --format=vertical'
+	alias egrep='egrep --color=auto'                                                                  # show differences in colour
+	alias fgrep='fgrep --color=auto'                                                                  # show differences in colour
+	alias grep='grep --color'                                                                         # show differences in colour
 else
 	alias l='ls -hBF --color'
 	alias ll='ls -hBF --color'
