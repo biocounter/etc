@@ -34,12 +34,12 @@ shopt -s nocaseglob              # Use case-insensitive filename globbing
 shopt -s sourcepath
 ulimit -S -c 0                   # Don't want any coREDumps
 
-# set alt-e as a toggle for VI line editing, default to EMACS
-# echo "use alt-e to toggle between editing modes"
+# set alt-e as a toggle for VI line editing 
+echo "use alt-e to toggle between editing modes (VI, EMACS)"
+set -o emacs
+bind '"\ee": vi-editing-mode'
 set -o vi
-#bind '"\ee": emacs-editing-mode'
-#set -o emacs
-#bind '"\ee": vi-editing-mode'
+bind '"\ee": emacs-editing-mode'
 
 # default to vi editing mode unless in Cygwin (where it prevents command-line completion)
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
