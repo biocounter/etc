@@ -579,7 +579,7 @@ set_prompt () {
 	
     # Print the working directory and prompt marker in blue, and reset
     # the text color to the default.
-	PS1+="$Blue[\D{%D %I:%M %p}] \w$Reset"
+	PS1+="$Blue[\D{%m/%d/%y %I:%M %p}] \w$Reset"
 	
 	# show current editing mode
 	mode=`set -o | grep -i '^vi'`
