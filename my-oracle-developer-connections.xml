@@ -1,5 +1,102 @@
 <?xml version = '1.0' encoding = 'UTF-8'?>
 <References xmlns="http://xmlns.oracle.com/adf/jndi">
+   <Reference name="SASTG" className="oracle.jdeveloper.db.adapter.DatabaseProvider" xmlns="">
+      <Factory className="oracle.jdevimpl.db.adapter.DatabaseProviderFactory1212"/>
+      <RefAddresses>
+         <StringRefAddr addrType="OracleConnectionType">
+            <Contents>TNS</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="oraDriverType">
+            <Contents>thin</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="NAV_FOLDER">
+            <Contents>SA</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="user">
+            <Contents>furashg</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="role">
+            <Contents/>
+         </StringRefAddr>
+         <StringRefAddr addrType="NoPasswordConnection">
+            <Contents>TRUE</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="subtype">
+            <Contents>oraJDBC</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="KERBEROS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="OS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="Connection-Color-For-Editors">
+            <Contents>-16777216</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="ConnName">
+            <Contents>SASTG</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="RaptorConnectionType">
+            <Contents>Oracle</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="customUrl">
+            <Contents>SASTG</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="SavePassword">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="driver">
+            <Contents>oracle.jdbc.OracleDriver</Contents>
+         </StringRefAddr>
+      </RefAddresses>
+   </Reference>
+   <Reference name="UAZELSUP" className="oracle.jdeveloper.db.adapter.DatabaseProvider" xmlns="">
+      <Factory className="oracle.jdevimpl.db.adapter.DatabaseProviderFactory1212"/>
+      <RefAddresses>
+         <StringRefAddr addrType="OracleConnectionType">
+            <Contents>TNS</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="oraDriverType">
+            <Contents>thin</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="NAV_FOLDER">
+            <Contents>ELM</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="user">
+            <Contents>FURASHG</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="role">
+            <Contents/>
+         </StringRefAddr>
+         <StringRefAddr addrType="NoPasswordConnection">
+            <Contents>TRUE</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="subtype">
+            <Contents>oraJDBC</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="KERBEROS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="OS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="ConnName">
+            <Contents>UAZELSUP</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="RaptorConnectionType">
+            <Contents>Oracle</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="customUrl">
+            <Contents>UAZELSUP</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="SavePassword">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="driver">
+            <Contents>oracle.jdbc.OracleDriver</Contents>
+         </StringRefAddr>
+      </RefAddresses>
+   </Reference>
    <Reference name="UAZHRSTG" className="oracle.jdeveloper.db.adapter.DatabaseProvider" xmlns="">
       <Factory className="oracle.jdevimpl.db.adapter.DatabaseProviderFactory1212"/>
       <RefAddresses>
@@ -8,6 +105,168 @@
          </StringRefAddr>
          <StringRefAddr addrType="oraDriverType">
             <Contents>thin</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="NAV_FOLDER">
+            <Contents>HCM</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="user">
+            <Contents>FURASHG</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="role">
+            <Contents/>
+         </StringRefAddr>
+         <StringRefAddr addrType="NoPasswordConnection">
+            <Contents>TRUE</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="subtype">
+            <Contents>oraJDBC</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="KERBEROS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="OS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="ConnName">
+            <Contents>UAZHRSTG</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="RaptorConnectionType">
+            <Contents>Oracle</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="customUrl">
+            <Contents>UAZHRSTG</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="SavePassword">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="driver">
+            <Contents>oracle.jdbc.OracleDriver</Contents>
+         </StringRefAddr>
+      </RefAddresses>
+   </Reference>
+   <Reference name="SATST" className="oracle.jdeveloper.db.adapter.DatabaseProvider" xmlns="">
+      <Factory className="oracle.jdevimpl.db.adapter.DatabaseProviderFactory1212"/>
+      <RefAddresses>
+         <StringRefAddr addrType="OracleConnectionType">
+            <Contents>TNS</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="oraDriverType">
+            <Contents>thin</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="NAV_FOLDER">
+            <Contents>SA</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="user">
+            <Contents>furashg</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="role">
+            <Contents/>
+         </StringRefAddr>
+         <StringRefAddr addrType="NoPasswordConnection">
+            <Contents>TRUE</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="subtype">
+            <Contents>oraJDBC</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="KERBEROS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="OS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="Connection-Color-For-Editors">
+            <Contents>-16777216</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="ConnName">
+            <Contents>SATST</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="RaptorConnectionType">
+            <Contents>Oracle</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="customUrl">
+            <Contents>SATST</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="SavePassword">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="driver">
+            <Contents>oracle.jdbc.OracleDriver</Contents>
+         </StringRefAddr>
+      </RefAddresses>
+   </Reference>
+   <Reference name="UAZHRDMO" className="oracle.jdeveloper.db.adapter.DatabaseProvider" xmlns="">
+      <Factory className="oracle.jdevimpl.db.adapter.DatabaseProviderFactory1212"/>
+      <RefAddresses>
+         <StringRefAddr addrType="oraDriverType">
+            <Contents>thin</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="Connection-Color-For-Editors">
+            <Contents>-16777216</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="RaptorConnectionType">
+            <Contents>Oracle</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="OracleConnectionType">
+            <Contents>TNS</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="PreferfedFetchSize">
+            <Contents>500</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="ConnName">
+            <Contents>UAZHRDMO</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="driver">
+            <Contents>oracle.jdbc.OracleDriver</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="port">
+            <Contents>1521</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="serviceName">
+            <Contents>uazhrdmo.mosaic.arizona.edu</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="OS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="hostname">
+            <Contents>uaz-dv-scan-01.mosaic.arizona.edu</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="SavePassword">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="subtype">
+            <Contents>oraJDBC</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="customUrl">
+            <Contents>jdbc:oracle:thin:@(DESCRIPTION=    (ADDRESS_LIST=      (FAILOVER=on)      (LOAD_BALANCE=on)      (ADDRESS=        (PROTOCOL=TCP)        (HOST=uaz-dv-scan-01.mosaic.arizona.edu)        (PORT=1521)      )    )    (CONNECT_DATA=      (SERVER=dedicated)      (SERVICE_NAME=uazhrdmo.mosaic.arizona.edu)      (FAILOVER_MODE=        (TYPE=select)        (METHOD=basic)      )    )  )</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="NoPasswordConnection">
+            <Contents>TRUE</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="NAV_FOLDER">
+            <Contents>HCM</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="KERBEROS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="user">
+            <Contents>furashg</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="role">
+            <Contents/>
+         </StringRefAddr>
+      </RefAddresses>
+   </Reference>
+   <Reference name="UAZHRDEV" className="oracle.jdeveloper.db.adapter.DatabaseProvider" xmlns="">
+      <Factory className="oracle.jdevimpl.db.adapter.DatabaseProviderFactory1212"/>
+      <RefAddresses>
+         <StringRefAddr addrType="OracleConnectionType">
+            <Contents>TNS</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="oraDriverType">
+            <Contents>thin</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="NAV_FOLDER">
+            <Contents>HCM</Contents>
          </StringRefAddr>
          <StringRefAddr addrType="user">
             <Contents>furashg</Contents>
@@ -28,26 +287,82 @@
             <Contents>false</Contents>
          </StringRefAddr>
          <StringRefAddr addrType="ConnName">
-            <Contents>UAZHRSTG</Contents>
+            <Contents>UAZHRDEV</Contents>
          </StringRefAddr>
          <StringRefAddr addrType="RaptorConnectionType">
             <Contents>Oracle</Contents>
          </StringRefAddr>
          <StringRefAddr addrType="customUrl">
-            <Contents>UAZHRSTG</Contents>
+            <Contents>UAZHRDEV</Contents>
          </StringRefAddr>
          <StringRefAddr addrType="SavePassword">
-            <Contents>true</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="password">
-            <Contents>UTqUFodjlz+3Hjhs80koLw==</Contents>
+            <Contents>false</Contents>
          </StringRefAddr>
          <StringRefAddr addrType="driver">
             <Contents>oracle.jdbc.OracleDriver</Contents>
          </StringRefAddr>
       </RefAddresses>
    </Reference>
-   <Reference name="UAZHRDEV" className="oracle.jdeveloper.db.adapter.DatabaseProvider" xmlns="">
+   <Reference name="UAZHRDM2" className="oracle.jdeveloper.db.adapter.DatabaseProvider" xmlns="">
+      <Factory className="oracle.jdevimpl.db.adapter.DatabaseProviderFactory1212"/>
+      <RefAddresses>
+         <StringRefAddr addrType="oraDriverType">
+            <Contents>thin</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="RaptorConnectionType">
+            <Contents>Oracle</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="OracleConnectionType">
+            <Contents>TNS</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="PreferfedFetchSize">
+            <Contents>500</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="ConnName">
+            <Contents>UAZHRDM2</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="driver">
+            <Contents>oracle.jdbc.OracleDriver</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="port">
+            <Contents>1521</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="OS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="serviceName">
+            <Contents>uazhrdm2.mosaic.arizona.edu</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="hostname">
+            <Contents>uaz-dv-scan-01.mosaic.arizona.edu</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="SavePassword">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="subtype">
+            <Contents>oraJDBC</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="customUrl">
+            <Contents>jdbc:oracle:thin:@(DESCRIPTION=    (ADDRESS_LIST=      (FAILOVER=on)      (LOAD_BALANCE=on)      (ADDRESS=        (PROTOCOL=TCP)        (HOST=uaz-dv-scan-01.mosaic.arizona.edu)        (PORT=1521)      )    )    (CONNECT_DATA=      (SERVER=dedicated)      (SERVICE_NAME=uazhrdm2.mosaic.arizona.edu)      (FAILOVER_MODE=        (TYPE=select)        (METHOD=basic)      )    )  )</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="NoPasswordConnection">
+            <Contents>TRUE</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="NAV_FOLDER">
+            <Contents>HCM</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="KERBEROS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="user">
+            <Contents>furashg</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="role">
+            <Contents/>
+         </StringRefAddr>
+      </RefAddresses>
+   </Reference>
+   <Reference name="SADEV" className="oracle.jdeveloper.db.adapter.DatabaseProvider" xmlns="">
       <Factory className="oracle.jdevimpl.db.adapter.DatabaseProviderFactory1212"/>
       <RefAddresses>
          <StringRefAddr addrType="OracleConnectionType">
@@ -56,8 +371,11 @@
          <StringRefAddr addrType="oraDriverType">
             <Contents>thin</Contents>
          </StringRefAddr>
+         <StringRefAddr addrType="NAV_FOLDER">
+            <Contents>SA</Contents>
+         </StringRefAddr>
          <StringRefAddr addrType="user">
-            <Contents>FURASHG</Contents>
+            <Contents>furashg</Contents>
          </StringRefAddr>
          <StringRefAddr addrType="role">
             <Contents/>
@@ -74,67 +392,17 @@
          <StringRefAddr addrType="OS_AUTHENTICATION">
             <Contents>false</Contents>
          </StringRefAddr>
-         <StringRefAddr addrType="RaptorConnectionType">
-            <Contents>Oracle</Contents>
-         </StringRefAddr>
          <StringRefAddr addrType="ConnName">
-            <Contents>UAZHRDEV</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="customUrl">
-            <Contents>UAZHRDEV</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="password">
-            <Contents>vcIH9iqXN6FXdhEl0LI57w==</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="SavePassword">
-            <Contents>true</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="driver">
-            <Contents>oracle.jdbc.OracleDriver</Contents>
-         </StringRefAddr>
-      </RefAddresses>
-   </Reference>
-   <Reference name="UAZHRTST" className="oracle.jdeveloper.db.adapter.DatabaseProvider" xmlns="">
-      <Factory className="oracle.jdevimpl.db.adapter.DatabaseProviderFactory1212"/>
-      <RefAddresses>
-         <StringRefAddr addrType="OracleConnectionType">
-            <Contents>TNS</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="oraDriverType">
-            <Contents>thin</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="user">
-            <Contents>FURASHG</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="role">
-            <Contents/>
-         </StringRefAddr>
-         <StringRefAddr addrType="NoPasswordConnection">
-            <Contents>TRUE</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="subtype">
-            <Contents>oraJDBC</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="KERBEROS_AUTHENTICATION">
-            <Contents>false</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="OS_AUTHENTICATION">
-            <Contents>false</Contents>
+            <Contents>SADEV</Contents>
          </StringRefAddr>
          <StringRefAddr addrType="RaptorConnectionType">
             <Contents>Oracle</Contents>
          </StringRefAddr>
-         <StringRefAddr addrType="ConnName">
-            <Contents>UAZHRTST</Contents>
-         </StringRefAddr>
          <StringRefAddr addrType="customUrl">
-            <Contents>UAZHRTST</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="password">
-            <Contents>KFq53ELVtxwSrOXuBidCwQ==</Contents>
+            <Contents>SADEV</Contents>
          </StringRefAddr>
          <StringRefAddr addrType="SavePassword">
-            <Contents>true</Contents>
+            <Contents>false</Contents>
          </StringRefAddr>
          <StringRefAddr addrType="driver">
             <Contents>oracle.jdbc.OracleDriver</Contents>
@@ -150,52 +418,8 @@
          <StringRefAddr addrType="oraDriverType">
             <Contents>thin</Contents>
          </StringRefAddr>
-         <StringRefAddr addrType="user">
-            <Contents>FURASHG</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="role">
-            <Contents/>
-         </StringRefAddr>
-         <StringRefAddr addrType="NoPasswordConnection">
-            <Contents>TRUE</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="subtype">
-            <Contents>oraJDBC</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="KERBEROS_AUTHENTICATION">
-            <Contents>false</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="OS_AUTHENTICATION">
-            <Contents>false</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="RaptorConnectionType">
-            <Contents>Oracle</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="ConnName">
-            <Contents>UAZELSTG</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="customUrl">
-            <Contents>UAZELSTG</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="password">
-            <Contents>KFq53ELVtxwlDjBNyE3Jvg==</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="SavePassword">
-            <Contents>true</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="driver">
-            <Contents>oracle.jdbc.OracleDriver</Contents>
-         </StringRefAddr>
-      </RefAddresses>
-   </Reference>
-   <Reference name="HRPRDGEN" className="oracle.jdeveloper.db.adapter.DatabaseProvider" xmlns="">
-      <Factory className="oracle.jdevimpl.db.adapter.DatabaseProviderFactory1212"/>
-      <RefAddresses>
-         <StringRefAddr addrType="OracleConnectionType">
-            <Contents>TNS</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="oraDriverType">
-            <Contents>thin</Contents>
+         <StringRefAddr addrType="NAV_FOLDER">
+            <Contents>ELM</Contents>
          </StringRefAddr>
          <StringRefAddr addrType="user">
             <Contents>FURASHG</Contents>
@@ -216,19 +440,16 @@
             <Contents>false</Contents>
          </StringRefAddr>
          <StringRefAddr addrType="ConnName">
-            <Contents>HRPRDGEN</Contents>
+            <Contents>UAZELSTG</Contents>
          </StringRefAddr>
          <StringRefAddr addrType="RaptorConnectionType">
             <Contents>Oracle</Contents>
          </StringRefAddr>
          <StringRefAddr addrType="customUrl">
-            <Contents>HRPRDGEN</Contents>
+            <Contents>UAZELSTG</Contents>
          </StringRefAddr>
          <StringRefAddr addrType="SavePassword">
-            <Contents>true</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="password">
-            <Contents>KFq53ELVtxwlDjBNyE3Jvg==</Contents>
+            <Contents>false</Contents>
          </StringRefAddr>
          <StringRefAddr addrType="driver">
             <Contents>oracle.jdbc.OracleDriver</Contents>
@@ -244,6 +465,9 @@
          <StringRefAddr addrType="oraDriverType">
             <Contents>thin</Contents>
          </StringRefAddr>
+         <StringRefAddr addrType="NAV_FOLDER">
+            <Contents>ELM</Contents>
+         </StringRefAddr>
          <StringRefAddr addrType="user">
             <Contents>FURASHG</Contents>
          </StringRefAddr>
@@ -262,20 +486,17 @@
          <StringRefAddr addrType="OS_AUTHENTICATION">
             <Contents>false</Contents>
          </StringRefAddr>
-         <StringRefAddr addrType="RaptorConnectionType">
-            <Contents>Oracle</Contents>
-         </StringRefAddr>
          <StringRefAddr addrType="ConnName">
             <Contents>UAZELDEV</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="RaptorConnectionType">
+            <Contents>Oracle</Contents>
          </StringRefAddr>
          <StringRefAddr addrType="customUrl">
             <Contents>UAZELDEV</Contents>
          </StringRefAddr>
-         <StringRefAddr addrType="password">
-            <Contents>KFq53ELVtxwlDjBNyE3Jvg==</Contents>
-         </StringRefAddr>
          <StringRefAddr addrType="SavePassword">
-            <Contents>true</Contents>
+            <Contents>false</Contents>
          </StringRefAddr>
          <StringRefAddr addrType="driver">
             <Contents>oracle.jdbc.OracleDriver</Contents>
@@ -291,6 +512,59 @@
          <StringRefAddr addrType="oraDriverType">
             <Contents>thin</Contents>
          </StringRefAddr>
+         <StringRefAddr addrType="NAV_FOLDER">
+            <Contents>HCM</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="user">
+            <Contents>furashg</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="role">
+            <Contents/>
+         </StringRefAddr>
+         <StringRefAddr addrType="NoPasswordConnection">
+            <Contents>TRUE</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="subtype">
+            <Contents>oraJDBC</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="KERBEROS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="OS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="Connection-Color-For-Editors">
+            <Contents>-16777216</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="ConnName">
+            <Contents>HRSUPGEN</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="RaptorConnectionType">
+            <Contents>Oracle</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="customUrl">
+            <Contents>HRSUPGEN</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="SavePassword">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="driver">
+            <Contents>oracle.jdbc.OracleDriver</Contents>
+         </StringRefAddr>
+      </RefAddresses>
+   </Reference>
+   <Reference name="UAZELPRD" className="oracle.jdeveloper.db.adapter.DatabaseProvider" xmlns="">
+      <Factory className="oracle.jdevimpl.db.adapter.DatabaseProviderFactory1212"/>
+      <RefAddresses>
+         <StringRefAddr addrType="OracleConnectionType">
+            <Contents>TNS</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="oraDriverType">
+            <Contents>thin</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="NAV_FOLDER">
+            <Contents>ELM</Contents>
+         </StringRefAddr>
          <StringRefAddr addrType="user">
             <Contents>FURASHG</Contents>
          </StringRefAddr>
@@ -309,20 +583,400 @@
          <StringRefAddr addrType="OS_AUTHENTICATION">
             <Contents>false</Contents>
          </StringRefAddr>
+         <StringRefAddr addrType="Connection-Color-For-Editors">
+            <Contents>-65536</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="ConnName">
+            <Contents>UAZELPRD</Contents>
+         </StringRefAddr>
          <StringRefAddr addrType="RaptorConnectionType">
             <Contents>Oracle</Contents>
          </StringRefAddr>
-         <StringRefAddr addrType="ConnName">
-            <Contents>HRSUPGEN</Contents>
-         </StringRefAddr>
          <StringRefAddr addrType="customUrl">
-            <Contents>HRSUPGEN</Contents>
-         </StringRefAddr>
-         <StringRefAddr addrType="password">
-            <Contents>KFq53ELVtxwlDjBNyE3Jvg==</Contents>
+            <Contents>UAZELPRD</Contents>
          </StringRefAddr>
          <StringRefAddr addrType="SavePassword">
-            <Contents>true</Contents>
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="driver">
+            <Contents>oracle.jdbc.OracleDriver</Contents>
+         </StringRefAddr>
+      </RefAddresses>
+   </Reference>
+   <Reference name="UAZELTST" className="oracle.jdeveloper.db.adapter.DatabaseProvider" xmlns="">
+      <Factory className="oracle.jdevimpl.db.adapter.DatabaseProviderFactory1212"/>
+      <RefAddresses>
+         <StringRefAddr addrType="OracleConnectionType">
+            <Contents>TNS</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="oraDriverType">
+            <Contents>thin</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="NAV_FOLDER">
+            <Contents>ELM</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="user">
+            <Contents>FURASHG</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="role">
+            <Contents/>
+         </StringRefAddr>
+         <StringRefAddr addrType="NoPasswordConnection">
+            <Contents>TRUE</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="subtype">
+            <Contents>oraJDBC</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="KERBEROS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="OS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="ConnName">
+            <Contents>UAZELTST</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="RaptorConnectionType">
+            <Contents>Oracle</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="customUrl">
+            <Contents>UAZELTST</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="SavePassword">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="driver">
+            <Contents>oracle.jdbc.OracleDriver</Contents>
+         </StringRefAddr>
+      </RefAddresses>
+   </Reference>
+   <Reference name="ELSUPGEN" className="oracle.jdeveloper.db.adapter.DatabaseProvider" xmlns="">
+      <Factory className="oracle.jdevimpl.db.adapter.DatabaseProviderFactory1212"/>
+      <RefAddresses>
+         <StringRefAddr addrType="OracleConnectionType">
+            <Contents>TNS</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="oraDriverType">
+            <Contents>thin</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="NAV_FOLDER">
+            <Contents>ELM</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="user">
+            <Contents>FURASHG</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="role">
+            <Contents/>
+         </StringRefAddr>
+         <StringRefAddr addrType="NoPasswordConnection">
+            <Contents>TRUE</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="subtype">
+            <Contents>oraJDBC</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="KERBEROS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="OS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="ConnName">
+            <Contents>ELSUPGEN</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="RaptorConnectionType">
+            <Contents>Oracle</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="customUrl">
+            <Contents>UAZELSUP</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="SavePassword">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="driver">
+            <Contents>oracle.jdbc.OracleDriver</Contents>
+         </StringRefAddr>
+      </RefAddresses>
+   </Reference>
+   <Reference name="UAZHRTST" className="oracle.jdeveloper.db.adapter.DatabaseProvider" xmlns="">
+      <Factory className="oracle.jdevimpl.db.adapter.DatabaseProviderFactory1212"/>
+      <RefAddresses>
+         <StringRefAddr addrType="oraDriverType">
+            <Contents>thin</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="RaptorConnectionType">
+            <Contents>Oracle</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="OracleConnectionType">
+            <Contents>TNS</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="PreferfedFetchSize">
+            <Contents>500</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="ConnName">
+            <Contents>UAZHRTST</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="driver">
+            <Contents>oracle.jdbc.OracleDriver</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="port">
+            <Contents>1521</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="OS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="serviceName">
+            <Contents>uazhrtst.mosaic.arizona.edu</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="hostname">
+            <Contents>uaz-dv-scan-01.mosaic.arizona.edu</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="SavePassword">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="subtype">
+            <Contents>oraJDBC</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="customUrl">
+            <Contents>jdbc:oracle:thin:@(DESCRIPTION=    (ADDRESS_LIST=      (FAILOVER=on)      (LOAD_BALANCE=on)      (ADDRESS=        (PROTOCOL=TCP)        (HOST=uaz-dv-scan-01.mosaic.arizona.edu)        (PORT=1521)      )    )    (CONNECT_DATA=      (SERVER=dedicated)      (SERVICE_NAME=uazhrtst.mosaic.arizona.edu)      (FAILOVER_MODE=        (TYPE=select)        (METHOD=basic)      )    )  )</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="NoPasswordConnection">
+            <Contents>TRUE</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="NAV_FOLDER">
+            <Contents>HCM</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="KERBEROS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="user">
+            <Contents>furashg</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="role">
+            <Contents/>
+         </StringRefAddr>
+      </RefAddresses>
+   </Reference>
+   <Reference name="UAZHRCNV" className="oracle.jdeveloper.db.adapter.DatabaseProvider" xmlns="">
+      <Factory className="oracle.jdevimpl.db.adapter.DatabaseProviderFactory1212"/>
+      <RefAddresses>
+         <StringRefAddr addrType="oraDriverType">
+            <Contents>thin</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="RaptorConnectionType">
+            <Contents>Oracle</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="OracleConnectionType">
+            <Contents>TNS</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="PreferfedFetchSize">
+            <Contents>500</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="ConnName">
+            <Contents>UAZHRCNV</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="driver">
+            <Contents>oracle.jdbc.OracleDriver</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="port">
+            <Contents>1521</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="OS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="serviceName">
+            <Contents>uazhrcnv.mosaic.arizona.edu</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="hostname">
+            <Contents>uaz-dv-scan-01.mosaic.arizona.edu</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="SavePassword">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="subtype">
+            <Contents>oraJDBC</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="customUrl">
+            <Contents>jdbc:oracle:thin:@(DESCRIPTION=    (ADDRESS_LIST=      (LOAD_BALANCE=on)      (ADDRESS=        (PROTOCOL=TCP)        (HOST=uaz-dv-scan-01.mosaic.arizona.edu)        (PORT=1521)      )    )    (CONNECT_DATA=      (SERVER=dedicated)      (SERVICE_NAME=uazhrcnv.mosaic.arizona.edu)    )  )</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="NoPasswordConnection">
+            <Contents>TRUE</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="NAV_FOLDER">
+            <Contents>HCM</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="KERBEROS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="user">
+            <Contents>furashg</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="role">
+            <Contents/>
+         </StringRefAddr>
+      </RefAddresses>
+   </Reference>
+   <Reference name="HRPRDGEN" className="oracle.jdeveloper.db.adapter.DatabaseProvider" xmlns="">
+      <Factory className="oracle.jdevimpl.db.adapter.DatabaseProviderFactory1212"/>
+      <RefAddresses>
+         <StringRefAddr addrType="oraDriverType">
+            <Contents>thin</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="Connection-Color-For-Editors">
+            <Contents>-65536</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="RaptorConnectionType">
+            <Contents>Oracle</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="OracleConnectionType">
+            <Contents>TNS</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="PreferfedFetchSize">
+            <Contents>500</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="ConnName">
+            <Contents>HRPRDGEN</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="driver">
+            <Contents>oracle.jdbc.OracleDriver</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="port">
+            <Contents>1521</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="serviceName">
+            <Contents>hrprdgen.mosaic.arizona.edu</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="OS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="hostname">
+            <Contents>uaz-pd-scan-01.mosaic.arizona.edu</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="SavePassword">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="subtype">
+            <Contents>oraJDBC</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="customUrl">
+            <Contents>jdbc:oracle:thin:@(DESCRIPTION=    (ADDRESS_LIST=      (FAILOVER=on)      (LOAD_BALANCE=on)      (ADDRESS=        (PROTOCOL=TCP)        (HOST=uaz-pd-scan-01.mosaic.arizona.edu)        (PORT=1521)      )    )    (CONNECT_DATA=      (SERVER=dedicated)      (SERVICE_NAME=hrprdgen.mosaic.arizona.edu)      (FAILOVER_MODE=        (TYPE=select)        (METHOD=basic)      )    )  )</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="NoPasswordConnection">
+            <Contents>TRUE</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="NAV_FOLDER">
+            <Contents>HCM</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="KERBEROS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="user">
+            <Contents>FURASHG</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="role">
+            <Contents/>
+         </StringRefAddr>
+      </RefAddresses>
+   </Reference>
+   <Reference name="UAZHRCFG" className="oracle.jdeveloper.db.adapter.DatabaseProvider" xmlns="">
+      <Factory className="oracle.jdevimpl.db.adapter.DatabaseProviderFactory1212"/>
+      <RefAddresses>
+         <StringRefAddr addrType="oraDriverType">
+            <Contents>thin</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="RaptorConnectionType">
+            <Contents>Oracle</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="OracleConnectionType">
+            <Contents>TNS</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="PreferfedFetchSize">
+            <Contents>500</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="ConnName">
+            <Contents>UAZHRCFG</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="driver">
+            <Contents>oracle.jdbc.OracleDriver</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="port">
+            <Contents>1521</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="OS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="serviceName">
+            <Contents>uazhrcfg.mosaic.arizona.edu</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="hostname">
+            <Contents>uaz-dv-scan-01.mosaic.arizona.edu</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="SavePassword">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="subtype">
+            <Contents>oraJDBC</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="customUrl">
+            <Contents>jdbc:oracle:thin:@(DESCRIPTION=    (ADDRESS_LIST=      (FAILOVER=on)      (LOAD_BALANCE=on)      (ADDRESS=        (PROTOCOL=TCP)        (HOST=uaz-dv-scan-01.mosaic.arizona.edu)        (PORT=1521)      )    )    (CONNECT_DATA=      (SERVER=dedicated)      (SERVICE_NAME=uazhrcfg.mosaic.arizona.edu)      (FAILOVER_MODE=        (TYPE=select)        (METHOD=basic)      )    )  )</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="NoPasswordConnection">
+            <Contents>TRUE</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="NAV_FOLDER">
+            <Contents>HCM</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="KERBEROS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="user">
+            <Contents>furashg</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="role">
+            <Contents/>
+         </StringRefAddr>
+      </RefAddresses>
+   </Reference>
+   <Reference name="UAZHRCFD" className="oracle.jdeveloper.db.adapter.DatabaseProvider" xmlns="">
+      <Factory className="oracle.jdevimpl.db.adapter.DatabaseProviderFactory1212"/>
+      <RefAddresses>
+         <StringRefAddr addrType="OracleConnectionType">
+            <Contents>TNS</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="oraDriverType">
+            <Contents>thin</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="NAV_FOLDER">
+            <Contents>HCM</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="user">
+            <Contents>FURASHG</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="role">
+            <Contents/>
+         </StringRefAddr>
+         <StringRefAddr addrType="NoPasswordConnection">
+            <Contents>TRUE</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="subtype">
+            <Contents>oraJDBC</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="KERBEROS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="OS_AUTHENTICATION">
+            <Contents>false</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="ConnName">
+            <Contents>UAZHRCFD</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="RaptorConnectionType">
+            <Contents>Oracle</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="customUrl">
+            <Contents>UAZHRCFD</Contents>
+         </StringRefAddr>
+         <StringRefAddr addrType="SavePassword">
+            <Contents>false</Contents>
          </StringRefAddr>
          <StringRefAddr addrType="driver">
             <Contents>oracle.jdbc.OracleDriver</Contents>
