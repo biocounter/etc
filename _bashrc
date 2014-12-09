@@ -488,6 +488,7 @@ alias j='jobs -l'
 alias jjs='rlwrap $JAVA_HOME/bin/jjs'
 alias jpgtopdf='for f in *.jp*g ; do convert ./"$f" ./"${f%.jpg}.pdf"; done'
 alias ld='du -hs * | grep -e "^[0-9].*G\s" -e "^[0-9].*M\s" | sort -n -k 2,2 -s'
+alias ld='ls -alt | head -11'										  # list top 10 recent mod files
 alias less='less -r'                                                                              # raw control characters
 alias ltree="find . -print | sed -e 's;[^/]*/;|____;g;s;____|; |;g'" 	# print a directory tree
 alias markdown='python3 -m markdown  '
