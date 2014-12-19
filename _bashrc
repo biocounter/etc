@@ -33,7 +33,6 @@ shopt -s nocaseglob              # Use case-insensitive filename globbing
 shopt -s sourcepath
 ulimit -S -c 0                   # Don't want any coREDumps
 
-# set alt-e as a toggle for VI line editing 
 if [[ ${BASH_VERSINFO[5]} == *cygwin* ]]; then
 	set -o emacs
 	export EDITOR=emacs
@@ -452,6 +451,18 @@ cd_func () {
 }
 alias cd=cd_func
 
+function toggle_editor_mode() {
+	if [[ $EDITOR == "emacs" ]]; then
+		set -o vi
+		export EDITOR=vi				# use the VI editor for line editing
+	else
+		set -o emacs
+		export EDITOR=emacs
+	fi
+}
+export -f toggle_editor_mode
+alias tm=toggle_editor_mode
+
 #-------------------------------------------------------------------------------
 # environment variables
 #-------------------------------------------------------------------------------
@@ -584,9 +595,9 @@ set_prompt () {
 	# show current editing mode
 	mode=`set -o | grep -i '^vi'`
 	if [[ $mode == *on* ]]; then
-		mode_char='+';
+		mode_char='v';
 	else
-		mode_char='-';
+		mode_char='e';
 	fi
 	PS1+="\n[$mode_char] \$ "
 	
